@@ -47,7 +47,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
       - name: Temporarily stage APK on the current branch for Drive upload
-        if: ${{ inputs.stage_apk_for_drive }}
+        if: ${{ contains(github.event.head_commit.message, '[stage-apk-for-drive]') }}
         run: |
           mkdir -p .drive-handoff
           cp android/app/build/outputs/apk/debug/TU-VR-Player-debug.apk .drive-handoff/TU-VR-Player-debug.apk
