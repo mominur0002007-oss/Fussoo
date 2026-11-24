@@ -2,6 +2,12 @@ name: Android APK
 
 on:
   workflow_dispatch:
+    inputs:
+      stage_apk_for_drive:
+        description: Temporarily stage the APK on this branch for Drive upload, then remove it
+        type: boolean
+        required: false
+        default: false
   push:
     paths:
       - 'android/**'
@@ -13,7 +19,7 @@ on:
       - '.github/workflows/android-apk.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -40,3 +46,13 @@ jobs:
           path: android/app/build/outputs/apk/debug/TU-VR-Player-debug.apk
           if-no-files-found: error
           retention-days: 14
+      - name: Temporarily stage APK on the current branch for Drive upload
+        if: ${{ inputs.stage_apk_for_drive }}
+        run: |
+          mkdir -p .drive-handoff
+          cp android/app/build/outputs/apk/debug/TU-VR-Player-debug.apk .drive-handoff/TU-VR-Player-debug.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .drive-handoff/TU-VR-Player-debug.apk
+          git commit -m "ci: temporary APK handoff for Drive"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
