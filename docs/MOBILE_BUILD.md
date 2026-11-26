@@ -15,7 +15,7 @@ This is exactly how the committed APKs in this repository are produced.
    build files; otherwise open the run and press **Run workflow**.
 4. Wait ~2–4 minutes. The run’s **Artifacts** section has `TUVR-APK`.
 5. Download it. On Android you get a `.zip`; extract it with any file manager
-   (Files by Google, Material Files, …) and tap `TUVR-1.0.0-release.apk`.
+   (Files by Google, Material Files, …) and tap `TUVR-1.0.1-release.apk`.
 6. Android asks for permission to install unknown apps for the app that is opening the
    APK — allow it once, then install/update.
 

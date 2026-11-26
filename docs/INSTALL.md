@@ -11,7 +11,7 @@
 
 ## Install the APK
 
-1. Get `TUVR-1.0.0-release.apk`:
+1. Get `TUVR-1.0.1-release.apk`:
    * GitHub → **Actions** → newest *TU VR APK* run → **Artifacts** → `TUVR-APK`
      (a `.zip` on mobile) → unzip.
    * Or take it from a local/CI build (see [BUILD.md](BUILD.md)).

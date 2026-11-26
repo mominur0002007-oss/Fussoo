@@ -1,17 +1,51 @@
 # Testing report
 
-Honest summary first: **the app has been built, but it has not been run on a phone yet.**
-The development environment for this milestone had no Android device, no emulator and no
-local Android SDK, so every conclusion below is either a *build result*, a *static analysis
-result* or a *code-level verification*. Nothing here claims that a screen looked right in a
-headset. The checklist at the end is what needs to be executed on the TECNO Spark 10C.
+Honest summary, current state: **1.0.1 has been built in CI; 1.0.0 was installed and run on
+the TECNO Spark 10C by the user.** That first real-device round found real defects, listed
+below with what was changed. Nothing in this file claims a screen "looks right in the
+headset" until the checklist at the end has been executed on the phone again.
+
+## Round 1 — first install on the phone (build 1.0.0)
+
+Reported by the user, verbatim in spirit:
+
+| Report | Diagnosis | Change in 1.0.1 |
+| --- | --- | --- |
+| "player is upside down" | `SurfaceTexture.getTransformMatrix()` returns a transform defined for 0..1 texture coordinates, but it was being applied to centre-based UVs *and* before the SBS/TAB sub-rect was taken | `video.vert` rewritten: `aUv * uUvScale + uUvOffset` → rotation about the sub-rect centre → `uFlipV` → `uTexMatrix` last. A **Flip** control and a **Rotate** control were added to the cinema bar as an escape hatch for files whose metadata lies |
+| "nothing is working except the browser; the app closes by itself" | Two causes: (a) unhandled exceptions in scene callbacks killed the process, (b) the home/cinema control rows sat near the resting gaze direction, so dwell selection fired Exit without the user meaning it | Every scene callback (`onCreated`, `update`, `drawEye`, `collectPanels`, `onPanelSelected`, `onSettingsChanged`, `onResumed`, `onPaused`, `release`) is now wrapped and recorded in a `Problems` log instead of crashing; background work is guarded the same way; Exit/Back are two-step ("look again to confirm"); selection is armed 1.2 s after a scene appears; the dwell timer pauses while the head is moving; control rows moved below the horizon |
+| "I can't see 3d theater or 3d world in vr mode" | The theater palette was almost black (`0xFF07060A` walls) and there was no outdoor world at all | Cinema and theater walls/floor/light panels brightened and given depth-sorted geometry; new **3D world** environment (sky gradient, ground, mountain silhouettes, sun); nebula band for space; direct **Theater** and **3D world** tiles on the VR home screen |
+| "make the search option easy" | Search existed only as a small field on the phone gallery | New in-VR search screen: a real text field floats over the top of the stereo view, the phone keyboard types into it and the grid filters live on top of the cached list; home screen has a **Search** tile |
+| "add youtube in vr mode" | No YouTube entry point | **YouTube** tile on the VR home screen opens `m.youtube.com` in the VR browser; the VR browser has an **YouTube app** panel and the phone browser hands `watch?v=` links to the installed YouTube app (a WebView is not a player) |
+| "the player is not very stable" | Decoder kept running (and kept audio) when the activity went to the background | `VrScene.onPaused()`; the cinema pauses the decoder on pause and resumes only if it was playing; the VR browser stops page capture while backgrounded |
+
+Round 1 also confirmed the parts that worked: the VR browser rendered pages in stereo, the
+app installed and launched, and the packaged permissions were accepted.
+
+## Round 2 — what still has to be verified (build 1.0.1)
+
+1. Open a normal 16:9 video in VR Cinema → picture upright, not mirrored. If it is upside
+   down, press **Flip** once; if it is sideways, press **Rotate**.
+2. SBS and TAB files: pick **Mode** until the right half is in each eye; use **Swap eyes** if
+   the depth looks inverted.
+3. Watch for 3 minutes: does the app stay open? Does anything close it by itself?
+4. Look at **Exit** in the cinema for one second, look away, then look back for one second →
+   it should ask "look again to confirm" only on the second deliberate activation.
+5. Home screen → **Theater** and **3D world**: the room/sky must be visible around the
+   panels, not a black void.
+6. Home screen → **Search**: the phone keyboard appears over the stereo view; typing filters
+   the grid.
+7. Home screen → **YouTube** → the VR browser shows m.youtube.com; open a video page and
+   press **YouTube app** to hand it to the app.
+8. If it still closes: open **Diagnostics** → the report now contains `== LAST CRASH ==` and
+   `== RECOVERED PROBLEMS ==`; share it. The same text is written to `Download/TUVR-crash.txt`
+   (API 29+) or `Android/data/com.tuvr.app/files/last_crash.txt`.
 
 ## What was verified, and how
 
 | Verification | Method | Result |
 | --- | --- | --- |
 | Project builds | GitHub Actions, `ubuntu-latest`, Temurin JDK 17, `platforms;android-35`, `build-tools;35.0.0`, Gradle 8.9 | **`assembleDebug` and `assembleRelease` succeed** — release APK 6,508,313 bytes, debug 8,169,955 bytes |
-| Manifest as packaged | `aapt2 dump badging` on the release APK (report in `ci/lint.txt`) | `com.tuvr.app` v1.0.0, minSdk 24, targetSdk 34, compileSdk 35, permissions exactly as intended |
+| Manifest as packaged | `aapt2 dump badging` on the release APK (report in `ci/lint.txt`) | `com.tuvr.app` v1.0.1, minSdk 24, targetSdk 34, compileSdk 35, permissions exactly as intended |
 | Release signing | `apksigner verify --print-certs` | verified; signer `CN=TU VR, OU=Personal, O=TU VR Project, L=Dhaka, C=BD`, cert SHA-256 `c1e2b519…ff11d41` |
 | Resource wiring | script that extracts every `R.string/R.id/R.drawable/R.array/R.layout/R.color/R.dimen/R.style` reference from Java and XML and compares it with what is defined | 0 unresolved references (55 Java files) |
 | Resource validity | AAPT resource linking during the build | passes (duplicate string, malformed style item and `app:max` misuse were found and fixed this way) |

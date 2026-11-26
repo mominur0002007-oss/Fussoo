@@ -26,7 +26,7 @@ android/
   `build-tools;35.0.0`, `platform-tools` and Gradle 8.9.
 * Builds `assembleDebug` **and** `assembleRelease`.
 * Uploads the artifact **`TUVR-APK`** containing
-  `TUVR-1.0.0-debug.apk`, `TUVR-1.0.0-release.apk` and `SHA256SUMS.txt`.
+  `TUVR-1.0.1-debug.apk`, `TUVR-1.0.1-release.apk` and `SHA256SUMS.txt`.
 * On a failure it commits the compile errors to `ci/last-build.log`; on success it
   commits the lint summary to `ci/lint.txt`. That way the build can be debugged from
   the repository even when the Actions log is not reachable from a phone.
@@ -40,7 +40,7 @@ inside.
 GitHub stores artifacts on a host that some environments (and some networks) cannot
 reach. If you need the APK somewhere that can only pull from git, create the marker file
 `ci/request-apk` and push any change under `android/**` (or the workflow file). On success
-the workflow commits `release-assets/TUVR-1.0.0-release.apk` plus its `SHA256SUMS.txt`
+the workflow commits `release-assets/TUVR-1.0.1-release.apk` plus its `SHA256SUMS.txt`
 to the branch and deletes the marker again. Delete the `release-assets/` folder afterwards
 so the repository does not keep growing with binaries — the blob stays in history.
 

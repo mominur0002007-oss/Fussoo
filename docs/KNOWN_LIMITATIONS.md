@@ -82,6 +82,26 @@ Read this before judging the app. Every item is a deliberate boundary, not a hid
 * The Mali-G57 handles this workload well, but a closed headset heats a phone faster than
   hand-held use; expect the adaptive scaler to kick in on long sessions.
 
+## Known after the first phone install (1.0.0 → 1.0.1)
+
+* **YouTube in VR**: the VR browser shows YouTube's mobile site as a texture that is
+  captured a few times per second. That is fine for browsing titles, but it is *not* a video
+  player; video playback inside the VR browser will be choppy. The **YouTube app** panel
+  hands a video id to the installed YouTube app instead, which leaves TU VR. There is no
+  YouTube API integration and no support for downloading videos.
+* **In-VR search** is typed on the phone screen: search mode shows a normal text field over
+  the stereo view and uses the phone keyboard. The headset has no text input of its own.
+* **Environment switching is visual only**: the cinema/theater/world are geometry without
+  textures or reflections; there is no ambient occlusion or lighting model beyond vertex
+  colour. This is a deliberate choice for the T606/Mali-G57, not a promised feature.
+* **A hard crash still closes the process.** Recoverable failures (scene callbacks, decoder
+  updates, background work) no longer do, and the crash text is written to
+  `Download/TUVR-crash.txt` and shown in Diagnostics, but Android cannot resume a process
+  whose main thread has died.
+* **Video orientation** depends on what the file and the decoder report. If a file still
+  arrives mirrored or rotated on your device, the cinema has Flip and Rotate controls and
+  *Swap eyes* for stereo files; those choices last for the session, not per file, on 1.0.1.
+
 ## Platform
 
 * targetSdk 34. Android 15/16 behaviour changes are untested.
