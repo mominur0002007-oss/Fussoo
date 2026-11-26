@@ -49,6 +49,9 @@ Read this before judging the app. Every item is a deliberate boundary, not a hid
   indexed need the Storage Access Framework picker; folders added that way are re-scanned
   on demand, not watched live.
 * Thumbnails are memory-only and rebuilt after the process is killed.
+* In VR the grid supports paging, folder filtering and favourites; **search and sorting are
+  only in the phone gallery** (typing inside a headset with gaze selection is not usable).
+  The VR list is always ordered newest first, so it doubles as "recents".
 * No editing, no transcoding, no downloading of remote video.
 
 ## Web screen
@@ -59,7 +62,8 @@ Read this before judging the app. Every item is a deliberate boundary, not a hid
 * Some devices/WebView builds do not expose pixels to a software canvas. When that happens
   the app detects a flat/blank capture and shows an explanatory message instead of a black
   panel; use the phone browser in that case.
-* No tabs, no bookmarks UI beyond the shared bookmark list, no downloads, no ad blocking.
+* No tabs and no downloads. Bookmarks are created in the phone browser; the VR browser
+  shows pages but has no bookmark panel (Back/Forward/Reload/URL/Exit only).
 * HTTPS only (`usesCleartextTraffic=false`).
 
 ## VR apps / launcher
