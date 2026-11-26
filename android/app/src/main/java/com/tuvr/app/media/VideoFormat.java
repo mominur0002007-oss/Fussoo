@@ -22,6 +22,8 @@ public final class VideoFormat {
     public int rotationDeg = 0;
     /** Mirrors the picture vertically; some files/decoders need it. */
     public boolean flipVertical = false;
+    /** Horizontal mirror, for panoramic spheres built the other way round. */
+    public boolean mirrorHorizontal = false;
 
     public static VideoFormat defaults(Context context) {
         AppSettings s = AppSettings.get(context);
@@ -46,6 +48,7 @@ public final class VideoFormat {
         f.swapEyes = swapEyes;
         f.rotationDeg = rotationDeg;
         f.flipVertical = flipVertical;
+        f.mirrorHorizontal = mirrorHorizontal;
         return f;
     }
 
@@ -84,6 +87,9 @@ public final class VideoFormat {
         }
         if (flipVertical) {
             base += " · flipped";
+        }
+        if (mirrorHorizontal) {
+            base += " · mirrored";
         }
         return base;
     }

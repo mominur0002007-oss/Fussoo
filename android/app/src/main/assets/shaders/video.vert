@@ -7,6 +7,7 @@ uniform vec2 uUvOffset;    // where that rectangle starts, e.g. (0.0, 0.0) or (0
 // Orientation correction applied inside that rectangle.
 uniform float uUvRotation; // radians
 uniform float uFlipV;      // 1.0 mirrors vertically, 0.0 leaves it alone
+uniform float uFlipH;      // 1.0 mirrors horizontally
 
 attribute vec3 aPos;
 attribute vec2 aUv;
@@ -29,6 +30,9 @@ void main() {
     // 3. Optional mirroring, kept inside the rectangle.
     if (uFlipV > 0.5) {
         uv.y = uUvOffset.y + uUvScale.y - (uv.y - uUvOffset.y);
+    }
+    if (uFlipH > 0.5) {
+        uv.x = uUvOffset.x + uUvScale.x - (uv.x - uUvOffset.x);
     }
 
     // 4. Finally the SurfaceTexture transform. This matrix is defined for

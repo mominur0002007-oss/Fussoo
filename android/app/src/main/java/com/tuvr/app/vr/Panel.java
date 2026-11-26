@@ -73,8 +73,11 @@ public final class Panel {
             up[2] = -up[2];
         }
         MathUtil.normalize(up);
-        // Re-orthogonalise right so it stays perpendicular to both.
-        MathUtil.cross(up, normal, right);
+        // Right-handed basis: the quad's local +Z is -normal (it faces the user),
+        // so +X must be (normal x up). Using (up x normal) mirrored every panel,
+        // which is why text read like a mirror image and icons looked like they
+        // were printed on the back of the tile.
+        MathUtil.cross(normal, up, right);
         MathUtil.normalize(right);
 
         // Model matrix: quad (+-1) -> panel rectangle facing the user.

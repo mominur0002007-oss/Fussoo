@@ -21,6 +21,40 @@ Reported by the user, verbatim in spirit:
 Round 1 also confirmed the parts that worked: the VR browser rendered pages in stereo, the
 app installed and launched, and the packaged permissions were accepted.
 
+## Round 4 — mirrored text, world behind the user, gyro feel (build 1.0.3)
+
+Report: "the text showing me like a mirror", "the icons are on my back, I have to turn around",
+"the app is not working with the phone's gyroscope properly", "3d backgrounds are not that good".
+
+**Mirrored text — root cause found by simulation, not by guessing.** The basis in
+`Panel.updateBasis()` was left-handed: the quad's local +Z is `-normal` (it must face the user),
+so a right-handed basis needs `right = normal × up`, but the code used `right = up × normal`.
+Replicating the whole pipeline (quaternion → view → projection, `SurfaceTexture` contracts
+excluded) in a script and projecting a panel's corners showed:
+
+| basis | uv(0,0) on screen | uv(1,0) on screen | readable |
+| --- | --- | --- | --- |
+| before | x = **+2.08** (right) | x = −2.08 (left) | **no** — mirrored |
+| after | x = −2.08 (left) | x = **+2.08** (right) | yes |
+
+A determinant of −1 also means the readable side of the texture faced *away* from the user,
+which is why the icons behaved as if they were printed on the back of each tile.
+
+**World behind the user.** Two independent causes, both fixed:
+
+* the display rotation was read once per resume, so a stale value from `Display.getRotation()`
+  left the world 180° out for the whole session → it is now polled every 400 ms and a change
+  recentres instead of leaving the view rotated;
+* a scene used to inherit whatever heading the sensor happened to have, so with "recenter on
+  start" off the home row could sit behind the sitter → every scene creation now recentres.
+
+**Gyro feel.** `TYPE_GAME_ROTATION_VECTOR` (gyro + accelerometer) is now preferred over the
+magnetometer-fused `TYPE_ROTATION_VECTOR`, because a viewer box plus nearby metal makes compass
+yaw jump or crawl. The low-pass filter is now time-based (`tau = 8..40 ms` from the smoothing
+setting) instead of a fixed per-frame factor, so tracking latency no longer depends on the
+frame rate. The camera maths itself was verified: yaw +30° moves the world 30° the opposite way,
+pitch +20° moves it down — no inversion.
+
 ## Round 3 — the upside-down UI (build 1.0.2)
 
 The user sent two screenshots from Drive. The sensor screen showed healthy hardware

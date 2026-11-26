@@ -376,6 +376,11 @@ public class VrRenderer implements GLSurfaceView.Renderer {
                 scene = null;
             }
             armSelection();
+            // The scene's panels are laid out around the origin, so the heading has
+            // to be zeroed here as well: otherwise a gadget that starts with an
+            // arbitrary yaw reference (any gyro-only track) can leave the home
+            // screen behind the user.
+            tracker.recenter();
             settingsDirty = true;
         }
         if (settingsDirty) {
@@ -962,6 +967,13 @@ public class VrRenderer implements GLSurfaceView.Renderer {
     public void drawVideo(Mesh mesh, float[] model, float uvScaleX, float uvScaleY,
                           float uvOffsetX, float uvOffsetY, float uvRotationRad, float flipV,
                           float alpha) {
+        drawVideo(mesh, model, uvScaleX, uvScaleY, uvOffsetX, uvOffsetY, uvRotationRad,
+                flipV, 0f, alpha);
+    }
+
+    public void drawVideo(Mesh mesh, float[] model, float uvScaleX, float uvScaleY,
+                          float uvOffsetX, float uvOffsetY, float uvRotationRad, float flipV,
+                          float flipH, float alpha) {
         if (videoProgram == null || !videoTexture.isReady()) {
             return;
         }
@@ -973,6 +985,7 @@ public class VrRenderer implements GLSurfaceView.Renderer {
         videoProgram.set2f("uUvOffset", uvOffsetX, uvOffsetY);
         videoProgram.set1f("uUvRotation", uvRotationRad);
         videoProgram.set1f("uFlipV", flipV);
+        videoProgram.set1f("uFlipH", flipH);
         videoProgram.set1f("uAlpha", alpha);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, videoTexture.textureId());

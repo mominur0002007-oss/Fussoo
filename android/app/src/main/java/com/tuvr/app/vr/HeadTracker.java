@@ -12,8 +12,8 @@ import com.tuvr.app.core.AppSettings;
  * 3DoF head tracking.
  *
  * Sensor priority:
- *   1. TYPE_ROTATION_VECTOR (fused rotation, includes magnetometer heading)
- *   2. TYPE_GAME_ROTATION_VECTOR (fused rotation without magnetometer)
+ *   1. TYPE_GAME_ROTATION_VECTOR (gyro + accelerometer, no magnetometer)
+ *   2. TYPE_ROTATION_VECTOR (fused rotation, includes magnetometer heading)
  *   3. Gyroscope + accelerometer complementary fusion implemented here
  *   4. Nothing (touch / drag look-around fallback)
  *
@@ -86,6 +86,7 @@ public class HeadTracker implements SensorEventListener {
     private final float[] scratchEuler = new float[3];
     private final float[] eulerDeg = new float[3];
     private boolean smoothInitialized;
+    private long lastOutputNanos;
 
     private float sensitivity = 1f;
     private float smoothing = 0.35f;
@@ -126,6 +127,10 @@ public class HeadTracker implements SensorEventListener {
         gameRotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
         gyroSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        // Inside a viewer the compass heading is unreliable: the box, the phone's
+        // own magnets and any nearby metal make TYPE_ROTATION_VECTOR yaw jump or
+        // crawl. The game rotation vector (gyro + accelerometer, no magnetometer)
+        // is what phone VR viewers use, so it is tried first.
     }
 
     public boolean hasRotationSensor() {
@@ -177,20 +182,21 @@ public class HeadTracker implements SensorEventListener {
         sampleCount = 0;
 
         boolean registered = false;
-        if (rotationSensor != null) {
-            registered = sensorManager.registerListener(this, rotationSensor,
-                    SensorManager.SENSOR_DELAY_GAME);
-            if (registered) {
-                source = SOURCE_ROTATION;
-                sensorName = "ROTATION_VECTOR";
-            }
-        }
-        if (!registered && gameRotationSensor != null) {
+        // Gyro-based first: no compass, so no yaw drift from nearby metal.
+        if (gameRotationSensor != null) {
             registered = sensorManager.registerListener(this, gameRotationSensor,
                     SensorManager.SENSOR_DELAY_GAME);
             if (registered) {
                 source = SOURCE_GAME_ROTATION;
                 sensorName = "GAME_ROTATION_VECTOR";
+            }
+        }
+        if (!registered && rotationSensor != null) {
+            registered = sensorManager.registerListener(this, rotationSensor,
+                    SensorManager.SENSOR_DELAY_GAME);
+            if (registered) {
+                source = SOURCE_ROTATION;
+                sensorName = "ROTATION_VECTOR";
             }
         }
         if (!registered && gyroSensor != null && accelSensor != null) {
@@ -510,8 +516,16 @@ public class HeadTracker implements SensorEventListener {
             System.arraycopy(qScratch, 0, qSmooth, 0, 4);
             smoothInitialized = true;
         } else {
-            float alpha = 1f - smoothing * 0.92f;
-            MathUtil.quatSlerp(qSmooth, qScratch, MathUtil.clamp(alpha, 0.08f, 1f), qSmooth);
+            // Time-based low pass: a fixed per-frame factor would feel sluggish on
+            // a device that renders at 30 fps and twitchy at 60. tau maps the
+            // "smoothing" setting to 8..40 ms of lag.
+            long nowNs = System.nanoTime();
+            float dt = lastOutputNanos == 0L ? 0.016f
+                    : Math.min(0.1f, (nowNs - lastOutputNanos) / 1e9f);
+            lastOutputNanos = nowNs;
+            float tau = 0.008f + MathUtil.clamp(smoothing, 0f, 1f) * 0.032f;
+            float alpha = MathUtil.clamp(1f - (float) Math.exp(-dt / tau), 0.05f, 1f);
+            MathUtil.quatSlerp(qSmooth, qScratch, alpha, qSmooth);
         }
 
         MathUtil.quatMultiply(qRecenterOffset, qSmooth, qRecentered);

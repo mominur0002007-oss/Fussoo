@@ -213,6 +213,36 @@ public abstract class VrActivity extends AppCompatActivity
     /* lifecycle                                                          */
     /* ------------------------------------------------------------------ */
 
+    /* ---- display rotation watchdog -------------------------------------- */
+
+    private final android.os.Handler uiHandler =
+            new android.os.Handler(android.os.Looper.getMainLooper());
+    private int lastDisplayRotation = -1;
+
+    /**
+     * {@code Display.getRotation()} can lag behind the real orientation right after
+     * a rotation (and on some vendor ROMs it stays stale for a long time). Reading
+     * it once in onResume meant a phone inserted the other way round in the box
+     * left the whole world 180 degrees behind the user, so the rotation is polled
+     * and a change recentres the view instead of leaving it rotated.
+     */
+    private final Runnable rotationWatchdog = new Runnable() {
+        @Override
+        public void run() {
+            int rotation = displayRotation();
+            if (rotation != lastDisplayRotation) {
+                boolean firstRead = lastDisplayRotation == -1;
+                lastDisplayRotation = rotation;
+                tracker.setDisplayRotation(rotation);
+                if (!firstRead) {
+                    tracker.recenter();
+                    showWhisper("Screen turned - view recentred");
+                }
+            }
+            uiHandler.postDelayed(this, 400L);
+        }
+    };
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -228,11 +258,14 @@ public abstract class VrActivity extends AppCompatActivity
         }
         statsView.setVisibility(AppSettings.get(this).showFps()
                 ? View.VISIBLE : View.GONE);
+        uiHandler.removeCallbacks(rotationWatchdog);
+        uiHandler.post(rotationWatchdog);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        uiHandler.removeCallbacks(rotationWatchdog);
         if (!isChangingConfigurations()) {
             renderer.setPaused(true);
             surfaceView.onPause();

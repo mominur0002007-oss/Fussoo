@@ -68,35 +68,59 @@ public final class EnvironmentBuilder {
         Env env = new Env();
         env.type = type;
         switch (type) {
-            case CINEMA:
-                // A dim room: wall box plus a warm floor and cool trim lines.
-                env.backdrop = room(11f, 5f, -1.7f, 3.2f, 0xFF1B2836, 0xFF0A1018, 0xFF131C26);
+            case CINEMA: {
+                // A small screening room: wall box, screen surround, ceiling light
+                // strips, side sconces and a carpet in cool blue-grey.
+                Buf b = new Buf(4096);
+                addRoom(b, 11f, 5f, -1.7f, 3.2f, 0xFF1B2836, 0xFF0A1018, 0xFF131C26);
+                addScreenSurround(b, 3.4f, -1.6f, 2.2f, 0xFF05080C, 0xFF10161E);
+                addCeilingStrips(b, 9f, 3.15f, 0xFF2E6E86);
+                addSconces(b, 9.4f, -0.4f, 2.0f, 0xFF2FA8C8);
+                addCarpet(b, -6.5f, -1.68f, 0xFF16202B);
+                env.backdrop = b.toMesh();
                 env.floor = floor(12f, 0xFF1A2430, 0xFF070B10);
                 env.accents = accentStrips(0xFF3AC0E0, 0.5f);
                 break;
-            case THEATER:
-                // Warm screening room: walls read even on a dim phone panel.
-                env.backdrop = room(7.5f, 4f, -1.7f, 2.6f, 0xFF3A2418, 0xFF1A0F09, 0xFF241207);
+            }
+            case THEATER: {
+                // Warm screening room with curtains either side of the screen,
+                // sconces on the walls and two rows of seat backs behind you.
+                Buf b = new Buf(4096);
+                addRoom(b, 7.5f, 4f, -1.7f, 2.6f, 0xFF3A2418, 0xFF1A0F09, 0xFF241207);
+                addScreenSurround(b, 3.4f, -1.6f, 2.1f, 0xFF120A05, 0xFF2A1509);
+                addCurtains(b, 3.9f, -1.6f, 2.5f, 0xFF4A1309, 0xFF2A0A05);
+                addSconces(b, 6.2f, -0.2f, 1.8f, 0xFFE0A160);
+                addSeats(b, 5, 3, 1.2f, 0xFF3A1B12, 0xFF1E0C07);
+                addCarpet(b, -4.5f, -1.68f, 0xFF2A1409);
+                env.backdrop = b.toMesh();
                 env.floor = floor(8f, 0xFF2A160C, 0xFF080402);
                 env.accents = accentStrips(0xFFE0A160, 0.3f);
                 env.glow = wallGlow(0xFFB4783C);
                 break;
+            }
             case SPACE:
-                env.backdrop = gradientDome(60f, 0xFF000000, 0xFF070C18, 24, 14);
-                env.stars = starfield(1600, 44f);
-                env.floor = nebula(0xFF0A1430, 0xFF01040A);
+                env.backdrop = gradientDome(60f, 0xFF02040A, 0xFF0A1630, 28, 16);
+                env.stars = starfield(1800, 44f);
+                env.floor = nebula(0xFF102146, 0xFF01040A);
+                env.glow = planet(0xFF2A4E7A, 0xFF6E9BC8);
                 break;
             case AMBIENT:
                 env.backdrop = gradientDome(45f, 0xFF04161C, 0xFF07242E, 22, 12);
                 env.floor = gridFloor(16f, 0xFF2A8FA6);
                 env.accents = accentStrips(0xFF2A8FA6, 0.2f);
                 break;
-            case WORLD:
-                // Outdoor: sky gradient, ground, mountain silhouettes and a sun.
-                env.backdrop = worldSky();
+            case WORLD: {
+                // Outdoor: sky gradient, two mountain ranges, clouds and a sun.
+                Buf b = new Buf(8192);
+                addWorldSky(b);
+                addMountainRing(b, 62f, -2.5f, 6f, 16, 0xFF1A2A33);
+                addMountainRing(b, 44f, -2.4f, 4f, 22, 0xFF20362E);
+                addClouds(b, 0xFFDCE8F2, 0xFF9FBFD8);
+                env.backdrop = b.toMesh();
                 env.floor = floor(70f, 0xFF2C4227, 0xFF12200F);
                 env.glow = sunDisc();
                 break;
+            }
             case VOID:
             default:
                 env.backdrop = gradientDome(45f, 0xFF04060B, 0xFF0E1622, 24, 12);
@@ -150,11 +174,9 @@ public final class EnvironmentBuilder {
         }
     }
 
-    /** A three-colour wall box around the viewer (no top face, no side flicker). */
-    private static Mesh room(float halfWidth, float halfDepth, float floorY,
-                             float ceilingY, int topColor, int bottomColor, int ceiling) {
-        Buf b = new Buf(4 * 6 * 6 + 6 * 6);
-        // North (in front), south (behind), west, east walls.
+    /** A three-colour wall box around the viewer, appended to {@code b}. */
+    private static void addRoom(Buf b, float halfWidth, float halfDepth, float floorY,
+                                float ceilingY, int topColor, int bottomColor, int ceiling) {
         b.quad(-halfWidth, floorY, -halfDepth, halfWidth, floorY, -halfDepth,
                 -halfWidth, ceilingY, -halfDepth, halfWidth, ceilingY, -halfDepth,
                 bottomColor, topColor);
@@ -167,22 +189,175 @@ public final class EnvironmentBuilder {
         b.quad(halfWidth, floorY, -halfDepth, halfWidth, floorY, halfDepth,
                 halfWidth, ceilingY, -halfDepth, halfWidth, ceilingY, halfDepth,
                 bottomColor, topColor);
-        // Ceiling
         b.quad(-halfWidth, ceilingY, -halfDepth, halfWidth, ceilingY, -halfDepth,
                 -halfWidth, ceilingY, halfDepth, halfWidth, ceilingY, halfDepth,
                 ceiling, ceiling);
+    }
+
+    /**
+     * A dark frame on the front wall so the video has something to sit in; without
+     * it the screen looks like it is floating in a box.
+     */
+    private static void addScreenSurround(Buf b, float halfWidth, float bottom, float top,
+                                          int inner, int outer) {
+        float z = -4.2f;
+        float bar = 0.4f;
+        // bottom bar
+        b.quad(-halfWidth - bar, bottom - bar, z, halfWidth + bar, bottom - bar, z,
+                -halfWidth - bar, bottom, z, halfWidth + bar, bottom, z, inner, outer);
+        // top bar
+        b.quad(-halfWidth - bar, top, z, halfWidth + bar, top, z,
+                -halfWidth - bar, top + bar, z, halfWidth + bar, top + bar, z, outer, inner);
+        // side bars
+        b.quad(-halfWidth - bar, bottom, z, -halfWidth, bottom, z,
+                -halfWidth - bar, top, z, -halfWidth, top, z, outer, outer);
+        b.quad(halfWidth, bottom, z, halfWidth + bar, bottom, z,
+                halfWidth, top, z, halfWidth + bar, top, z, outer, outer);
+    }
+
+    /** Two long light strips just under the ceiling. */
+    private static void addCeilingStrips(Buf b, float halfWidth, float y, int color) {
+        float z0 = -3.6f;
+        float z1 = 3.6f;
+        float w = 0.5f;
+        for (int side = -1; side <= 1; side += 2) {
+            float x = side * halfWidth * 0.55f;
+            int edge = blend(color, 0xFF05080C, 0.75f);
+            b.quad(x - w, y, z0, x + w, y, z0, x - w, y, z1, x + w, y, z1, color, edge);
+        }
+    }
+
+    /** Small wall lights on both side walls. */
+    private static void addSconces(Buf b, float x, float y, float spacing, int color) {
+        float w = 0.35f;
+        float h = 0.9f;
+        int edge = blend(color, 0xFF08060A, 0.6f);
+        for (int side = -1; side <= 1; side += 2) {
+            float wallX = side * x;
+            for (int i = -1; i <= 1; i++) {
+                float z = i * spacing;
+                b.quad(wallX, y, z - w, wallX, y, z + w,
+                        wallX, y + h, z - w, wallX, y + h, z + w, color, edge);
+            }
+        }
+    }
+
+    /** Curtains flanking the screen: alternating vertical strips. */
+    private static void addCurtains(Buf b, float xEdge, float bottom, float top,
+                                    int light, int dark) {
+        float z = -4.0f;
+        int strips = 7;
+        float width = 0.34f;
+        for (int side = -1; side <= 1; side += 2) {
+            for (int i = 0; i < strips; i++) {
+                float x0 = side * (xEdge + i * width);
+                float x1 = x0 + side * width * 0.92f;
+                int color = (i % 2 == 0) ? light : dark;
+                b.quad(x0, bottom, z, x1, bottom, z, x0, top, z, x1, top, z,
+                        blend(color, 0xFF000000, 0.45f), color);
+            }
+        }
+    }
+
+    /** Rows of seat backs behind the viewer, so turning around is not a void. */
+    private static void addSeats(Buf b, int columns, int rows, float zStart,
+                                 int back, int dark) {
+        float seatWidth = 0.52f;
+        float seatHeight = 0.62f;
+        float rowGap = 1.05f;
+        float floorY = -1.6f;
+        for (int r = 0; r < rows; r++) {
+            float z = zStart + r * rowGap;
+            float damp = 1f - r * 0.12f;
+            int color = blend(back, dark, 1f - damp);
+            for (int c = 0; c < columns; c++) {
+                float x = (c - (columns - 1) * 0.5f) * seatWidth * 1.25f;
+                float halfW = seatWidth * 0.5f;
+                b.quad(x - halfW, floorY, z, x + halfW, floorY, z,
+                        x - halfW, floorY + seatHeight, z, x + halfW, floorY + seatHeight, z,
+                        color, blend(color, 0xFFFFFFFF, 0.12f));
+            }
+        }
+    }
+
+    /** A lighter patch of floor in front of the seats. */
+    private static void addCarpet(Buf b, float zFront, float y, int color) {
+        float w = 3.2f;
+        float zBack = -1.2f;
+        b.quad(-w, y, zFront, w, y, zFront, -w, y, zBack, w, y, zBack,
+                blend(color, 0xFF000000, 0.5f), color);
+    }
+
+    /** A planet disc low on the horizon of the space environment. */
+    private static Mesh planet(int body, int rim) {
+        Buf b = new Buf(64 * 6);
+        float cx = 26f;
+        float cy = 12f;
+        float cz = -40f;
+        float radius = 9f;
+        int segments = 28;
+        for (int i = 0; i < segments; i++) {
+            double a0 = 2 * Math.PI * i / segments;
+            double a1 = 2 * Math.PI * (i + 1) / segments;
+            b.vertex(cx, cy, cz, body);
+            b.vertex(cx + (float) Math.cos(a0) * radius, cy + (float) Math.sin(a0) * radius, cz,
+                    blend(body, rim, 0.5f));
+            b.vertex(cx + (float) Math.cos(a1) * radius, cy + (float) Math.sin(a1) * radius, cz,
+                    rim);
+        }
         return b.toMesh();
     }
 
-    /** Blue sky with a horizon haze, plus mountain silhouettes. */
-    private static Mesh worldSky() {
-        Buf b = new Buf(64 * 6);
+    /** A ring of mountain triangles. */
+    private static void addMountainRing(Buf b, float radius, float baseY, float maxHeight,
+                                        int peaks, int color) {
+        int edge = blend(color, 0xFF7FA0B8, 0.35f);
+        for (int i = 0; i < peaks; i++) {
+            double a0 = 2 * Math.PI * i / peaks;
+            double a1 = 2 * Math.PI * (i + 1) / peaks;
+            double am = (a0 + a1) * 0.5;
+            float h = baseY + 3f + (float) ((i * 37 % 11) * (maxHeight / 11f));
+            b.vertex((float) Math.cos(a0) * radius, baseY, (float) Math.sin(a0) * radius, color);
+            b.vertex((float) Math.cos(a1) * radius, baseY, (float) Math.sin(a1) * radius, color);
+            b.vertex((float) Math.cos(am) * radius, h, (float) Math.sin(am) * radius, edge);
+        }
+    }
+
+    /** Flat cloud slabs high above the ground. */
+    private static void addClouds(Buf b, int top, int bottom) {
+        float[][] clouds = {
+                {-34f, 34f, -52f, 16f, 5f},
+                {-6f, 40f, -60f, 20f, 6f},
+                {28f, 30f, -48f, 14f, 4.5f},
+                {46f, 38f, -18f, 18f, 5.5f},
+                {-44f, 30f, 4f, 15f, 5f},
+                {8f, 44f, 22f, 22f, 6f},
+        };
+        for (float[] c : clouds) {
+            float x = c[0];
+            float y = c[1];
+            float z = c[2];
+            float w = c[3] * 0.5f;
+            float h = c[4] * 0.5f;
+            b.quad(x - w, y - h, z, x + w, y - h, z, x - w, y + h, z, x + w, y + h, z,
+                    bottom, top);
+            b.quad(x - w * 0.7f, y + h, z, x + w * 0.7f, y + h, z,
+                    x - w * 0.5f, y + h * 1.5f, z, x + w * 0.5f, y + h * 1.5f, z, top, top);
+        }
+    }
+
+    private static int blend(int from, int to, float t) {
+        return lerpColor(from, to, t);
+    }
+
+    /** Blue sky with a horizon haze. */
+    private static void addWorldSky(Buf b) {
         float radius = 80f;
         int skyTop = 0xFF0B2A5A;
-        int skyHorizon = 0xFF8FB6D8;
+        int skyMid = 0xFF3E7AB4;
+        int skyHorizon = 0xFFBFD8EA;
         int ground = 0xFF243521;
 
-        // Sky dome as a ring of quads (cheap, only 32 segments).
         int segments = 32;
         for (int i = 0; i < segments; i++) {
             double a0 = 2 * Math.PI * i / segments;
@@ -191,32 +366,13 @@ public final class EnvironmentBuilder {
             float z0 = (float) Math.sin(a0) * radius;
             float x1 = (float) Math.cos(a1) * radius;
             float z1 = (float) Math.sin(a1) * radius;
-            b.quad(x0, -4f, z0, x1, -4f, z1, x0, radius, z0, x1, radius, z1,
-                    skyHorizon, skyTop);
+            // horizon band
+            b.quad(x0, -4f, z0, x1, -4f, z1, x0, 6f, z0, x1, 6f, z1, skyHorizon, skyMid);
+            // upper sky
+            b.quad(x0, 6f, z0, x1, 6f, z1, x0, radius, z0, x1, radius, z1, skyMid, skyTop);
+            // haze strip just above the horizon so mountains do not float
+            b.quad(x0, -2.4f, z0, x1, -2.4f, z1, x0, -4f, z0, x1, -4f, z1, ground, skyHorizon);
         }
-        // Mountain silhouettes just above the horizon.
-        int peaks = 16;
-        for (int i = 0; i < peaks; i++) {
-            double a0 = 2 * Math.PI * i / peaks;
-            double a1 = 2 * Math.PI * (i + 1) / peaks;
-            float r = 62f;
-            float h = 6f + (float) ((i * 37 % 11) * 0.9);
-            b.vertex((float) Math.cos(a0) * r, -2.5f, (float) Math.sin(a0) * r, ground);
-            b.vertex((float) Math.cos(a1) * r, -2.5f, (float) Math.sin(a1) * r, ground);
-            b.vertex((float) Math.cos((a0 + a1) * 0.5) * r, h, (float) Math.sin((a0 + a1) * 0.5) * r,
-                    0xFF1A2A33);
-        }
-        return b.toMesh();
-    }
-
-    /** Two soft vertical panels either side of the screen: the room's key light. */
-    private static Mesh wallGlow(int color) {
-        Buf b = new Buf(12 * 6);
-        b.quad(-6f, -1.5f, -3.9f, -3.2f, -1.5f, -3.9f, -6f, 2.4f, -3.9f, -3.2f, 2.4f, -3.9f,
-                color, 0xFF120A05);
-        b.quad(3.2f, -1.5f, -3.9f, 6f, -1.5f, -3.9f, 3.2f, 2.4f, -3.9f, 6f, 2.4f, -3.9f,
-                color, 0xFF120A05);
-        return b.toMesh();
     }
 
     /** A bright disc standing in for the sun (drawn with the star point program). */

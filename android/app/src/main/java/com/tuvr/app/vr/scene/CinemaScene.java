@@ -176,8 +176,11 @@ public class CinemaScene implements VrScene {
                 () -> changeBrightness(1));
         addControl(renderer, "volume", "\u25B6\u25B6", "Volume", yaws2[5], row2, iconRowDistance,
                 this::toggleVolumeStep);
-        addControl(renderer, "environment", "\u25A3", "Env", 52f, row2, iconRowDistance,
+        float[] yaws3 = {-40f, -24f, -8f, 8f, 24f, 40f, 56f};
+        addControl(renderer, "environment", "\u25A3", "Env", yaws3[6], row2, iconRowDistance,
                 this::cycleEnvironment);
+        addControl(renderer, "mirror", "\u21C4", "Mirror", -56f, row2, iconRowDistance,
+                this::toggleMirror);
 
         progressPanel = new Panel("progress");
         progressPanel.interactive = false;
@@ -317,6 +320,11 @@ public class CinemaScene implements VrScene {
         host.showWhisper(format.flipVertical ? "Vertical flip on" : "Vertical flip off");
     }
 
+    private void toggleMirror() {
+        format.mirrorHorizontal = !format.mirrorHorizontal;
+        host.showWhisper(format.mirrorHorizontal ? "Mirror on" : "Mirror off");
+    }
+
     private void cycleRotation() {
         format.rotationDeg = (format.rotationDeg + 90) % 360;
         meshAspect = -1f;
@@ -442,6 +450,7 @@ public class CinemaScene implements VrScene {
             offsetY = uvEye == 0 ? 0f : 0.5f;
         }
         float flip = format.flipVertical ? 1f : 0f;
+        float flipH = format.mirrorHorizontal ? 1f : 0f;
 
         if (format.projection == VideoFormat.PROJ_FLAT) {
             float width = BASE_SCREEN_WIDTH_M * settings.screenSize();
@@ -469,17 +478,17 @@ public class CinemaScene implements VrScene {
             model[13] = settings.screenY();
             model[14] = -settings.screenDistance();
             renderer.drawVideo(flatMesh, model, scaleX, scaleY, offsetX, offsetY,
-                    format.rotationDeg * MathUtil.DEG_TO_RAD, flip, 1f);
+                    format.rotationDeg * MathUtil.DEG_TO_RAD, flip, flipH, 1f);
         } else {
             MathUtil.identity(model);
             if (format.projection == VideoFormat.PROJ_VR360) {
                 if (sphereMesh != null) {
                     renderer.drawVideo(sphereMesh, model, scaleX, scaleY, offsetX, offsetY,
-                            format.rotationDeg * MathUtil.DEG_TO_RAD, flip, 1f);
+                            format.rotationDeg * MathUtil.DEG_TO_RAD, flip, flipH, 1f);
                 }
             } else if (hemisphereMesh != null) {
                 renderer.drawVideo(hemisphereMesh, model, scaleX, scaleY, offsetX, offsetY,
-                        format.rotationDeg * MathUtil.DEG_TO_RAD, flip, 1f);
+                        format.rotationDeg * MathUtil.DEG_TO_RAD, flip, flipH, 1f);
             }
         }
     }
