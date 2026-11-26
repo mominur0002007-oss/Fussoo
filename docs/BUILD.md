@@ -35,6 +35,15 @@ Download: open the run, scroll to **Artifacts**, tap `TUVR-APK`. On Android the
 artifact arrives as a `.zip`; unzip it with any file manager and install the APK
 inside.
 
+### Handing a build over without the artifact host
+
+GitHub stores artifacts on a host that some environments (and some networks) cannot
+reach. If you need the APK somewhere that can only pull from git, create the marker file
+`ci/request-apk` and push any change under `android/**` (or the workflow file). On success
+the workflow commits `release-assets/TUVR-1.0.0-release.apk` plus its `SHA256SUMS.txt`
+to the branch and deletes the marker again. Delete the `release-assets/` folder afterwards
+so the repository does not keep growing with binaries — the blob stays in history.
+
 ## 2. Local build (JDK 17 + Android SDK)
 
 ```bash
