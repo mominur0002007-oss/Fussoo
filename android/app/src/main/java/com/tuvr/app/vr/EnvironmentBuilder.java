@@ -375,6 +375,16 @@ public final class EnvironmentBuilder {
         }
     }
 
+    /** Two soft vertical panels either side of the screen: the room's key light. */
+    private static Mesh wallGlow(int color) {
+        Buf b = new Buf(12 * 6);
+        b.quad(-6f, -1.5f, -3.9f, -3.2f, -1.5f, -3.9f, -6f, 2.4f, -3.9f, -3.2f, 2.4f, -3.9f,
+                color, 0xFF120A05);
+        b.quad(3.2f, -1.5f, -3.9f, 6f, -1.5f, -3.9f, 3.2f, 2.4f, -3.9f, 6f, 2.4f, -3.9f,
+                color, 0xFF120A05);
+        return b.toMesh();
+    }
+
     /** A bright disc standing in for the sun (drawn with the star point program). */
     private static Mesh sunDisc() {
         Buf b = new Buf(6 * 6);
