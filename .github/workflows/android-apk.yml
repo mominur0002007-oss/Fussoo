@@ -12,8 +12,11 @@ on:
         type: boolean
         default: false
   push:
+    # `ci/**` carries the request-apk marker, so dropping that marker in also
+    # triggers the build that hands the APK over.
     paths:
       - 'android/**'
+      - 'ci/**'
       - '.github/workflows/android-apk.yml'
 
 permissions:
