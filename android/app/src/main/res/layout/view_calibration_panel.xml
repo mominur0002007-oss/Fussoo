@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_bar"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/space_m"
+    android:paddingVertical="@dimen/space_s">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Text.TuVr.Caption"
+        android:lineSpacingExtra="2dp"
+        android:text="@string/calibration_hint" />
+
+    <include android:id="@+id/row_lens" layout="@layout/part_slider" />
+    <include android:id="@+id/row_fov" layout="@layout/part_slider" />
+    <include android:id="@+id/row_offset_y" layout="@layout/part_slider" />
+    <include android:id="@+id/row_offset_x" layout="@layout/part_slider" />
+    <include android:id="@+id/row_distortion" layout="@layout/part_slider" />
+    <include android:id="@+id/row_distance" layout="@layout/part_slider" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_s"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_reset"
+            style="@style/Widget.TuVr.TonalButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/action_reset"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btn_save"
+            style="@style/Widget.TuVr.PrimaryButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/action_save"
+            android:textSize="13sp" />
+    </LinearLayout>
+</LinearLayout>

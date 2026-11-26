@@ -1,0 +1,153 @@
+name: TU VR APK
+
+# Builds the TU VR APK entirely in the cloud so that a phone-only
+# developer workflow is possible: push (or press "Run workflow") and
+# download the APK artifact from the run page.
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_apk:
+        description: 'Commit the release APK to the branch (used to hand a build over to Drive)'
+        type: boolean
+        default: false
+  push:
+    # `ci/**` carries the request-apk marker, so dropping that marker in also
+    # triggers the build that hands the APK over.
+    paths:
+      - 'android/**'
+      - 'ci/**'
+      - '.github/workflows/android-apk.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+
+      - name: Install Android platform + build tools
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Assemble debug + release APK
+        run: |
+          set -o pipefail
+          gradle --no-daemon --project-dir android --console=plain \
+            :app:assembleDebug :app:assembleRelease 2>&1 | tee "$RUNNER_TEMP/build.log"
+
+      - name: Stage APKs
+        run: |
+          mkdir -p dist
+          VERSION=$(grep -m1 "versionName" android/app/build.gradle | sed "s/.*versionName *'\(.*\)'.*/\1/")
+          # Uppercase: GITHUB_ENV keys become the environment variable names verbatim.
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "dist/TUVR-$VERSION-debug.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "dist/TUVR-$VERSION-release.apk"
+          cd dist && sha256sum *.apk | tee SHA256SUMS.txt
+          ls -lh
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: TUVR-APK
+          path: dist/**
+          if-no-files-found: error
+          retention-days: 30
+
+      # Optional hand-off: commit the release APK into the branch so it can be fetched
+      # with plain git (used when the Actions artifact host is not reachable).
+      - name: Commit APK for hand-off
+        if: ${{ hashFiles('ci/request-apk') != '' }}
+        run: |
+          mkdir -p release-assets
+          echo "version=[${VERSION}]"
+          APK="dist/TUVR-${VERSION}-release.apk"
+          if [ ! -f "$APK" ]; then
+            APK=$(ls -1 dist/TUVR-*-release.apk | head -1)
+          fi
+          cp "$APK" release-assets/
+          cp dist/SHA256SUMS.txt release-assets/SHA256SUMS.txt
+          ls -l release-assets
+          git config user.name "ci-diagnostics"
+          git config user.email "ci@tuvr.invalid"
+          git add release-assets
+          # Consume the request so later builds do not re-commit the APK.
+          git rm --ignore-unmatch -q ci/request-apk || rm -f ci/request-apk
+          git commit -m "ci: attach release APK for hand-off [skip ci]" || true
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" || true
+
+      # Lint findings and the packaged-APK report are committed back so they can be
+      # reviewed without access to the Actions log.
+      - name: Static analysis (lint)
+        run: |
+          set +e
+          gradle --no-daemon --project-dir android --console=plain :app:lintDebug \
+            > "$RUNNER_TEMP/lint.log" 2>&1
+          mkdir -p ci
+          {
+            echo "TU VR static analysis"
+            echo "run: $GITHUB_RUN_ID"
+            echo
+            grep -E "(Error|Warning):" "$RUNNER_TEMP/lint.log" | head -120
+            echo "---- report head ----"
+            head -120 android/app/build/reports/lint-results-debug.txt 2>/dev/null
+            echo "---- log tail ----"
+            tail -40 "$RUNNER_TEMP/lint.log"
+            echo
+            echo "======== packaged APK ========"
+            ls -l dist 2>/dev/null
+            echo
+            "$ANDROID_SDK_ROOT/build-tools/35.0.0/aapt2" dump badging \
+              dist/TUVR-*-release.apk 2>/dev/null | head -18
+            echo
+            "$ANDROID_SDK_ROOT/build-tools/35.0.0/apksigner" verify --print-certs \
+              dist/TUVR-*-release.apk 2>/dev/null | head -6
+          } > ci/lint.txt
+
+          git config user.name "ci-diagnostics"
+          git config user.email "ci@tuvr.invalid"
+          git add ci/lint.txt
+          git commit -m "ci: lint report for $GITHUB_RUN_ID [skip ci]" || true
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" || true
+
+      # On failure the compile errors are committed back to the branch so that
+      # they can be read without access to the Actions log.
+      - name: Publish build diagnostics
+        if: failure()
+        run: |
+          mkdir -p ci
+          {
+            echo "TU VR build diagnostics"
+            echo "run: $GITHUB_RUN_ID  commit: $GITHUB_SHA"
+            echo
+            grep -E "^e: |error:|Error:|FAILED|What went wrong|Execution failed|> Task .* FAILED" \
+              "$RUNNER_TEMP/build.log" 2>/dev/null | head -400
+            echo
+            grep -A 25 -E "^\* What went wrong|^Caused by:|Could not|Failed to apply" \
+              "$RUNNER_TEMP/build.log" 2>/dev/null | head -200
+            echo
+            echo "---- tail ----"
+            tail -400 "$RUNNER_TEMP/build.log" 2>/dev/null
+          } > ci/last-build.log
+          git config user.name "ci-diagnostics"
+          git config user.email "ci@tuvr.invalid"
+          git add ci/last-build.log
+          git commit -m "ci: build diagnostics for $GITHUB_RUN_ID [skip ci]" || true
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" || true

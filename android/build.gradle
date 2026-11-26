@@ -1,0 +1,6 @@
+// TU VR - The Unlimited Virtual Reality
+// Root build script. Versions are pinned to combinations that are known to work
+// with AGP 8.7.x / Gradle 8.9 / JDK 17 and Android 12 (API 31) devices.
+plugins {
+    id 'com.android.application' version '8.7.3' apply false
+}
