@@ -78,7 +78,7 @@
     <style name="Text.TuVr.Title" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_title</item>
-        <item name="android:textStyle="bold"">true</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0.01</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
