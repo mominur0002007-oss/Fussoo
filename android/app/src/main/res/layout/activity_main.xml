@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_main"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/space_l"
+        android:paddingTop="@dimen/space_xl"
+        android:paddingBottom="@dimen/space_xl">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Text.TuVr.Title"
+                    android:letterSpacing="0.12"
+                    android:text="@string/app_name" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    style="@style/Text.TuVr.Body"
+                    android:text="@string/app_full_name" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_vr"
+                app:tint="@color/accent" />
+        </LinearLayout>
+
+        <!-- Enter VR hero -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.TuVr.GlassCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            app:cardCornerRadius="@dimen/radius_l"
+            app:strokeColor="@color/glass_stroke_accent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_l">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Text.TuVr.SectionLabel"
+                    android:text="@string/home_greeting" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_s"
+                    style="@style/Text.TuVr.Body"
+                    android:text="@string/home_subtitle" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_m"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_enter_vr"
+                        style="@style/Widget.TuVr.PrimaryButton"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:text="@string/home_enter_vr"
+                        app:icon="@drawable/ic_vr"
+                        app:iconTint="@color/text_on_accent" />
+
+                    <TextView
+                        android:id="@+id/txt_viewer_profile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_m"
+                        android:background="@drawable/bg_chip"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="8dp"
+                        style="@style/Text.TuVr.Caption"
+                        android:textColor="@color/text_secondary"/>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Recent -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            style="@style/Text.TuVr.SectionLabel"
+            android:text="@string/home_recent" />
+
+        <TextView
+            android:id="@+id/txt_recent_empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            style="@style/Text.TuVr.Body"
+            android:text="@string/home_recent_empty" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recent_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/space_s" />
+
+        <!-- Main grid -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            style="@style/Text.TuVr.SectionLabel"
+            android:text="@string/home_greeting" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:columnCount="2"
+            android:useDefaultMargins="false">
+
+            <include
+                android:id="@+id/card_cinema"
+                layout="@layout/part_tile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1" />
+
+            <include
+                android:id="@+id/card_gallery"
+                layout="@layout/part_tile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1" />
+
+            <include
+                android:id="@+id/card_browser"
+                layout="@layout/part_tile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1" />
+
+            <include
+                android:id="@+id/card_apps"
+                layout="@layout/part_tile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1" />
+
+            <include
+                android:id="@+id/card_settings"
+                layout="@layout/part_tile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1" />
+
+            <include
+                android:id="@+id/card_diagnostics"
+                layout="@layout/part_tile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1" />
+        </GridLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            style="@style/Text.TuVr.Caption"
+            android:lineSpacingExtra="3dp"
+            android:text="@string/home_tip" />
+    </LinearLayout>
+</ScrollView>

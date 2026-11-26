@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base surfaces -->
+    <color name="bg_deep">#FF04060B</color>
+    <color name="bg_surface">#FF0A0F18</color>
+    <color name="bg_surface_raised">#FF111827</color>
+    <color name="glass_fill">#B3121A28</color>
+    <color name="glass_stroke">#33FFFFFF</color>
+    <color name="glass_stroke_accent">#664DE0FF</color>
+
+    <!-- Accents -->
+    <color name="accent">#FF4DE0FF</color>
+    <color name="accent_dim">#FF2A8FA6</color>
+    <color name="accent_violet">#FF7C5CFF</color>
+    <color name="accent_green">#FF43E39B</color>
+    <color name="accent_amber">#FFFFC46B</color>
+    <color name="danger">#FFFF5C7A</color>
+
+    <!-- Text -->
+    <color name="text_primary">#FFE9F2FF</color>
+    <color name="text_secondary">#FF9AA7BD</color>
+    <color name="text_tertiary">#FF66748C</color>
+    <color name="text_on_accent">#FF04121A</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="scrim">#B3000000</color>
+    <color name="divider">#1FFFFFFF</color>
+</resources>

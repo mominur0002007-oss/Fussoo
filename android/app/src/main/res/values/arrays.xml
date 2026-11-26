@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="viewer_profile_entries">
+        <item>Shinecon VR Box (default)</item>
+        <item>Cardboard v1</item>
+        <item>Cardboard v2</item>
+        <item>Generic 3D box</item>
+        <item>Custom calibration</item>
+    </string-array>
+    <string-array name="viewer_profile_values">
+        <item>shinecon</item>
+        <item>cardboard_v1</item>
+        <item>cardboard_v2</item>
+        <item>generic</item>
+        <item>custom</item>
+    </string-array>
+
+    <string-array name="projection_entries">
+        <item>Flat screen (2D / 3D)</item>
+        <item>VR180</item>
+        <item>VR360</item>
+    </string-array>
+    <string-array name="projection_values">
+        <item>flat</item>
+        <item>vr180</item>
+        <item>vr360</item>
+    </string-array>
+
+    <string-array name="stereo_entries">
+        <item>Mono</item>
+        <item>Side-by-side (3D)</item>
+        <item>Top-and-bottom (3D)</item>
+    </string-array>
+    <string-array name="stereo_values">
+        <item>mono</item>
+        <item>sbs</item>
+        <item>tab</item>
+    </string-array>
+
+    <string-array name="quality_entries">
+        <item>Low (smoothest)</item>
+        <item>Balanced (recommended)</item>
+        <item>High</item>
+    </string-array>
+    <string-array name="quality_values">
+        <item>low</item>
+        <item>balanced</item>
+        <item>high</item>
+    </string-array>
+
+    <string-array name="frame_limit_entries">
+        <item>30 fps (coolest)</item>
+        <item>60 fps (recommended)</item>
+        <item>90 fps (if supported)</item>
+    </string-array>
+    <string-array name="frame_limit_values">
+        <item>30</item>
+        <item>60</item>
+        <item>90</item>
+    </string-array>
+
+    <string-array name="environment_entries">
+        <item>Space</item>
+        <item>Cinema</item>
+        <item>Dark theater</item>
+        <item>Minimal void</item>
+        <item>Ambient grid</item>
+    </string-array>
+    <string-array name="environment_values">
+        <item>space</item>
+        <item>cinema</item>
+        <item>theater</item>
+        <item>void</item>
+        <item>ambient</item>
+    </string-array>
+
+    <string-array name="selection_entries">
+        <item>Head gaze with dwell</item>
+        <item>Touch only</item>
+    </string-array>
+    <string-array name="selection_values">
+        <item>gaze</item>
+        <item>touch</item>
+    </string-array>
+</resources>

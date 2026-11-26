@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TU VR</string>
+    <string name="app_full_name">The Unlimited Virtual Reality</string>
+    <string name="app_tagline">Cardboard-compatible VR for your phone</string>
+
+    <!-- Phone home -->
+    <string name="home_greeting">Ready for VR</string>
+    <string name="home_subtitle">Headset not required to browse. Put the phone in your Shinecon box when you are ready.</string>
+    <string name="home_enter_vr">Enter VR</string>
+    <string name="home_exit_vr">Exit VR</string>
+    <string name="home_card_cinema">VR Cinema</string>
+    <string name="home_card_cinema_desc">Big screen, your videos</string>
+    <string name="home_card_gallery">Media Gallery</string>
+    <string name="home_card_gallery_desc">Videos on this phone</string>
+    <string name="home_card_browser">VR Browser</string>
+    <string name="home_card_browser_desc">Web on a virtual screen</string>
+    <string name="home_card_apps">Apps</string>
+    <string name="home_card_apps_desc">Launch installed apps</string>
+    <string name="home_card_settings">Settings</string>
+    <string name="home_card_settings_desc">Viewer, tracking, quality</string>
+    <string name="home_card_diagnostics">Diagnostics</string>
+    <string name="home_card_diagnostics_desc">Sensors, GPU, report</string>
+    <string name="home_recent">Continue watching</string>
+    <string name="home_recent_empty">Videos you play will show up here.</string>
+    <string name="home_viewer_label">Viewer profile</string>
+    <string name="home_tip">Tip: tap anywhere in VR mode to toggle touch selection instead of head gaze.</string>
+
+    <!-- Gallery -->
+    <string name="gallery_title">Media Gallery</string>
+    <string name="gallery_search_hint">Search videos</string>
+    <string name="gallery_empty">No videos found. Use “Open file” to add a video from storage, or check that the storage permission is granted.</string>
+    <string name="gallery_empty_folder">This folder is empty.</string>
+    <string name="gallery_open_file">Open file</string>
+    <string name="gallery_sort">Sort</string>
+    <string name="gallery_sort_name">Name</string>
+    <string name="gallery_sort_duration">Duration</string>
+    <string name="gallery_sort_size">File size</string>
+    <string name="gallery_sort_date">Date added</string>
+    <string name="gallery_filter_all">All</string>
+    <string name="gallery_filter_favorites">Favorites</string>
+    <string name="gallery_filter_recent">Recent</string>
+    <string name="gallery_folders">Folders</string>
+    <string name="gallery_permission_needed">Storage access is needed to list videos. Only media files are read.</string>
+    <string name="gallery_grant">Grant access</string>
+    <string name="gallery_video_count">%1$d videos</string>
+    <string name="gallery_folder_count">%1$d files</string>
+
+    <!-- Media meta -->
+    <string name="meta_resolution">%1$d × %2$d</string>
+    <string name="meta_unknown">Unknown</string>
+    <string name="meta_missing_file">File is no longer available</string>
+
+    <!-- Player -->
+    <string name="player_title">Player</string>
+    <string name="player_play">Play</string>
+    <string name="player_pause">Pause</string>
+    <string name="player_speed">Speed</string>
+    <string name="player_audio_track">Audio track</string>
+    <string name="player_subtitles">Subtitles</string>
+    <string name="player_projection">Projection</string>
+    <string name="player_enter_vr">Play in VR</string>
+    <string name="player_resume_title">Resume playback?</string>
+    <string name="player_resume_message">Continue from %1$s or start over?</string>
+    <string name="player_resume_continue">Resume</string>
+    <string name="player_resume_restart">Start over</string>
+    <string name="player_error">Cannot play this file (%1$s).</string>
+    <string name="player_off_subtitles">Off</string>
+    <string name="player_track_none">Default</string>
+    <string name="player_stereo_mono">Mono</string>
+    <string name="player_stereo_sbs">3D side-by-side</string>
+    <string name="player_stereo_tab">3D top-and-bottom</string>
+    <string name="player_swap_eyes">Swap eyes</string>
+    <string name="player_orientation">Orientation</string>
+
+    <!-- VR common -->
+    <string name="vr_select_hint">Look at a panel and hold to select</string>
+    <string name="vr_back">Back</string>
+    <string name="vr_recenter">Recenter</string>
+    <string name="vr_recenter_done">View recentred</string>
+    <string name="vr_exit">Exit VR</string>
+    <string name="vr_settings">VR settings</string>
+    <string name="vr_mono_preview">Mono preview</string>
+    <string name="vr_stereo_preview">Stereo</string>
+    <string name="vr_sensor_warning">Head tracking looks unstable. Open sensor diagnostics or recenter.</string>
+    <string name="vr_no_sensor">No rotation sensor available — using touch or drag to look around.</string>
+    <string name="vr_tap_to_select">Tap to select</string>
+
+    <!-- VR cinema -->
+    <string name="cinema_title">VR Cinema</string>
+    <string name="cinema_no_video">No video loaded. Choose a video from the gallery.</string>
+    <string name="cinema_environment">Environment</string>
+    <string name="cinema_screen_size">Screen size</string>
+    <string name="cinema_screen_distance">Distance</string>
+    <string name="cinema_curvature">Curvature</string>
+    <string name="cinema_reset_screen">Reset screen</string>
+    <string name="cinema_brightness">Brightness</string>
+    <string name="cinema_volume">Volume</string>
+    <string name="cinema_ambient">Ambient light</string>
+    <string name="cinema_layout">Screen layout</string>
+
+    <!-- Environments -->
+    <string name="env_space">Space</string>
+    <string name="env_cinema">Cinema</string>
+    <string name="env_theater">Dark theater</string>
+    <string name="env_void">Minimal void</string>
+    <string name="env_ambient">Ambient grid</string>
+
+    <!-- Projection -->
+    <string name="proj_flat">Flat screen (2D)</string>
+    <string name="proj_180">VR180</string>
+    <string name="proj_360">VR360</string>
+
+    <!-- Browser -->
+    <string name="browser_title">VR Browser</string>
+    <string name="browser_url_hint">Enter address or search</string>
+    <string name="browser_bookmarks">Bookmarks</string>
+    <string name="browser_add_bookmark">Add bookmark</string>
+    <string name="browser_bookmark_name">Name</string>
+    <string name="browser_no_bookmarks">No bookmarks yet.</string>
+    <string name="browser_reload">Reload</string>
+    <string name="browser_forward">Forward</string>
+    <string name="browser_back">Back</string>
+    <string name="browser_fullscreen">Fullscreen</string>
+    <string name="browser_vr">VR screen</string>
+    <string name="browser_delete_bookmark">Delete</string>
+    <string name="browser_page_error">Page could not be loaded. Check your connection.</string>
+
+    <!-- Apps -->
+    <string name="apps_title">Apps</string>
+    <string name="apps_search_hint">Search apps</string>
+    <string name="apps_favorites">Favorites</string>
+    <string name="apps_recent">Recent</string>
+    <string name="apps_all">All apps</string>
+    <string name="apps_vr_label">VR</string>
+    <string name="apps_vr_ready">VR capable</string>
+    <string name="apps_vr_video">Video player</string>
+    <string name="apps_vr_none">Regular app (2D only)</string>
+    <string name="apps_launch_failed">Could not launch this app.</string>
+    <string name="apps_2d_only_note">Regular Android apps are shown on a flat virtual screen. They are not converted into stereoscopic VR.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_group_viewer">Viewer &amp; optics</string>
+    <string name="settings_group_tracking">Head tracking</string>
+    <string name="settings_group_video">Video &amp; audio</string>
+    <string name="settings_group_graphics">Graphics &amp; performance</string>
+    <string name="settings_group_interface">Interface</string>
+    <string name="settings_group_storage">Storage</string>
+    <string name="settings_group_about">About</string>
+
+    <string name="pref_viewer_profile">Viewer profile</string>
+    <string name="pref_viewer_profile_desc">Presets for common Cardboard-style boxes, or your own calibration</string>
+    <string name="pref_viewer_calibrate">Calibrate viewer</string>
+    <string name="pref_viewer_calibrate_desc">Live stereo test pattern with alignment guides</string>
+    <string name="pref_lens_separation">Lens separation</string>
+    <string name="pref_screen_distance">Screen-to-lens distance</string>
+    <string name="pref_fov">Field of view</string>
+    <string name="pref_eye_offset_x">Horizontal eye alignment</string>
+    <string name="pref_eye_offset_y">Vertical eye alignment</string>
+    <string name="pref_distortion">Lens distortion correction</string>
+    <string name="pref_chromatic">Chromatic aberration correction</string>
+    <string name="pref_ipd">Interpupillary distance</string>
+
+    <string name="pref_tracking_source">Tracking source</string>
+    <string name="pref_tracking_smoothing">Smoothing</string>
+    <string name="pref_tracking_sensitivity">Sensitivity</string>
+    <string name="pref_tracking_recenter_on_start">Recenter when VR starts</string>
+    <string name="pref_comfort_fov">Comfort field of view</string>
+    <string name="pref_sensor_diagnostics">Sensor diagnostics</string>
+    <string name="pref_sensor_diagnostics_desc">Check sensor health, drift and calibration</string>
+
+    <string name="pref_graphics_quality">Graphics quality</string>
+    <string name="pref_graphics_quality_desc">Lower settings render fewer pixels and are smoother</string>
+    <string name="pref_adaptive_quality">Adaptive quality</string>
+    <string name="pref_adaptive_quality_desc">Reduce render resolution automatically when frames get slow or the phone is warm</string>
+    <string name="pref_frame_limit">Frame rate limit</string>
+    <string name="pref_show_fps">Show performance overlay</string>
+    <string name="pref_distortion_enabled">Lens distortion pass</string>
+    <string name="pref_distortion_enabled_desc">Turn off for flat, undistorted rendering on low-end devices</string>
+
+    <string name="pref_default_projection">Default projection</string>
+    <string name="pref_default_stereo">Default 3D format</string>
+    <string name="pref_resume_playback">Resume playback</string>
+    <string name="pref_playback_speed">Default playback speed</string>
+    <string name="pref_subtitle_size">Subtitle size</string>
+    <string name="pref_audio_boost">Volume boost</string>
+
+    <string name="pref_environment">Default environment</string>
+    <string name="pref_screen_size">Default screen size</string>
+    <string name="pref_screen_distance">Default screen distance</string>
+    <string name="pref_curvature">Default curvature</string>
+    <string name="pref_dwell_time">Selection dwell time</string>
+    <string name="pref_selection_mode">Selection mode</string>
+    <string name="pref_selection_gaze">Head gaze</string>
+    <string name="pref_selection_touch">Touch</string>
+    <string name="pref_ui_scale">VR panel scale</string>
+    <string name="pref_keep_awake">Keep screen on in VR</string>
+
+    <string name="pref_clear_resume">Clear resume positions</string>
+    <string name="pref_clear_thumbnails">Clear thumbnail cache</string>
+    <string name="pref_storage_info">Storage usage</string>
+    <string name="pref_battery_info">Battery optimisation</string>
+    <string name="pref_battery_info_desc">What to expect and how to get the best results</string>
+    <string name="pref_device_report">Device &amp; capability report</string>
+    <string name="pref_licenses">Open-source licenses</string>
+    <string name="pref_about">About TU VR</string>
+    <string name="pref_version">Version</string>
+
+    <string name="quality_low">Low (smoothest)</string>
+    <string name="quality_balanced">Balanced (recommended)</string>
+    <string name="quality_high">High</string>
+
+    <string name="settings_saved">Saved</string>
+
+    <!-- Diagnostics -->
+    <string name="diag_title">Diagnostics</string>
+    <string name="diag_sensors">Sensors</string>
+    <string name="diag_sensor_available">Available</string>
+    <string name="diag_sensor_missing">Not available</string>
+    <string name="diag_tracking_state">Tracking state</string>
+    <string name="diag_orientation">Orientation (yaw / pitch / roll)</string>
+    <string name="diag_rate">Sensor rate</string>
+    <string name="diag_drift">Yaw drift estimate</string>
+    <string name="diag_recenter">Recenter now</string>
+    <string name="diag_calibrate_gyro">Calibrate gyro (hold still)</string>
+    <string name="diag_calibrating">Calibrating — keep the phone still…</string>
+    <string name="diag_calibrated">Calibration finished</string>
+    <string name="diag_copy_report">Copy report</string>
+    <string name="diag_share_report">Share report</string>
+    <string name="diag_report_copied">Report copied</string>
+    <string name="diag_device">Device</string>
+    <string name="diag_gpu">Graphics</string>
+    <string name="diag_video">Video decoding</string>
+    <string name="diag_none_detected">None detected</string>
+    <string name="diag_unsupported_features">Unsupported / limited features</string>
+
+    <!-- Common -->
+    <string name="action_back">Back</string>
+    <string name="action_close">Close</string>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_apply">Apply</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_favorite">Favorite</string>
+    <string name="action_unfavorite">Remove favorite</string>
+    <string name="action_more">More</string>
+    <string name="action_open">Open</string>
+    <string name="action_play">Play</string>
+    <string name="action_add">Add</string>
+    <string name="action_clear_confirm">Clear</string>
+    <string name="calibration_hint">Hold the phone inside the headset and adjust until the two crosses merge into one, the outer cyan frame is fully visible on all four sides, and the vertical bars look straight.</string>
+    <string name="diag_live">Live sensor readout</string>
+    <string name="diag_profile">Viewer profile</string>
+    <string name="diag_crash">Last crash log</string>
+
+    <string name="cd_play_pause">Play or pause</string>
+    <string name="cd_seek_back">Back 10 seconds</string>
+    <string name="cd_seek_forward">Forward 10 seconds</string>
+    <string name="cd_thumbnail">Thumbnail</string>
+    <string name="cd_menu">Menu</string>
+</resources>
