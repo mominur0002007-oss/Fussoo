@@ -1,5 +1,5 @@
 TU VR static analysis
-run: 45757660323
+run: 45757962522
 
 ---- report head ----
 /home/runner/work/Fussoo/Fussoo/android/app/build.gradle:13: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
@@ -56,72 +56,72 @@ run: 45757660323
    However, you may simply not be aware that a more recent version is
    available, and that is what this lint check helps find.
 
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:37: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-    private final VideoSession session;
-                  ~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:71: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-    public CinemaScene(Context context, VrHost host, VideoSession session, VideoFormat format) {
-                                                     ~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:128: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        final VideoSession currentSession = session;
-              ~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:131: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-                    currentSession.setVideoSurface(renderer.videoTexture().surface()));
-                                   ~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:227: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        session.togglePlayPause();
-                ~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:234: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        long target = Math.max(0L, session.position() + deltaMs);
-                                           ~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:235: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        session.seekTo(target);
-                ~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:253: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        session.setSpeed(speed);
-                ~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:285: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-            session.setVolume(volume);
-                    ~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:323: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        final VideoSession currentSession = session;
-              ~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:326: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-                    currentSession.setVideoSurface(renderer.videoTexture().surface()));
-                                   ~~~~~~~~~~~~~~~
-
-   Explanation for issues of type "UnsafeOptInUsageError":
-   This API has been flagged as opt-in with error-level severity.
-
-   Any declaration annotated with this marker is considered part of an
-   unstable or
-   otherwise non-standard API surface and its call sites should accept the
-   opt-in
-   aspect of it by using the @OptIn annotation, using the marker annotation
-   --
-   effectively causing further propagation of the opt-in aspect -- or
-   configuring
-   the UnsafeOptInUsageError check's options for project-wide opt-in.
-
-   To configure project-wide opt-in, specify the opt-in option value in
-   lint.xml
-   as a comma-delimited list of opted-in annotations:
-
-   <lint>
-       <issue id="UnsafeOptInUsageError">
-           <option name="opt-in" value="com.foo.ExperimentalBarAnnotation" />
-       </issue>
-   </lint>
-
-   Vendor: Android Open Source Project
-   Identifier: androidx.annotation.experimental
-   Feedback: https://issuetracker.google.com/issues/new?component=459778
-
 /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_apps.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
     android:tint="@color/text_primary"
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_audio.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
     android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_back.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_brightness.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_browser.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_cinema.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_exit.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_folder.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_forward.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_gallery.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_info.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_pause.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_play.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_recenter.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_reload.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_screen_size.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_search.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_settings.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_speed.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_star.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_subtitles.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_vr.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---- log tail ----
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.9/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
@@ -158,16 +158,16 @@ Daemon will be stopped at the end of the build
 Wrote HTML report to file:///home/runner/work/Fussoo/Fussoo/android/app/build/reports/lint-results-debug.html
 
 > Task :app:lintDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1795668716570.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1795668911448.json
 
-BUILD SUCCESSFUL in 30s
+BUILD SUCCESSFUL in 28s
 26 actionable tasks: 10 executed, 1 from cache, 15 up-to-date
 
 ======== packaged APK ========
 total 14340
--rw-r--r-- 1 runner runner     176 Nov 26 04:51 SHA256SUMS.txt
--rw-r--r-- 1 runner runner 8169955 Nov 26 04:51 TUVR-1.0.0-debug.apk
--rw-r--r-- 1 runner runner 6508313 Nov 26 04:51 TUVR-1.0.0-release.apk
+-rw-r--r-- 1 runner runner     176 Nov 26 04:55 SHA256SUMS.txt
+-rw-r--r-- 1 runner runner 8169951 Nov 26 04:55 TUVR-1.0.0-debug.apk
+-rw-r--r-- 1 runner runner 6508313 Nov 26 04:55 TUVR-1.0.0-release.apk
 
 package: name='com.tuvr.app' versionCode='1' versionName='1.0.0' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
 minSdkVersion:'24'
