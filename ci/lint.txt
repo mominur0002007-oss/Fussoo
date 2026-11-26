@@ -1,5 +1,5 @@
 TU VR static analysis
-run: 45812985464
+run: 45827805188
 
 ---- report head ----
 /home/runner/work/Fussoo/Fussoo/android/app/build.gradle:13: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
@@ -158,18 +158,18 @@ Daemon will be stopped at the end of the build
 Wrote HTML report to file:///home/runner/work/Fussoo/Fussoo/android/app/build/reports/lint-results-debug.html
 
 > Task :app:lintDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1795693453798.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1795699239135.json
 
-BUILD SUCCESSFUL in 22s
+BUILD SUCCESSFUL in 34s
 26 actionable tasks: 10 executed, 1 from cache, 15 up-to-date
 
 ======== packaged APK ========
 total 14360
--rw-r--r-- 1 runner runner     176 Nov 26 11:44 SHA256SUMS.txt
--rw-r--r-- 1 runner runner 8180395 Nov 26 11:44 TUVR-1.0.0-debug.apk
--rw-r--r-- 1 runner runner 6514381 Nov 26 11:44 TUVR-1.0.0-release.apk
+-rw-r--r-- 1 runner runner     176 Nov 26 13:20 SHA256SUMS.txt
+-rw-r--r-- 1 runner runner 8180575 Nov 26 13:20 TUVR-1.0.0-debug.apk
+-rw-r--r-- 1 runner runner 6514561 Nov 26 13:20 TUVR-1.0.0-release.apk
 
-package: name='com.tuvr.app' versionCode='2' versionName='1.0.1' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
+package: name='com.tuvr.app' versionCode='3' versionName='1.0.2' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
 minSdkVersion:'24'
 targetSdkVersion:'34'
 uses-permission: name='android.permission.READ_MEDIA_VIDEO'
