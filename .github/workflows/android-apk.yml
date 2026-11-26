@@ -57,7 +57,8 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      # Lint findings are committed back so they can be reviewed without log access.
+      # Lint findings and the packaged-APK report are committed back so they can be
+      # reviewed without access to the Actions log.
       - name: Static analysis (lint)
         run: |
           set +e
@@ -74,9 +75,21 @@ jobs:
             echo "---- log tail ----"
             tail -60 "$RUNNER_TEMP/lint.log"
           } > ci/lint.txt
+
+          BT="$ANDROID_SDK_ROOT/build-tools/35.0.0"
+          {
+            echo "TU VR packaged APK"
+            echo
+            ls -l dist 2>/dev/null
+            echo
+            "$BT/aapt2" dump badging dist/TUVR-1.0.0-release.apk 2>/dev/null | head -20
+            echo
+            "$BT/apksigner" verify --print-certs dist/TUVR-1.0.0-release.apk 2>/dev/null | head -8
+          } > ci/apk-info.txt
+
           git config user.name "ci-diagnostics"
           git config user.email "ci@tuvr.invalid"
-          git add ci/lint.txt
+          git add ci/lint.txt ci/apk-info.txt
           git commit -m "ci: lint report for $GITHUB_RUN_ID [skip ci]" || true
           git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
           git push origin "HEAD:${GITHUB_REF_NAME}" || true
