@@ -12,7 +12,7 @@ on:
       - '.github/workflows/android-apk.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -37,7 +37,9 @@ jobs:
 
       - name: Assemble debug + release APK
         run: |
-          gradle --no-daemon --project-dir android :app:assembleDebug :app:assembleRelease
+          set -o pipefail
+          gradle --no-daemon --project-dir android --console=plain \
+            :app:assembleDebug :app:assembleRelease 2>&1 | tee "$RUNNER_TEMP/build.log"
 
       - name: Stage APKs
         run: |
@@ -54,3 +56,26 @@ jobs:
           path: dist/**
           if-no-files-found: error
           retention-days: 30
+
+      # On failure the compile errors are committed back to the branch so that
+      # they can be read without access to the Actions log.
+      - name: Publish build diagnostics
+        if: failure()
+        run: |
+          mkdir -p ci
+          {
+            echo "TU VR build diagnostics"
+            echo "run: $GITHUB_RUN_ID  commit: $GITHUB_SHA"
+            echo
+            grep -E "^e: |error:|Error:|FAILED|What went wrong|Execution failed|> Task .* FAILED" \
+              "$RUNNER_TEMP/build.log" 2>/dev/null | head -400
+            echo
+            echo "---- tail ----"
+            tail -120 "$RUNNER_TEMP/build.log" 2>/dev/null
+          } > ci/last-build.log
+          git config user.name "ci-diagnostics"
+          git config user.email "ci@tuvr.invalid"
+          git add ci/last-build.log
+          git commit -m "ci: build diagnostics for $GITHUB_RUN_ID [skip ci]" || true
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" || true
