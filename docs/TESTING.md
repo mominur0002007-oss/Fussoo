@@ -21,6 +21,30 @@ Reported by the user, verbatim in spirit:
 Round 1 also confirmed the parts that worked: the VR browser rendered pages in stereo, the
 app installed and launched, and the packaged permissions were accepted.
 
+## Round 3 — the upside-down UI (build 1.0.2)
+
+The user sent two screenshots from Drive. The sensor screen showed healthy hardware
+(`Game Rotation Vector` active, gyro/accelerometer/magnetometer available, current orientation
+yaw −1.33°, pitch −1.28°, roll −1.04° — i.e. no bogus roll in the tracker output), while the
+VR home screen screenshot showed the stereo geometry laid out correctly but **all text and
+icons upside down**.
+
+Root cause, found by reading the texture path rather than guessing at the tracker:
+
+* `GLUtils.texImage2D()` uploads an Android bitmap with its **first (top) row at texel row 0**,
+  and GL treats that row as `v = 0`.
+* Every quad in `MeshBuilder` (`unitQuad`, `quad`, `curvedQuad`) has **`v = 0` on its bottom
+  edge**.
+* `textured.vert` passed `aUv` through unchanged, so every bitmap-backed surface — panels,
+  icons, thumbnails, captured browser pages, the calibration pattern — was flipped vertically.
+  The 3D geometry (environment, panel placement, reticle) was never affected, which is why the
+  layout looked right while the text did not.
+
+Fix: `textured.vert` now writes `vUv = vec2(aUv.x, 1.0 - aUv.y)`. This is a single upload
+convention for every bitmap in the app, so one change covers all of them. The video path is
+untouched: external OES textures are sampled through `SurfaceTexture.getTransformMatrix()`,
+which already carries the decoder's row order.
+
 ## Round 2 — what still has to be verified (build 1.0.1)
 
 1. Open a normal 16:9 video in VR Cinema → picture upright, not mirrored. If it is upside
