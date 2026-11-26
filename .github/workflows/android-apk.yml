@@ -68,9 +68,11 @@ jobs:
             echo "TU VR static analysis"
             echo "run: $GITHUB_RUN_ID"
             echo
-            grep -E "^(/|[A-Za-z]:).*(Error|Warning):" "$RUNNER_TEMP/lint.log" | head -150
-            echo
-            grep -E "errors?, [0-9]+ warnings?" "$RUNNER_TEMP/lint.log" | tail -3
+            grep -E "(Error|Warning):" "$RUNNER_TEMP/lint.log" | head -120
+            echo "---- report head ----"
+            head -120 android/app/build/reports/lint-results-debug.txt 2>/dev/null
+            echo "---- log tail ----"
+            tail -60 "$RUNNER_TEMP/lint.log"
           } > ci/lint.txt
           git config user.name "ci-diagnostics"
           git config user.email "ci@tuvr.invalid"
