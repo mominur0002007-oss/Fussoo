@@ -366,7 +366,6 @@ public abstract class VrActivity extends AppCompatActivity
     }
 
     @Override
-    @Override
     public void openVrSearch() {
         Intent intent = new Intent(this, VrGridActivity.class);
         intent.putExtra(Intents.EXTRA_MODE, Intents.GRID_MODE_SEARCH);
