@@ -1,0 +1,2 @@
+93454fe2caa3f0c36362262260ec81869597be0cc9b503da9b6e03c87201f6e1  TUVR-1.0.0-debug.apk
+c12fb5de35f8c3b77ccaac5bdb1fc7c12831a60aad6db204681ecdabd926d976  TUVR-1.0.0-release.apk
