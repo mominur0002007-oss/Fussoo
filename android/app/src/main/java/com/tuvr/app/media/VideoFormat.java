@@ -20,6 +20,8 @@ public final class VideoFormat {
     public boolean swapEyes = false;
     /** 0, 90, 180, 270 - rotates the image inside the projection. */
     public int rotationDeg = 0;
+    /** Mirrors the picture vertically; some files/decoders need it. */
+    public boolean flipVertical = false;
 
     public static VideoFormat defaults(Context context) {
         AppSettings s = AppSettings.get(context);
@@ -43,6 +45,7 @@ public final class VideoFormat {
         f.stereo = stereo;
         f.swapEyes = swapEyes;
         f.rotationDeg = rotationDeg;
+        f.flipVertical = flipVertical;
         return f;
     }
 
@@ -78,6 +81,9 @@ public final class VideoFormat {
         }
         if (rotationDeg != 0) {
             base += " · " + rotationDeg + "°";
+        }
+        if (flipVertical) {
+            base += " · flipped";
         }
         return base;
     }

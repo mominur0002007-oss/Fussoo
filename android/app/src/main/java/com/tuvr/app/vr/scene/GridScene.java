@@ -37,9 +37,13 @@ public class GridScene implements VrScene {
     private final int mode;
     private final String folderFilter;
     private final boolean favoritesOnly;
+    private volatile String query = "";
 
     private final List<Panel> slots = new ArrayList<>();
     private final List<Panel> chrome = new ArrayList<>();
+    /** Everything the scene can show (already filtered by folder/favourites). */
+    private final List<Object> allItems = new ArrayList<>();
+    /** What is actually shown right now (allItems narrowed by the search query). */
     private final List<Object> items = new ArrayList<>();
 
     private PanelFactory factory;
@@ -66,6 +70,9 @@ public class GridScene implements VrScene {
 
     @Override
     public String title() {
+        if (query != null && !query.isEmpty()) {
+            return "Search";
+        }
         return mode == MODE_MEDIA ? "Videos" : "Apps";
     }
 
@@ -97,7 +104,9 @@ public class GridScene implements VrScene {
 
         chrome.add(makeButton("prev", "\u25C0", "Prev", -30f, -30f, () -> changePage(-1)));
         chrome.add(makeButton("next", "\u25B6", "Next", 30f, -30f, () -> changePage(1)));
-        chrome.add(makeButton("back", "\u23FB", "Back", 0f, -30f, host::leaveScene));
+        Panel backButton = makeButton("back", "\u23FB", "Back", 0f, -34f, host::leaveScene);
+        backButton.confirmRequired = true;
+        chrome.add(backButton);
 
         pagePanel = new Panel("page");
         pagePanel.interactive = false;
@@ -129,7 +138,9 @@ public class GridScene implements VrScene {
             return;
         }
         String subtitle;
-        if (mode == MODE_MEDIA) {
+        if (query != null && !query.isEmpty()) {
+            subtitle = "\"" + query + "\"";
+        } else if (mode == MODE_MEDIA) {
             subtitle = folderFilter == null ? "all folders" : folderFilter;
             if (favoritesOnly) {
                 subtitle = "favorites";
@@ -139,6 +150,29 @@ public class GridScene implements VrScene {
         }
         titlePanel.setContent(factory.textPanel(title() + "\n" + subtitle, 512, 128, 40f,
                 true, 0xFFE9F2FF));
+    }
+
+    /** Live filter used by the in-VR search screen. */
+    public void setQuery(String text) {
+        String value = text == null ? "" : text.trim().toLowerCase(Locale.US);
+        if (value.equals(query)) {
+            return;
+        }
+        query = value;
+        page = 0;
+        applyFilter();
+        updateTitle();
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    private boolean matchesQuery(String haystack) {
+        if (query.isEmpty()) {
+            return true;
+        }
+        return haystack != null && haystack.toLowerCase(Locale.US).contains(query);
     }
 
     private void load() {
@@ -169,14 +203,33 @@ public class GridScene implements VrScene {
                 if (generation != contentGeneration) {
                     return;
                 }
-                items.clear();
-                items.addAll(result);
+                allItems.clear();
+                allItems.addAll(result);
                 loaded = true;
                 loading = false;
                 page = 0;
-                refreshPage();
+                applyFilter();
             });
         });
+    }
+
+    /** Rebuilds the visible list from the cached one and repaints the page. */
+    private void applyFilter() {
+        items.clear();
+        for (Object item : allItems) {
+            if (item instanceof VideoItem) {
+                VideoItem video = (VideoItem) item;
+                if (!matchesQuery(video.name) && !matchesQuery(video.folderName)) {
+                    continue;
+                }
+            } else if (item instanceof AppEntry) {
+                if (!matchesQuery(((AppEntry) item).label)) {
+                    continue;
+                }
+            }
+            items.add(item);
+        }
+        refreshPage();
     }
 
     private void changePage(int delta) {

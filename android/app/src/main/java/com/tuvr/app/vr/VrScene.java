@@ -21,6 +21,13 @@ public interface VrScene {
     /** Called when the activity resumes (and after a paused GL context). */
     void onResumed(VrRenderer renderer);
 
+    /**
+     * The activity went to the background: stop anything that costs battery or
+     * keeps making noise (decoder, page capture) without losing position.
+     */
+    default void onPaused(VrRenderer renderer) {
+    }
+
     /** Per-frame update, called on the GL thread. */
     void update(VrRenderer renderer, float dtSeconds);
 

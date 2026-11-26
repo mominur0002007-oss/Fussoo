@@ -15,7 +15,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.tuvr.app.R;
 import com.tuvr.app.core.AppSettings;
+import com.tuvr.app.core.CrashLog;
 import com.tuvr.app.core.DeviceCapabilities;
+import com.tuvr.app.core.Problems;
 import com.tuvr.app.core.ViewerProfile;
 import com.tuvr.app.vr.HeadTracker;
 
@@ -88,6 +90,12 @@ public class DiagnosticsActivity extends AppCompatActivity implements HeadTracke
                 profile.eyeFovXDeg(), profile.eyeFovYDeg(1.1f)));
         sb.append(String.format(Locale.US, "stereo baseline: %.1f mm\n",
                 profile.stereoBaselineMm()));
+        sb.append("\n== LAST CRASH ==\n");
+        String crash = CrashLog.read();
+        sb.append(crash == null || crash.isEmpty() ? "none recorded\n" : crash);
+        sb.append("\n== RECOVERED PROBLEMS ==\n");
+        String problems = Problems.report();
+        sb.append(problems.isEmpty() ? "none recorded\n" : problems);
         sb.append("\n== LIVE ==\n");
         return sb.toString();
     }

@@ -443,6 +443,8 @@ public final class AppSettings {
                 return 3;
             case "ambient":
                 return 4;
+            case "world":
+                return 5;
             default:
                 return 1;
         }
@@ -462,6 +464,9 @@ public final class AppSettings {
                 break;
             case 4:
                 value = "ambient";
+                break;
+            case 5:
+                value = "world";
                 break;
             default:
                 value = "cinema";

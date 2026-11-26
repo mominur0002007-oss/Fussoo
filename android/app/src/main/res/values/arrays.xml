@@ -65,6 +65,7 @@
         <item>Dark theater</item>
         <item>Minimal void</item>
         <item>Ambient grid</item>
+        <item>3D world</item>
     </string-array>
     <string-array name="environment_values">
         <item>space</item>
@@ -72,6 +73,7 @@
         <item>theater</item>
         <item>void</item>
         <item>ambient</item>
+        <item>world</item>
     </string-array>
 
     <string-array name="selection_entries">

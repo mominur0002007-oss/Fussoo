@@ -9,6 +9,9 @@ public interface VrHost {
 
     void openVrGallery();
 
+    /** Opens the in-VR search screen (typed query, filtered result grid). */
+    void openVrSearch();
+
     void openVrApps();
 
     void openVrBrowser(String url);

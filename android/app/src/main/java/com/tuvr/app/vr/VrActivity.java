@@ -88,7 +88,15 @@ public abstract class VrActivity extends AppCompatActivity
         Immersive.enter(this);
 
         tracker.setDisplayRotation(displayRotation());
-        renderer.setScene(createScene());
+        try {
+            renderer.setScene(createScene());
+        } catch (Throwable t) {
+            com.tuvr.app.core.Problems.record("createScene:" + getClass().getSimpleName(), t);
+            renderer.setScene(null);
+            android.widget.Toast.makeText(this,
+                    "This VR screen failed to start. See Diagnostics.",
+                    android.widget.Toast.LENGTH_LONG).show();
+        }
 
         surfaceView.setOnTouchListener((v, event) -> handleTouch(event));
     }
@@ -214,6 +222,7 @@ public abstract class VrActivity extends AppCompatActivity
         tracker.setDisplayRotation(displayRotation());
         tracker.start();
         renderer.setMonoPreview(false);
+        renderer.armSelection();
         if (AppSettings.get(this).recenterOnStart()) {
             tracker.recenter();
         }
@@ -353,6 +362,14 @@ public abstract class VrActivity extends AppCompatActivity
     public void openVrGallery() {
         Intent intent = new Intent(this, VrGridActivity.class);
         intent.putExtra(Intents.EXTRA_MODE, Intents.GRID_MODE_MEDIA);
+        startActivity(intent);
+    }
+
+    @Override
+    @Override
+    public void openVrSearch() {
+        Intent intent = new Intent(this, VrGridActivity.class);
+        intent.putExtra(Intents.EXTRA_MODE, Intents.GRID_MODE_SEARCH);
         startActivity(intent);
     }
 

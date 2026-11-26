@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tuvr.app.R;
 import com.tuvr.app.browser.Bookmarks;
+import com.tuvr.app.core.YoutubeLinks;
 
 import java.util.List;
 
@@ -76,6 +77,18 @@ public class BrowserActivity extends AppCompatActivity {
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         webView.setBackgroundColor(0xFF04060B);
         webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view,
+                                                    android.webkit.WebResourceRequest request) {
+                String target = request.getUrl().toString();
+                // A WebView is a poor YouTube player: hand video links to the app.
+                if (request.isForMainFrame() && YoutubeLinks.videoId(target) != null
+                        && YoutubeLinks.openInApp(view.getContext(), target)) {
+                    return true;
+                }
+                return false;
+            }
+
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 urlBar.setText(url);

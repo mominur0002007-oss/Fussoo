@@ -1,11 +1,12 @@
 package com.tuvr.app.vr;
 
-import java.util.Random;
+import java.util.Arrays;
 
 /**
- * Procedural VR environments built from vertex-coloured geometry only:
- * no textures, no lighting, no post-processing. Each preset is a handful of
- * small meshes so it costs almost nothing on a Mali-G57.
+ * Builds the virtual environments: simple, cheap geometry (a handful of quads and
+ * a dome) that gives the cinema a sense of place without any textures.
+ *
+ * All meshes are created on the GL thread and released with the environment.
  */
 public final class EnvironmentBuilder {
 
@@ -14,8 +15,10 @@ public final class EnvironmentBuilder {
     public static final int THEATER = 2;
     public static final int SPACE = 3;
     public static final int AMBIENT = 4;
+    public static final int WORLD = 5;
 
-    public static final String[] NAMES = {"Void", "Cinema", "Dark theater", "Space", "Ambient grid"};
+    public static final String[] NAMES = {
+            "Void", "Cinema", "Dark theater", "Space", "Ambient grid", "3D world"};
 
     private EnvironmentBuilder() {
     }
@@ -33,6 +36,8 @@ public final class EnvironmentBuilder {
         public Mesh floor;
         public Mesh stars;
         public Mesh accents;
+        /** Extra unlit triangles (sun disc and similar) drawn like the backdrop. */
+        public Mesh glow;
         public int type = VOID;
 
         public void release() {
@@ -52,6 +57,10 @@ public final class EnvironmentBuilder {
                 accents.release();
                 accents = null;
             }
+            if (glow != null) {
+                glow.release();
+                glow = null;
+            }
         }
     }
 
@@ -60,32 +69,189 @@ public final class EnvironmentBuilder {
         env.type = type;
         switch (type) {
             case CINEMA:
-                env.backdrop = gradientDome(40f, 0xFF05080D, 0xFF161C27, 24, 12);
-                env.floor = floor(18f, 0xFF0A0D12, 0xFF14181F);
-                env.accents = accentStrips(0xFF2A8FA6, 0.18f);
+                // A dim room: wall box plus a warm floor and cool trim lines.
+                env.backdrop = room(11f, 5f, -1.7f, 3.2f, 0xFF1B2836, 0xFF0A1018, 0xFF131C26);
+                env.floor = floor(12f, 0xFF1A2430, 0xFF070B10);
+                env.accents = accentStrips(0xFF3AC0E0, 0.5f);
                 break;
             case THEATER:
-                env.backdrop = gradientDome(40f, 0xFF020304, 0xFF0C0F13, 24, 12);
-                env.floor = floor(18f, 0xFF040506, 0xFF0B0D11);
-                env.accents = accentStrips(0xFF3A3F46, 0.12f);
+                // Warm screening room: walls read even on a dim phone panel.
+                env.backdrop = room(7.5f, 4f, -1.7f, 2.6f, 0xFF3A2418, 0xFF1A0F09, 0xFF241207);
+                env.floor = floor(8f, 0xFF2A160C, 0xFF080402);
+                env.accents = accentStrips(0xFFE0A160, 0.3f);
+                env.glow = wallGlow(0xFFB4783C);
                 break;
             case SPACE:
-                env.backdrop = gradientDome(40f, 0xFF000000, 0xFF060A14, 20, 10);
-                env.stars = starfield(1400, 30f);
+                env.backdrop = gradientDome(60f, 0xFF000000, 0xFF070C18, 24, 14);
+                env.stars = starfield(1600, 44f);
+                env.floor = nebula(0xFF0A1430, 0xFF01040A);
                 break;
             case AMBIENT:
-                env.backdrop = gradientDome(40f, 0xFF04161C, 0xFF071A22, 20, 10);
-                env.floor = gridFloor(14f, 0xFF2A8FA6);
+                env.backdrop = gradientDome(45f, 0xFF04161C, 0xFF07242E, 22, 12);
+                env.floor = gridFloor(16f, 0xFF2A8FA6);
+                env.accents = accentStrips(0xFF2A8FA6, 0.2f);
+                break;
+            case WORLD:
+                // Outdoor: sky gradient, ground, mountain silhouettes and a sun.
+                env.backdrop = worldSky();
+                env.floor = floor(70f, 0xFF2C4227, 0xFF12200F);
+                env.glow = sunDisc();
                 break;
             case VOID:
             default:
-                env.backdrop = gradientDome(40f, 0xFF04060B, 0xFF0E1622, 24, 12);
+                env.backdrop = gradientDome(45f, 0xFF04060B, 0xFF0E1622, 24, 12);
                 break;
         }
         return env;
     }
 
-    /* ---------------------------------------------------------------- */
+    /* ------------------------------------------------------------------ */
+    /* geometry helpers                                                    */
+    /* ------------------------------------------------------------------ */
+
+    /** Small float buffer that appends interleaved position+colour vertices. */
+    private static final class Buf {
+        private float[] data;
+        private int used;
+
+        Buf(int floats) {
+            data = new float[floats];
+        }
+
+        void vertex(float x, float y, float z, int color) {
+            if (used + 6 > data.length) {
+                data = Arrays.copyOf(data, Math.max(data.length * 2, used + 6));
+            }
+            data[used++] = x;
+            data[used++] = y;
+            data[used++] = z;
+            data[used++] = ((color >> 16) & 0xFF) / 255f;
+            data[used++] = ((color >> 8) & 0xFF) / 255f;
+            data[used++] = (color & 0xFF) / 255f;
+        }
+
+        /** Quad a-b at the bottom edge, c-d at the top edge (counter-clockwise). */
+        void quad(float ax, float ay, float az, float bx, float by, float bz,
+                  float cx, float cy, float cz, float dx, float dy, float dz,
+                  int bottomColor, int topColor) {
+            vertex(ax, ay, az, bottomColor);
+            vertex(bx, by, bz, bottomColor);
+            vertex(cx, cy, cz, topColor);
+            vertex(bx, by, bz, bottomColor);
+            vertex(dx, dy, dz, topColor);
+            vertex(cx, cy, cz, topColor);
+        }
+
+        Mesh toMesh() {
+            if (used == 0) {
+                return null;
+            }
+            return Mesh.create(Arrays.copyOf(data, used), 6, null);
+        }
+    }
+
+    /** A three-colour wall box around the viewer (no top face, no side flicker). */
+    private static Mesh room(float halfWidth, float halfDepth, float floorY,
+                             float ceilingY, int topColor, int bottomColor, int ceiling) {
+        Buf b = new Buf(4 * 6 * 6 + 6 * 6);
+        // North (in front), south (behind), west, east walls.
+        b.quad(-halfWidth, floorY, -halfDepth, halfWidth, floorY, -halfDepth,
+                -halfWidth, ceilingY, -halfDepth, halfWidth, ceilingY, -halfDepth,
+                bottomColor, topColor);
+        b.quad(halfWidth, floorY, halfDepth, -halfWidth, floorY, halfDepth,
+                halfWidth, ceilingY, halfDepth, -halfWidth, ceilingY, halfDepth,
+                bottomColor, topColor);
+        b.quad(-halfWidth, floorY, halfDepth, -halfWidth, floorY, -halfDepth,
+                -halfWidth, ceilingY, halfDepth, -halfWidth, ceilingY, -halfDepth,
+                bottomColor, topColor);
+        b.quad(halfWidth, floorY, -halfDepth, halfWidth, floorY, halfDepth,
+                halfWidth, ceilingY, -halfDepth, halfWidth, ceilingY, halfDepth,
+                bottomColor, topColor);
+        // Ceiling
+        b.quad(-halfWidth, ceilingY, -halfDepth, halfWidth, ceilingY, -halfDepth,
+                -halfWidth, ceilingY, halfDepth, halfWidth, ceilingY, halfDepth,
+                ceiling, ceiling);
+        return b.toMesh();
+    }
+
+    /** Blue sky with a horizon haze, plus mountain silhouettes. */
+    private static Mesh worldSky() {
+        Buf b = new Buf(64 * 6);
+        float radius = 80f;
+        int skyTop = 0xFF0B2A5A;
+        int skyHorizon = 0xFF8FB6D8;
+        int ground = 0xFF243521;
+
+        // Sky dome as a ring of quads (cheap, only 32 segments).
+        int segments = 32;
+        for (int i = 0; i < segments; i++) {
+            double a0 = 2 * Math.PI * i / segments;
+            double a1 = 2 * Math.PI * (i + 1) / segments;
+            float x0 = (float) Math.cos(a0) * radius;
+            float z0 = (float) Math.sin(a0) * radius;
+            float x1 = (float) Math.cos(a1) * radius;
+            float z1 = (float) Math.sin(a1) * radius;
+            b.quad(x0, -4f, z0, x1, -4f, z1, x0, radius, z0, x1, radius, z1,
+                    skyHorizon, skyTop);
+        }
+        // Mountain silhouettes just above the horizon.
+        int peaks = 16;
+        for (int i = 0; i < peaks; i++) {
+            double a0 = 2 * Math.PI * i / peaks;
+            double a1 = 2 * Math.PI * (i + 1) / peaks;
+            float r = 62f;
+            float h = 6f + (float) ((i * 37 % 11) * 0.9);
+            b.vertex((float) Math.cos(a0) * r, -2.5f, (float) Math.sin(a0) * r, ground);
+            b.vertex((float) Math.cos(a1) * r, -2.5f, (float) Math.sin(a1) * r, ground);
+            b.vertex((float) Math.cos((a0 + a1) * 0.5) * r, h, (float) Math.sin((a0 + a1) * 0.5) * r,
+                    0xFF1A2A33);
+        }
+        return b.toMesh();
+    }
+
+    /** Two soft vertical panels either side of the screen: the room's key light. */
+    private static Mesh wallGlow(int color) {
+        Buf b = new Buf(12 * 6);
+        b.quad(-6f, -1.5f, -3.9f, -3.2f, -1.5f, -3.9f, -6f, 2.4f, -3.9f, -3.2f, 2.4f, -3.9f,
+                color, 0xFF120A05);
+        b.quad(3.2f, -1.5f, -3.9f, 6f, -1.5f, -3.9f, 3.2f, 2.4f, -3.9f, 6f, 2.4f, -3.9f,
+                color, 0xFF120A05);
+        return b.toMesh();
+    }
+
+    /** A bright disc standing in for the sun (drawn with the star point program). */
+    private static Mesh sunDisc() {
+        Buf b = new Buf(6 * 6);
+        float x = -18f;
+        float y = 22f;
+        float z = -52f;
+        int core = 0xFFFFF3C4;
+        int edge = 0xFF9FBFE0;
+        b.vertex(x - 4f, y - 4f, z, edge);
+        b.vertex(x + 4f, y - 4f, z, edge);
+        b.vertex(x, y + 4.5f, z, core);
+        b.vertex(x + 4f, y - 4f, z, edge);
+        b.vertex(x, y + 4.5f, z, core);
+        b.vertex(x - 4f, y + 4.5f, z, edge);
+        return b.toMesh();
+    }
+
+    /** A faint horizontal band used as a nebula in the space environment. */
+    private static Mesh nebula(int innerColor, int outerColor) {
+        Buf b = new Buf(6 * 24);
+        float radius = 55f;
+        int segments = 24;
+        for (int i = 0; i < segments; i++) {
+            double a0 = 2 * Math.PI * i / segments;
+            double a1 = 2 * Math.PI * (i + 1) / segments;
+            b.quad((float) Math.cos(a0) * radius, -8f, (float) Math.sin(a0) * radius,
+                    (float) Math.cos(a1) * radius, -8f, (float) Math.sin(a1) * radius,
+                    (float) Math.cos(a0) * radius, 8f, (float) Math.sin(a0) * radius,
+                    (float) Math.cos(a1) * radius, 8f, (float) Math.sin(a1) * radius,
+                    outerColor, innerColor);
+        }
+        return b.toMesh();
+    }
 
     /**
      * A dome around the camera with a smooth vertical gradient. Rendered inside
@@ -125,7 +291,6 @@ public final class EnvironmentBuilder {
                 short b = (short) (a + 1);
                 short c = (short) (a + segments + 1);
                 short d = (short) (c + 1);
-                // inside-out winding
                 indices[idx++] = a;
                 indices[idx++] = b;
                 indices[idx++] = c;
@@ -139,8 +304,8 @@ public final class EnvironmentBuilder {
 
     /** A flat disc below the camera that grounds the scene without a texture. */
     private static Mesh floor(float radius, int centerColor, int edgeColor) {
-        int rings = 4;
-        int segments = 24;
+        int rings = 5;
+        int segments = 32;
         float[] vertices = new float[(rings + 1) * (segments + 1) * 6];
         int v = 0;
         float y = -1.65f;
@@ -182,24 +347,21 @@ public final class EnvironmentBuilder {
         int lines = 21;
         float[] vertices = new float[lines * 2 * 2 * 6];
         int v = 0;
-        float r = 0.72f;
-        float g = 0.85f;
-        float b = 0.95f;
+        float r = ((color >> 16) & 0xFF) / 255f;
+        float g = ((color >> 8) & 0xFF) / 255f;
+        float b = (color & 0xFF) / 255f;
         float y = -1.65f;
         for (int i = 0; i < lines; i++) {
             float t = -radius + (2f * radius) * i / (lines - 1);
-            // line along X
             addLineVertex(vertices, v, -radius, y, t, r, g, b);
             v += 6;
             addLineVertex(vertices, v, radius, y, t, r, g, b);
             v += 6;
-            // line along Z
             addLineVertex(vertices, v, t, y, -radius, r, g, b);
             v += 6;
             addLineVertex(vertices, v, t, y, radius, r, g, b);
             v += 6;
         }
-        // fade the colour toward the edge by using an unused alpha channel slot
         return Mesh.create(vertices, 6, null);
     }
 
@@ -215,7 +377,7 @@ public final class EnvironmentBuilder {
 
     /** A few soft emissive lines on the walls to suggest a room. */
     private static Mesh accentStrips(int color, float height) {
-        float[] vertices = new float[4 * 2 * 6];
+        float[] vertices = new float[8 * 2 * 6];
         int v = 0;
         float r = ((color >> 16) & 0xFF) / 255f;
         float g = ((color >> 8) & 0xFF) / 255f;
@@ -223,7 +385,6 @@ public final class EnvironmentBuilder {
         float distance = 9f;
         float width = 11f;
         float y = height - 1.0f;
-        // front and back walls
         addLineVertex(vertices, v, -width, y, -distance, r, g, b);
         v += 6;
         addLineVertex(vertices, v, width, y, -distance, r, g, b);
@@ -232,7 +393,6 @@ public final class EnvironmentBuilder {
         v += 6;
         addLineVertex(vertices, v, width, y, distance, r, g, b);
         v += 6;
-        // side walls
         addLineVertex(vertices, v, -width, y, -distance, r, g, b);
         v += 6;
         addLineVertex(vertices, v, -width, y, distance, r, g, b);
@@ -243,35 +403,34 @@ public final class EnvironmentBuilder {
         return Mesh.create(vertices, 6, null);
     }
 
-    /** Star points on the inside of a large sphere. */
+    /** Points scattered on a sphere, drawn with the point program. */
     private static Mesh starfield(int count, float radius) {
         float[] vertices = new float[count * 6];
-        Random random = new Random(20260401L);
+        java.util.Random random = new java.util.Random(7);
         int v = 0;
         for (int i = 0; i < count; i++) {
-            // uniform direction on a sphere
-            float u = random.nextFloat() * 2f - 1f;
-            float theta = random.nextFloat() * (float) (Math.PI * 2.0);
-            float r = (float) Math.sqrt(1f - u * u);
-            float x = r * (float) Math.cos(theta) * radius;
-            float y = u * radius;
-            float z = r * (float) Math.sin(theta) * radius;
+            double theta = random.nextDouble() * Math.PI * 2;
+            double cosPhi = random.nextDouble() * 2 - 1;
+            double sinPhi = Math.sqrt(Math.max(0, 1 - cosPhi * cosPhi));
+            float x = (float) (Math.cos(theta) * sinPhi * radius);
+            float y = (float) (cosPhi * radius);
+            float z = (float) (Math.sin(theta) * sinPhi * radius);
             float brightness = 0.45f + random.nextFloat() * 0.55f;
             vertices[v++] = x;
             vertices[v++] = y;
             vertices[v++] = z;
             vertices[v++] = brightness;
             vertices[v++] = brightness;
-            vertices[v++] = Math.min(1f, brightness * 1.1f);
+            vertices[v++] = Math.min(1f, brightness + 0.08f);
         }
         return Mesh.create(vertices, 6, null);
     }
 
     private static int lerpColor(int from, int to, float t) {
-        int a = (int) (((from >> 24) & 0xFF) + (((to >> 24) & 0xFF) - ((from >> 24) & 0xFF)) * t);
+        t = MathUtil.clamp(t, 0f, 1f);
         int r = (int) (((from >> 16) & 0xFF) + (((to >> 16) & 0xFF) - ((from >> 16) & 0xFF)) * t);
         int g = (int) (((from >> 8) & 0xFF) + (((to >> 8) & 0xFF) - ((from >> 8) & 0xFF)) * t);
         int b = (int) ((from & 0xFF) + ((to & 0xFF) - (from & 0xFF)) * t);
-        return (a << 24) | (r << 16) | (g << 8) | b;
+        return 0xFF000000 | (r << 16) | (g << 8) | b;
     }
 }

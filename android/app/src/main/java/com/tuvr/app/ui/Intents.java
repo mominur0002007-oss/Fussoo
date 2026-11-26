@@ -22,6 +22,7 @@ public final class Intents {
 
     public static final String GRID_MODE_MEDIA = "media";
     public static final String GRID_MODE_APPS = "apps";
+    public static final String GRID_MODE_SEARCH = "search";
 
     private Intents() {
     }

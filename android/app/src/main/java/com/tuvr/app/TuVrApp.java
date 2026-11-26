@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 
 import com.tuvr.app.core.AppSettings;
 import com.tuvr.app.core.CrashLog;
+import com.tuvr.app.core.TuVrAppCtx;
 
 /**
  * TU VR application entry point.
@@ -22,6 +23,7 @@ public class TuVrApp extends Application {
     public void onCreate() {
         super.onCreate();
         appContext = getApplicationContext();
+        TuVrAppCtx.set(this);
         CrashLog.install(this);
         AppSettings.init(this);
     }

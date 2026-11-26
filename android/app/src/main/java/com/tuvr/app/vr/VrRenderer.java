@@ -43,6 +43,9 @@ public class VrRenderer implements GLSurfaceView.Renderer {
     private static final int[] ATTR_POS_COLOR = {3, 0, 3};
 
     private static final float OVERSHOOT = 1.22f;
+    private static final long ENTRY_GRACE_MS = 1200L;
+    /** Head movement above this many degrees per frame pauses the dwell timer. */
+    private static final float GAZE_MOTION_DEG = 1.6f;
     private static final float NEAR_PLANE = 0.08f;
     private static final float FAR_PLANE = 90f;
 
@@ -101,6 +104,12 @@ public class VrRenderer implements GLSurfaceView.Renderer {
     private Panel focusedPanel;
     private long focusStartMs;
     private long selectionCooldownUntilMs;
+    /** No selection right after a scene appears, so entering VR never "clicks". */
+    private long selectionArmedAtMs;
+    private Panel confirmPanel;
+    private long confirmUntilMs;
+    private final float[] previousQuat = {0f, 0f, 0f, 1f};
+    private boolean hasPreviousQuat;
     private float dwellProgress;
 
     /* quality / stats */
@@ -174,7 +183,39 @@ public class VrRenderer implements GLSurfaceView.Renderer {
     }
 
     public void setPaused(boolean value) {
+        if (paused == value) {
+            return;
+        }
         paused = value;
+        if (value) {
+            if (scene != null) {
+                try {
+                    scene.onPaused(this);
+                } catch (Throwable t) {
+                    com.tuvr.app.core.Problems.record("scene.onPaused", t);
+                }
+            }
+            return;
+        }
+        if (!value) {
+            armSelection();
+            if (scene != null) {
+                try {
+                    scene.onResumed(this);
+                } catch (Throwable t) {
+                    com.tuvr.app.core.Problems.record("scene.onResumed", t);
+                }
+            }
+        }
+    }
+
+    /** Blocks dwell selection for a moment (scene entry, resume, recenter). */
+    public void armSelection() {
+        selectionArmedAtMs = System.currentTimeMillis() + ENTRY_GRACE_MS;
+        focusedPanel = null;
+        dwellProgress = 0f;
+        confirmPanel = null;
+        hasPreviousQuat = false;
     }
 
     public void setMonoPreview(boolean value) {
@@ -293,7 +334,11 @@ public class VrRenderer implements GLSurfaceView.Renderer {
         updateGaze(nowMs);
 
         if (scene != null) {
-            scene.update(this, dt);
+            try {
+                scene.update(this, dt);
+            } catch (Throwable t) {
+                com.tuvr.app.core.Problems.record("scene.update", t);
+            }
         }
         videoTexture.update();
         collectPanels();
@@ -308,6 +353,18 @@ public class VrRenderer implements GLSurfaceView.Renderer {
     /* frame stages                                                        */
     /* ------------------------------------------------------------------ */
 
+    /** Creates the scene; a failure must never take the GL thread down. */
+    private boolean createSceneSafely(VrScene candidate) {
+        try {
+            candidate.onCreated(this);
+            return true;
+        } catch (Throwable t) {
+            com.tuvr.app.core.Problems.record("scene:" + candidate.getClass().getSimpleName(), t);
+            showWhisper("Scene failed to load, see Diagnostics", 4000);
+            return false;
+        }
+    }
+
     private void applyPendingWork() {
         if (pendingScene != null) {
             if (scene != null) {
@@ -315,9 +372,10 @@ public class VrRenderer implements GLSurfaceView.Renderer {
             }
             scene = pendingScene;
             pendingScene = null;
-            if (scene != null) {
-                scene.onCreated(this);
+            if (scene != null && !createSceneSafely(scene)) {
+                scene = null;
             }
+            armSelection();
             settingsDirty = true;
         }
         if (settingsDirty) {
@@ -333,7 +391,11 @@ public class VrRenderer implements GLSurfaceView.Renderer {
                 environmentType = desiredEnv;
             }
             if (scene != null) {
-                scene.onSettingsChanged(this);
+                try {
+                    scene.onSettingsChanged(this);
+                } catch (Throwable t) {
+                    com.tuvr.app.core.Problems.record("scene.onSettingsChanged", t);
+                }
             }
             applyEyeSettings();
         }
@@ -369,7 +431,11 @@ public class VrRenderer implements GLSurfaceView.Renderer {
     private void collectPanels() {
         panels.clear();
         if (scene != null) {
-            scene.collectPanels(this, panels);
+            try {
+                scene.collectPanels(this, panels);
+            } catch (Throwable t) {
+                com.tuvr.app.core.Problems.record("scene.collectPanels", t);
+            }
         }
         panels.addAll(internalPanels);
         for (int i = 0; i < panels.size(); i++) {
@@ -428,7 +494,11 @@ public class VrRenderer implements GLSurfaceView.Renderer {
 
             drawEnvironment();
             if (scene != null) {
-                scene.drawEye(this, eye, eyeView, projMatrix);
+                try {
+                    scene.drawEye(this, eye, eyeView, projMatrix);
+                } catch (Throwable t) {
+                    com.tuvr.app.core.Problems.record("scene.drawEye", t);
+                }
             }
             drawPanels();
             drawReticle(eyeAspect);
@@ -534,6 +604,9 @@ public class VrRenderer implements GLSurfaceView.Renderer {
         }
         if (environment.floor != null) {
             environment.floor.draw(ATTR_POS_COLOR);
+        }
+        if (environment.glow != null) {
+            environment.glow.draw(ATTR_POS_COLOR);
         }
         if (environment.accents != null) {
             environment.accents.drawLines(ATTR_POS_COLOR);
@@ -646,6 +719,11 @@ public class VrRenderer implements GLSurfaceView.Renderer {
             dwellProgress = 0f;
             return;
         }
+        if (nowMs < selectionArmedAtMs) {
+            focusedPanel = null;
+            dwellProgress = 0f;
+            return;
+        }
         Panel best = pickPanel(gazeDir[0], gazeDir[1], gazeDir[2]);
         if (best != focusedPanel) {
             focusedPanel = best;
@@ -657,15 +735,49 @@ public class VrRenderer implements GLSurfaceView.Renderer {
             dwellProgress = 0f;
             return;
         }
-        int dwellMs = Math.max(500, settings.dwellMs());
+        // While the head is moving the user is looking around, not choosing:
+        // keep pushing the start time forward so the ring never fills.
+        float movedDeg = angleToPrevious(quat);
+        if (hasPreviousQuat && movedDeg > GAZE_MOTION_DEG) {
+            focusStartMs = nowMs;
+            dwellProgress = 0f;
+            System.arraycopy(quat, 0, previousQuat, 0, 4);
+            hasPreviousQuat = true;
+            return;
+        }
+        System.arraycopy(quat, 0, previousQuat, 0, 4);
+        hasPreviousQuat = true;
+
+        int dwellMs = Math.max(600, settings.dwellMs());
         long elapsedMs = nowMs - focusStartMs;
         dwellProgress = MathUtil.clamp(elapsedMs / (float) dwellMs, 0f, 1f);
         if (elapsedMs >= dwellMs && nowMs > selectionCooldownUntilMs) {
-            selectionCooldownUntilMs = nowMs + 500;
+            Panel target = focusedPanel;
+            if (target.confirmRequired
+                    && (confirmPanel != target || nowMs > confirmUntilMs)) {
+                // Two-step activation: leaving VR or the cinema must be deliberate.
+                confirmPanel = target;
+                confirmUntilMs = nowMs + 5000L;
+                selectionCooldownUntilMs = nowMs + 400L;
+                dwellProgress = 0f;
+                focusStartMs = nowMs;
+                showWhisper("Look again to confirm", 1800);
+                return;
+            }
+            confirmPanel = null;
+            selectionCooldownUntilMs = nowMs + 600L;
             dwellProgress = 0f;
             focusStartMs = nowMs;
-            dispatchSelection(focusedPanel);
+            dispatchSelection(target);
         }
+    }
+
+    /** Shortest angle in degrees between two unit quaternions. */
+    private float angleToPrevious(float[] current) {
+        float dot = Math.abs(previousQuat[0] * current[0] + previousQuat[1] * current[1]
+                + previousQuat[2] * current[2] + previousQuat[3] * current[3]);
+        dot = MathUtil.clamp(dot, -1f, 1f);
+        return (float) Math.toDegrees(2.0 * Math.acos(dot));
     }
 
     private Panel pickPanel(float dirX, float dirY, float dirZ) {
@@ -693,8 +805,13 @@ public class VrRenderer implements GLSurfaceView.Renderer {
         android.os.Handler handler = new android.os.Handler(
                 android.os.Looper.getMainLooper());
         handler.post(() -> {
-            listener.onPanelSelected(panel);
-            targetScene.onPanelSelected(panel, VrRenderer.this);
+            try {
+                listener.onPanelSelected(panel);
+                targetScene.onPanelSelected(panel, VrRenderer.this);
+            } catch (Throwable t) {
+                com.tuvr.app.core.Problems.record("panel " + panel.id, t);
+                showWhisper("Action failed, see Diagnostics", 3000);
+            }
         });
     }
 
@@ -839,6 +956,12 @@ public class VrRenderer implements GLSurfaceView.Renderer {
      */
     public void drawVideo(Mesh mesh, float[] model, float uvScaleX, float uvScaleY,
                           float uvOffsetX, float uvOffsetY, float uvRotationRad, float alpha) {
+        drawVideo(mesh, model, uvScaleX, uvScaleY, uvOffsetX, uvOffsetY, uvRotationRad, 0f, alpha);
+    }
+
+    public void drawVideo(Mesh mesh, float[] model, float uvScaleX, float uvScaleY,
+                          float uvOffsetX, float uvOffsetY, float uvRotationRad, float flipV,
+                          float alpha) {
         if (videoProgram == null || !videoTexture.isReady()) {
             return;
         }
@@ -849,6 +972,7 @@ public class VrRenderer implements GLSurfaceView.Renderer {
         videoProgram.set2f("uUvScale", uvScaleX, uvScaleY);
         videoProgram.set2f("uUvOffset", uvOffsetX, uvOffsetY);
         videoProgram.set1f("uUvRotation", uvRotationRad);
+        videoProgram.set1f("uFlipV", flipV);
         videoProgram.set1f("uAlpha", alpha);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, videoTexture.textureId());
@@ -908,7 +1032,11 @@ public class VrRenderer implements GLSurfaceView.Renderer {
     /** Must be called on the GL thread (for example via GLSurfaceView.queueEvent). */
     public void releaseGl() {
         if (scene != null) {
-            scene.release();
+            try {
+                scene.release();
+            } catch (Throwable t) {
+                com.tuvr.app.core.Problems.record("scene.release", t);
+            }
             scene = null;
         }
         for (Panel panel : panels) {

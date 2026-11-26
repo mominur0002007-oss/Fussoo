@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 
 import com.tuvr.app.R;
+import com.tuvr.app.core.YoutubeLinks;
 import com.tuvr.app.vr.VrActivity;
 import com.tuvr.app.vr.VrScene;
 import com.tuvr.app.vr.scene.BrowserScene;
@@ -239,6 +240,22 @@ public class VrBrowserActivity extends VrActivity implements BrowserScene.Bridge
             if (webView != null) {
                 webView.reload();
             }
+        });
+    }
+
+    @Override
+    public void onOpenInApp() {
+        runOnUiThread(() -> {
+            String url = currentUrl();
+            if (YoutubeLinks.openInApp(this, url)) {
+                return;
+            }
+            String id = YoutubeLinks.videoId(url);
+            if (id == null) {
+                showWhisper("Open a YouTube video link first");
+                return;
+            }
+            showWhisper("YouTube app not installed");
         });
     }
 

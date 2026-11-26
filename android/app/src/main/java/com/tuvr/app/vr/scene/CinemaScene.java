@@ -43,6 +43,8 @@ public class CinemaScene implements VrScene {
     private Mesh sphereMesh;
     private Mesh hemisphereMesh;
     private float meshAspect = -1f;
+    /** True when the activity was paused while the video was playing. */
+    private boolean pausedWasPlaying;
     private float meshCurvature = -1f;
     private float meshWidth = -1f;
     private float meshHeight = -1f;
@@ -134,12 +136,15 @@ public class CinemaScene implements VrScene {
 
     private void buildPanels(VrRenderer renderer) {
         panels.clear();
-        float iconRowPitch = -23f;
+        // The control rows sit well below the screen: you have to look down on
+        // purpose, which stops accidental dwell activation while watching.
+        float iconRowPitch = -34f;
         float iconRowDistance = 2.15f;
         float[] yaws = {-40f, -30f, -20f, -10f, 0f, 10f, 20f, 30f, 40f};
 
-        addControl(renderer, "exit", "\u23FB", "Exit", yaws[0], iconRowPitch, iconRowDistance,
-                host::leaveScene);
+        Panel exitPanel = addControl(renderer, "exit", "\u23FB", "Exit", yaws[0],
+                iconRowPitch, iconRowDistance, host::leaveScene);
+        exitPanel.confirmRequired = true;
         addControl(renderer, "rew", "\u21BA", "-10s", yaws[1], iconRowPitch, iconRowDistance,
                 () -> seekBy(-10000L));
         addControl(renderer, "prevproj", "\u25A6", "Mode", yaws[2], iconRowPitch, iconRowDistance,
@@ -152,12 +157,12 @@ public class CinemaScene implements VrScene {
                 this::resetScreen);
         addControl(renderer, "fwd", "\u21BB", "+10s", yaws[6], iconRowPitch, iconRowDistance,
                 () -> seekBy(10000L));
-        addControl(renderer, "smaller", "\u2212", "Smaller", yaws[7], iconRowPitch,
-                iconRowDistance, () -> changeSize(-1));
-        addControl(renderer, "bigger", "\u002B", "Bigger", yaws[8], iconRowPitch,
-                iconRowDistance, () -> changeSize(1));
+        addControl(renderer, "flip", "\u21C5", "Flip", yaws[7], iconRowPitch,
+                iconRowDistance, this::toggleFlip);
+        addControl(renderer, "rotate", "\u21BA", "Rotate", yaws[8], iconRowPitch,
+                iconRowDistance, this::cycleRotation);
 
-        float row2 = -32f;
+        float row2 = -45f;
         float[] yaws2 = {-40f, -24f, -8f, 8f, 24f, 40f};
         addControl(renderer, "closer", "\u2191", "Nearer", yaws2[0], row2, iconRowDistance,
                 () -> changeDistance(-1));
@@ -287,6 +292,14 @@ public class CinemaScene implements VrScene {
         host.showWhisper("Volume " + Formats.percent(volume));
     }
 
+    @Override
+    public void onPaused(VrRenderer renderer) {
+        pausedWasPlaying = session != null && session.isPlaying();
+        if (pausedWasPlaying) {
+            session.pause();
+        }
+    }
+
     /** Cycles the virtual environment without leaving the cinema. */
     private void cycleEnvironment() {
         int count = com.tuvr.app.vr.EnvironmentBuilder.NAMES.length;
@@ -296,6 +309,18 @@ public class CinemaScene implements VrScene {
             rendererRef.reloadSettings();
         }
         host.showWhisper(com.tuvr.app.vr.EnvironmentBuilder.name(next));
+    }
+
+    /** Some files/decoders arrive mirrored; this is the escape hatch. */
+    private void toggleFlip() {
+        format.flipVertical = !format.flipVertical;
+        host.showWhisper(format.flipVertical ? "Vertical flip on" : "Vertical flip off");
+    }
+
+    private void cycleRotation() {
+        format.rotationDeg = (format.rotationDeg + 90) % 360;
+        meshAspect = -1f;
+        host.showWhisper("Rotation " + format.rotationDeg + "\u00B0");
     }
 
     private void resetScreen() {
@@ -320,11 +345,17 @@ public class CinemaScene implements VrScene {
 
     @Override
     public void onResumed(VrRenderer renderer) {
+        rendererRef = renderer;
         final VideoSession currentSession = session;
         if (currentSession != null) {
             com.tuvr.app.core.Background.main(() ->
                     currentSession.setVideoSurface(renderer.videoTexture().surface()));
+            // Only resume what the user was already watching when we went away.
+            if (pausedWasPlaying) {
+                currentSession.play();
+            }
         }
+        pausedWasPlaying = false;
     }
 
     @Override
@@ -405,11 +436,12 @@ public class CinemaScene implements VrScene {
         float offsetY = 0.5f;
         if (format.stereo == VideoFormat.STEREO_SBS) {
             scaleX = 0.5f;
-            offsetX = uvEye == 0 ? 0.25f : 0.75f;
+            offsetX = uvEye == 0 ? 0f : 0.5f;
         } else if (format.stereo == VideoFormat.STEREO_TAB) {
             scaleY = 0.5f;
-            offsetY = uvEye == 0 ? 0.25f : 0.75f;
+            offsetY = uvEye == 0 ? 0f : 0.5f;
         }
+        float flip = format.flipVertical ? 1f : 0f;
 
         if (format.projection == VideoFormat.PROJ_FLAT) {
             float width = BASE_SCREEN_WIDTH_M * settings.screenSize();
@@ -437,17 +469,17 @@ public class CinemaScene implements VrScene {
             model[13] = settings.screenY();
             model[14] = -settings.screenDistance();
             renderer.drawVideo(flatMesh, model, scaleX, scaleY, offsetX, offsetY,
-                    format.rotationDeg * MathUtil.DEG_TO_RAD, 1f);
+                    format.rotationDeg * MathUtil.DEG_TO_RAD, flip, 1f);
         } else {
             MathUtil.identity(model);
             if (format.projection == VideoFormat.PROJ_VR360) {
                 if (sphereMesh != null) {
                     renderer.drawVideo(sphereMesh, model, scaleX, scaleY, offsetX, offsetY,
-                            format.rotationDeg * MathUtil.DEG_TO_RAD, 1f);
+                            format.rotationDeg * MathUtil.DEG_TO_RAD, flip, 1f);
                 }
             } else if (hemisphereMesh != null) {
                 renderer.drawVideo(hemisphereMesh, model, scaleX, scaleY, offsetX, offsetY,
-                        format.rotationDeg * MathUtil.DEG_TO_RAD, 1f);
+                        format.rotationDeg * MathUtil.DEG_TO_RAD, flip, 1f);
             }
         }
     }

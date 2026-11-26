@@ -7,6 +7,7 @@ import com.tuvr.app.core.AppSettings;
 import com.tuvr.app.media.MediaStateDb;
 import com.tuvr.app.media.VideoItem;
 import com.tuvr.app.media.VideoLibrary;
+import com.tuvr.app.vr.EnvironmentBuilder;
 import com.tuvr.app.vr.Panel;
 import com.tuvr.app.vr.VrHost;
 import com.tuvr.app.vr.VrRenderer;
@@ -80,24 +81,45 @@ public class HomeScene implements VrScene {
         addTile(renderer, "browser", "\u25CE", "Browser", "web screen", positions[4][0],
                 positions[4][1], () -> host.openVrBrowser(null));
 
-        // Second row: system actions
-        addTile(renderer, "settings", "\u2699", "Settings", "viewer + quality", -31f, -24f,
+        // Second row: find things, and change the room you sit in.
+        addTile(renderer, "search", "\u2315", "Search", "videos + apps", -34f, -25f,
+                host::openVrSearch);
+        addTile(renderer, "youtube", "\u25B6", "YouTube", "web screen", -11f, -25f,
+                () -> host.openVrBrowser("https://m.youtube.com"));
+        addTile(renderer, "world", "\u26F0", "3D world", "outdoors", 12f, -25f,
+                () -> applyEnvironment(renderer, EnvironmentBuilder.WORLD));
+        addTile(renderer, "theater", "\u25A3", "Theater", "dark room", 35f, -25f,
+                () -> applyEnvironment(renderer, EnvironmentBuilder.THEATER));
+
+        // Third row: system actions.
+        addTile(renderer, "settings", "\u2699", "Settings", "viewer + quality", -34f, -34f,
                 host::openSettings);
-        addTile(renderer, "calibrate", "\u2316", "Calibrate", "lens alignment", -10f, -24f,
+        addTile(renderer, "calibrate", "\u2316", "Calibrate", "lens alignment", -11f, -34f,
                 host::openCalibration);
-        addTile(renderer, "recenter", "\u25C9", "Recenter", "level the view", 11f, -24f,
+        addTile(renderer, "recenter", "\u25C9", "Recenter", "level the view", 12f, -34f,
                 host::recenter);
-        addTile(renderer, "diagnostics", "\u2139", "Diagnostics", "sensors + GPU", 32f, -24f,
+        addTile(renderer, "diagnostics", "\u2139", "Diagnostics", "sensors + GPU", 35f, -34f,
                 host::openDiagnostics);
-        addTile(renderer, "exit", "\u23FB", "Exit VR", "back to phone", 0f, -38f,
-                host::exitVr);
+
+        // Leaving takes two deliberate activations: it is the one action that
+        // must never happen because the phone shifted in the headset.
+        Panel exitTile = addTile(renderer, "exit", "\u23FB", "Exit VR", "hold twice",
+                0f, -44f, host::exitVr);
+        exitTile.confirmRequired = true;
 
         panels.add(titlePanel);
         refreshResume(renderer);
     }
 
-    private void addTile(VrRenderer renderer, String id, String glyph, String title,
-                         String subtitle, float yaw, float pitch, Runnable action) {
+    /** Switches environment immediately and confirms it in the headset. */
+    private void applyEnvironment(VrRenderer renderer, int environment) {
+        AppSettings.get(context).setEnvironment(environment);
+        renderer.reloadSettings();
+        host.showWhisper(EnvironmentBuilder.name(environment));
+    }
+
+    private Panel addTile(VrRenderer renderer, String id, String glyph, String title,
+                          String subtitle, float yaw, float pitch, Runnable action) {
         Panel panel = new Panel(id);
         panel.widthM = 1.05f;
         panel.heightM = 0.52f;
@@ -105,8 +127,10 @@ public class HomeScene implements VrScene {
         panel.pitchDeg = pitch;
         panel.distanceM = 3.1f;
         panel.tag = action;
+        panel.confirmRequired = false;
         setPanelContent(panel, renderer.panelFactory().tile(glyph, title, subtitle, false));
         panels.add(panel);
+        return panel;
     }
 
     private void setPanelContent(Panel panel, Bitmap bitmap) {

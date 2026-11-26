@@ -41,6 +41,9 @@ public class BrowserScene implements VrScene {
         void onReload();
 
         String currentUrl();
+
+        /** Hands the page to another app (used for YouTube videos). */
+        void onOpenInApp();
     }
 
     private static final int CAPTURE_WIDTH = 960;
@@ -120,6 +123,8 @@ public class BrowserScene implements VrScene {
         addButton(renderer, "reload", "\u21BB", "Reload", 2f, () -> bridge.onReload());
         addButton(renderer, "url", "\u270E", "URL", 18f, () -> bridge.onEditUrl());
         addButton(renderer, "exit", "\u23FB", "Exit", 34f, () -> bridge.onExit());
+        addButton(renderer, "app", "\u2197", "YouTube app", 0f,
+                () -> bridge.onOpenInApp(), -38f);
 
         rendererRef = renderer;
         startCapture();
@@ -127,11 +132,16 @@ public class BrowserScene implements VrScene {
 
     private void addButton(VrRenderer renderer, String id, String glyph, String label,
                            float yaw, Runnable action) {
+        addButton(renderer, id, glyph, label, yaw, action, -25f);
+    }
+
+    private void addButton(VrRenderer renderer, String id, String glyph, String label,
+                           float yaw, Runnable action, float pitch) {
         Panel panel = new Panel(id);
         panel.widthM = 0.4f;
         panel.heightM = 0.22f;
         panel.yawDeg = yaw;
-        panel.pitchDeg = -25f;
+        panel.pitchDeg = pitch;
         panel.distanceM = 2.3f;
         panel.tag = action;
         panel.setContent(renderer.panelFactory().button(label, glyph, false));
@@ -228,6 +238,11 @@ public class BrowserScene implements VrScene {
 
     @Override
     public void onSettingsChanged(VrRenderer renderer) {
+    }
+
+    @Override
+    public void onPaused(VrRenderer renderer) {
+        stopCapture();
     }
 
     @Override

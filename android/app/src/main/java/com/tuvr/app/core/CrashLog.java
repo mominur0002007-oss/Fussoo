@@ -57,9 +57,50 @@ public final class CrashLog {
         pw.println();
         throwable.printStackTrace(pw);
         pw.flush();
+        String text = sw.toString();
         try (FileWriter fw = new FileWriter(crashFile, false)) {
-            fw.write(sw.toString());
+            fw.write(text);
         } catch (IOException ignored) {
+        }
+        Problems.record("fatal", throwable);
+        exportToDownloads(text);
+    }
+
+    /**
+     * Best effort copy into the public Downloads folder. On a phone without a PC
+     * this is the only way a crash report can be shared: the file shows up in
+     * the Files app and can be attached to a message.
+     */
+    private static void exportToDownloads(String text) {
+        Context context = TuVrAppCtx.get();
+        if (context == null) {
+            return;
+        }
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 29) {
+                android.content.ContentValues values = new android.content.ContentValues();
+                values.put(android.provider.MediaStore.Downloads.DISPLAY_NAME, "TUVR-crash.txt");
+                values.put(android.provider.MediaStore.Downloads.MIME_TYPE, "text/plain");
+                android.net.Uri uri = context.getContentResolver().insert(
+                        android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                if (uri != null) {
+                    java.io.OutputStream out = context.getContentResolver().openOutputStream(uri);
+                    if (out != null) {
+                        out.write(text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        out.close();
+                    }
+                }
+            } else {
+                File dir = android.os.Environment
+                        .getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS);
+                if (dir != null && (dir.exists() || dir.mkdirs())) {
+                    try (FileWriter fw = new FileWriter(new File(dir, "TUVR-crash.txt"), false)) {
+                        fw.write(text);
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+            // reporting must never throw
         }
     }
 

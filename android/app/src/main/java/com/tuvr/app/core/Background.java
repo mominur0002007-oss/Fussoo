@@ -19,19 +19,42 @@ public final class Background {
     private Background() {
     }
 
+    /** Runs on a worker thread; failures are logged instead of killing the app. */
     public static void run(Runnable task) {
-        IO.execute(task);
+        IO.execute(() -> {
+            try {
+                task.run();
+            } catch (Throwable t) {
+                Problems.record("background", t);
+            }
+        });
     }
 
     public static void main(Runnable task) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            task.run();
+            try {
+                task.run();
+            } catch (Throwable t) {
+                Problems.record("main", t);
+            }
         } else {
-            MAIN.post(task);
+            MAIN.post(() -> {
+                try {
+                    task.run();
+                } catch (Throwable t) {
+                    Problems.record("main", t);
+                }
+            });
         }
     }
 
     public static void mainDelayed(Runnable task, long delayMs) {
-        MAIN.postDelayed(task, delayMs);
+        MAIN.postDelayed(() -> {
+            try {
+                task.run();
+            } catch (Throwable t) {
+                Problems.record("main", t);
+            }
+        }, delayMs);
     }
 }

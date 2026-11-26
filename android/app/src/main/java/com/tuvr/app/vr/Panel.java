@@ -18,6 +18,8 @@ public final class Panel {
     public float pitchDeg = 0f;
     public float distanceM = 3f;
     public boolean interactive = true;
+    /** Destructive/leaving actions require a second activation to fire. */
+    public boolean confirmRequired = false;
     public boolean visible = true;
     public Object tag;
 
