@@ -70,8 +70,11 @@ jobs:
             grep -E "^e: |error:|Error:|FAILED|What went wrong|Execution failed|> Task .* FAILED" \
               "$RUNNER_TEMP/build.log" 2>/dev/null | head -400
             echo
+            grep -A 25 -E "^\* What went wrong|^Caused by:|Could not|Failed to apply" \
+              "$RUNNER_TEMP/build.log" 2>/dev/null | head -200
+            echo
             echo "---- tail ----"
-            tail -120 "$RUNNER_TEMP/build.log" 2>/dev/null
+            tail -400 "$RUNNER_TEMP/build.log" 2>/dev/null
           } > ci/last-build.log
           git config user.name "ci-diagnostics"
           git config user.email "ci@tuvr.invalid"
