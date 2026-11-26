@@ -52,8 +52,10 @@ jobs:
       - name: Stage APKs
         run: |
           mkdir -p dist
-          cp android/app/build/outputs/apk/debug/app-debug.apk dist/TUVR-1.0.0-debug.apk
-          cp android/app/build/outputs/apk/release/app-release.apk dist/TUVR-1.0.0-release.apk
+          VERSION=$(grep -m1 "versionName" android/app/build.gradle | sed "s/.*versionName *'\(.*\)'.*/\1/")
+          echo "version=$VERSION" >> "$GITHUB_ENV"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "dist/TUVR-$VERSION-debug.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "dist/TUVR-$VERSION-release.apk"
           cd dist && sha256sum *.apk | tee SHA256SUMS.txt
           ls -lh
 
@@ -71,7 +73,7 @@ jobs:
         if: ${{ hashFiles('ci/request-apk') != '' }}
         run: |
           mkdir -p release-assets
-          cp dist/TUVR-1.0.0-release.apk release-assets/TUVR-1.0.0-release.apk
+          cp "dist/TUVR-${VERSION}-release.apk" "release-assets/TUVR-${VERSION}-release.apk"
           cp dist/SHA256SUMS.txt release-assets/SHA256SUMS.txt
           git config user.name "ci-diagnostics"
           git config user.email "ci@tuvr.invalid"
@@ -104,10 +106,10 @@ jobs:
             ls -l dist 2>/dev/null
             echo
             "$ANDROID_SDK_ROOT/build-tools/35.0.0/aapt2" dump badging \
-              dist/TUVR-1.0.0-release.apk 2>/dev/null | head -18
+              dist/TUVR-*-release.apk 2>/dev/null | head -18
             echo
             "$ANDROID_SDK_ROOT/build-tools/35.0.0/apksigner" verify --print-certs \
-              dist/TUVR-1.0.0-release.apk 2>/dev/null | head -6
+              dist/TUVR-*-release.apk 2>/dev/null | head -6
           } > ci/lint.txt
 
           git config user.name "ci-diagnostics"
