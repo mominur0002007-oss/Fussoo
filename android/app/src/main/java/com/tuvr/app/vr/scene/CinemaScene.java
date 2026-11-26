@@ -123,7 +123,7 @@ public class CinemaScene implements VrScene {
         final VideoSession currentSession = session;
         if (currentSession != null) {
             com.tuvr.app.core.Background.main(() ->
-                    currentSession.setSurfaceFromTexture(renderer.videoTexture().surface()));
+                    currentSession.setVideoSurface(renderer.videoTexture().surface()));
         }
     }
 
@@ -296,7 +296,7 @@ public class CinemaScene implements VrScene {
         final VideoSession currentSession = session;
         if (currentSession != null) {
             com.tuvr.app.core.Background.main(() ->
-                    currentSession.setSurfaceFromTexture(renderer.videoTexture().surface()));
+                    currentSession.setVideoSurface(renderer.videoTexture().surface()));
         }
     }
 

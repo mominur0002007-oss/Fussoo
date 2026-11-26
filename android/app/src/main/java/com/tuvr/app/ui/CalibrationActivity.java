@@ -157,8 +157,4 @@ public class CalibrationActivity extends VrActivity {
         contentRoot().removeAllViews();
         recreate();
     }
-
-    private void showWhisper(String message) {
-        renderer.showWhisper(message, 2200);
-    }
 }

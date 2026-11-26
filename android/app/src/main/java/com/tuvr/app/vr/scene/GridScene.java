@@ -242,7 +242,7 @@ public class GridScene implements VrScene {
     }
 
     private void bindApp(Panel slot, AppEntry entry) {
-        Bitmap bitmap = factory.blankPublic(PanelFactory.THUMB_W, PanelFactory.THUMB_H);
+        Bitmap bitmap = factory.newBitmap(PanelFactory.THUMB_W, PanelFactory.THUMB_H);
         Canvas canvas = new Canvas(bitmap);
         int backgroundColor = 0xCC101825;
         canvas.drawColor(backgroundColor);

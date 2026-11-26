@@ -47,6 +47,11 @@ public final class PanelFactory {
         accentPaint.setColor(ACCENT);
     }
 
+    /** Public helper so scenes can compose their own artwork. */
+    public Bitmap newBitmap(int w, int h) {
+        return blank(w, h);
+    }
+
     private Bitmap blank(int w, int h) {
         Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);

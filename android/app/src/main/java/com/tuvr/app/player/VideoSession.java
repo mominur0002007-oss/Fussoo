@@ -181,12 +181,12 @@ public final class VideoSession {
         }
     }
 
-    /** Used by the VR renderer: the player renders into an external texture. */
-    public void setSurfaceFromTexture(SurfaceTexture texture) {
-        if (player == null || texture == null) {
+    /** Used by the VR renderer: the player renders into the surface of an external texture. */
+    public void setVideoSurface(Surface surface) {
+        if (player == null || surface == null) {
             return;
         }
-        player.setVideoSurface(new Surface(texture));
+        player.setVideoSurface(surface);
     }
 
     public void play() {

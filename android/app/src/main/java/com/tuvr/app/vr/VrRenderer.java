@@ -38,9 +38,9 @@ public class VrRenderer implements GLSurfaceView.Renderer {
         void onTrackingWarning(int state, String source);
     }
 
-    private static final float[] ATTR_POS = {3};
-    private static final float[] ATTR_POS_UV = {3, 2};
-    private static final float[] ATTR_POS_COLOR = {3, 0, 3};
+    private static final int[] ATTR_POS = {3};
+    private static final int[] ATTR_POS_UV = {3, 2};
+    private static final int[] ATTR_POS_COLOR = {3, 0, 3};
 
     private static final float OVERSHOOT = 1.22f;
     private static final float NEAR_PLANE = 0.08f;

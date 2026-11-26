@@ -87,11 +87,11 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.VH> {
                 });
 
         if (!item.hasMetadata()) {
-            ThumbLoader.get().loadMetadata(holder.itemView.getContext(), item, meta -> {
-                if (meta.durationMs > 0) {
-                    holder.duration.setText(Formats.duration(meta.durationMs));
+            ThumbLoader.get().loadMetadata(holder.itemView.getContext(), item, loaded -> {
+                if (loaded.durationMs > 0) {
+                    holder.duration.setText(Formats.duration(loaded.durationMs));
                 }
-                String line = meta.metaLine();
+                String line = loaded.metaLine();
                 if (!line.isEmpty()) {
                     holder.meta.setText(line);
                 }

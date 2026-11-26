@@ -27,6 +27,8 @@ import com.tuvr.app.ui.DiagnosticsActivity;
 import com.tuvr.app.ui.GalleryActivity;
 import com.tuvr.app.ui.Intents;
 import com.tuvr.app.ui.SettingsActivity;
+import com.tuvr.app.ui.VrBrowserActivity;
+import com.tuvr.app.ui.VrHomeActivity;
 import com.tuvr.app.ui.VrGridActivity;
 
 /**
