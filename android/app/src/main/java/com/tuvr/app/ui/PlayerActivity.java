@@ -35,7 +35,7 @@ import java.util.List;
  * Phone-mode video player: 2D playback with full transport controls, track and
  * subtitle selection, playback speed, and a one-tap hand-off into the VR cinema.
  */
-@androidx.media3.common.util.UnstableApi
+@androidx.annotation.OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)
 public class PlayerActivity extends AppCompatActivity implements VideoSession.Listener {
 
     private static final float[] SPEEDS = {0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f};

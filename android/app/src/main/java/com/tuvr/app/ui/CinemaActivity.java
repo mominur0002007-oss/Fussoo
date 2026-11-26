@@ -22,7 +22,7 @@ import com.tuvr.app.vr.scene.CinemaScene;
  * VR Cinema activity: owns the ExoPlayer session and pushes small snapshots into
  * the scene so all player access stays on the main thread.
  */
-@androidx.media3.common.util.UnstableApi
+@androidx.annotation.OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)
 public class CinemaActivity extends VrActivity implements VideoSession.Listener {
 
     private VideoSession session;
