@@ -73,23 +73,21 @@ jobs:
             echo "---- report head ----"
             head -120 android/app/build/reports/lint-results-debug.txt 2>/dev/null
             echo "---- log tail ----"
-            tail -60 "$RUNNER_TEMP/lint.log"
-          } > ci/lint.txt
-
-          BT="$ANDROID_SDK_ROOT/build-tools/35.0.0"
-          {
-            echo "TU VR packaged APK"
+            tail -40 "$RUNNER_TEMP/lint.log"
             echo
+            echo "======== packaged APK ========"
             ls -l dist 2>/dev/null
             echo
-            "$BT/aapt2" dump badging dist/TUVR-1.0.0-release.apk 2>/dev/null | head -20
+            "$ANDROID_SDK_ROOT/build-tools/35.0.0/aapt2" dump badging \
+              dist/TUVR-1.0.0-release.apk 2>/dev/null | head -18
             echo
-            "$BT/apksigner" verify --print-certs dist/TUVR-1.0.0-release.apk 2>/dev/null | head -8
-          } > ci/apk-info.txt
+            "$ANDROID_SDK_ROOT/build-tools/35.0.0/apksigner" verify --print-certs \
+              dist/TUVR-1.0.0-release.apk 2>/dev/null | head -6
+          } > ci/lint.txt
 
           git config user.name "ci-diagnostics"
           git config user.email "ci@tuvr.invalid"
-          git add ci/lint.txt ci/apk-info.txt
+          git add ci/lint.txt
           git commit -m "ci: lint report for $GITHUB_RUN_ID [skip ci]" || true
           git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
           git push origin "HEAD:${GITHUB_REF_NAME}" || true
