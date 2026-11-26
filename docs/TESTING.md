@@ -10,12 +10,13 @@ headset. The checklist at the end is what needs to be executed on the TECNO Spar
 
 | Verification | Method | Result |
 | --- | --- | --- |
-| Project builds | GitHub Actions, `ubuntu-latest`, Temurin JDK 17, `platforms;android-35`, `build-tools;35.0.0`, Gradle 8.9 | **`assembleDebug` and `assembleRelease` succeed**; APK ≈ 6.5 MB per variant |
-| Release signing | committed keystore, `apksigner` output in the CI run | release APK signed, installable over previous builds with the same key |
+| Project builds | GitHub Actions, `ubuntu-latest`, Temurin JDK 17, `platforms;android-35`, `build-tools;35.0.0`, Gradle 8.9 | **`assembleDebug` and `assembleRelease` succeed** — release APK 6,508,313 bytes, debug 8,169,955 bytes |
+| Manifest as packaged | `aapt2 dump badging` on the release APK (report in `ci/lint.txt`) | `com.tuvr.app` v1.0.0, minSdk 24, targetSdk 34, compileSdk 35, permissions exactly as intended |
+| Release signing | `apksigner verify --print-certs` | verified; signer `CN=TU VR, OU=Personal, O=TU VR Project, L=Dhaka, C=BD`, cert SHA-256 `c1e2b519…ff11d41` |
 | Resource wiring | script that extracts every `R.string/R.id/R.drawable/R.array/R.layout/R.color/R.dimen/R.style` reference from Java and XML and compares it with what is defined | 0 unresolved references (55 Java files) |
 | Resource validity | AAPT resource linking during the build | passes (duplicate string, malformed style item and `app:max` misuse were found and fixed this way) |
 | Shader/Java contract | script comparing every `setXf("name")` uniform against the GLSL sources | all 16 uniforms exist in the shaders; no silently ignored uniforms |
-| Static analysis | `:app:lintDebug` (AGP 8.7.3) | after fixes: **0 errors**, warnings only (dependency-update notes, `OldTargetApi`, `InflateParams`, `RedundantLabel`, `SelectedPhotoAccess` was fixed) |
+| Static analysis | `:app:lintDebug` (AGP 8.7.3), report committed to `ci/lint.txt` | after fixes: **0 errors**; remaining warnings are dependency-update notices, `OldTargetApi`, and `DiscouragedApi` for the intentionally landscape-locked VR screens |
 | Opt-in APIs | lint `UnsafeOptInUsageError` | Media3 usage annotated, 0 remaining |
 
 ### Code-level reviews that changed the code
@@ -46,9 +47,11 @@ fixed in the current tree:
    and the browser's own buffers are marked `recycleOnReplace = false`.
 8. **API 26 file APIs on a minSdk 24 app** — `java.nio.file.Files` replaced with streams
    in the crash log reader (would have crashed on Android 7/8).
-9. **Back button in the VR browser** — overriding `onBackPressed` without `super` left
+9. **22 vector drawables had `android:tint` outside the `<vector>` tag** — the icons
+   compiled but rendered untinted; caught by lint (`ExtraText`) and fixed.
+10. **Back button in the VR browser** — overriding `onBackPressed` without `super` left
    the user unable to leave; navigation history and exit are now separate paths.
-10. **Permission request type** — switching to a multi-permission request (needed for
+11. **Permission request type** — switching to a multi-permission request (needed for
     Android 14 partial media access) also required changing the launcher type.
 
 ## What has NOT been verified
