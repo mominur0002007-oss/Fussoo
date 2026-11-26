@@ -23,7 +23,7 @@
             android:title="@string/pref_lens_separation"
             android:summary="Millimetres between the two lens centres (mm)"
             app:min="45"
-            app:max="85"
+            android:max="85"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -31,7 +31,7 @@
             android:title="@string/pref_fov"
             android:summary="Field of view per lens (degrees)"
             app:min="55"
-            app:max="115"
+            android:max="115"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -39,7 +39,7 @@
             android:title="@string/pref_screen_distance"
             android:summary="Physical distance from screen to lens (mm)"
             app:min="22"
-            app:max="75"
+            android:max="75"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -47,7 +47,7 @@
             android:title="@string/pref_ipd"
             android:summary="Your interpupillary distance (mm)"
             app:min="45"
-            app:max="80"
+            android:max="80"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -55,7 +55,7 @@
             android:title="@string/pref_eye_offset_x"
             android:summary="Shifts each eye image horizontally (mm)"
             app:min="-20"
-            app:max="20"
+            android:max="20"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -63,7 +63,7 @@
             android:title="@string/pref_eye_offset_y"
             android:summary="Shifts each eye image vertically (mm)"
             app:min="-20"
-            app:max="20"
+            android:max="20"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -71,7 +71,7 @@
             android:title="@string/pref_distortion"
             android:summary="Barrel correction strength (x100)"
             app:min="0"
-            app:max="60"
+            android:max="60"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -79,7 +79,7 @@
             android:title="Distortion falloff"
             android:summary="Higher-order correction (x100)"
             app:min="0"
-            app:max="40"
+            android:max="40"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -87,7 +87,7 @@
             android:title="@string/pref_chromatic"
             android:summary="Colour fringing correction (x1000)"
             app:min="0"
-            app:max="40"
+            android:max="40"
             app:showSeekBarValue="true" />
 
         <SwitchPreferenceCompat
@@ -110,7 +110,7 @@
             android:title="@string/pref_tracking_smoothing"
             android:summary="0 = raw and snappy, 90 = very smooth"
             app:min="0"
-            app:max="90"
+            android:max="90"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -118,7 +118,7 @@
             android:title="@string/pref_tracking_sensitivity"
             android:summary="Head rotation multiplier (%)"
             app:min="40"
-            app:max="200"
+            android:max="200"
             app:showSeekBarValue="true" />
 
         <SwitchPreferenceCompat
@@ -165,7 +165,7 @@
             android:title="@string/pref_playback_speed"
             android:summary="Percent of normal speed"
             app:min="50"
-            app:max="200"
+            android:max="200"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -173,7 +173,7 @@
             android:title="@string/pref_subtitle_size"
             android:summary="Subtitle text size (sp)"
             app:min="10"
-            app:max="28"
+            android:max="28"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -181,7 +181,7 @@
             android:title="Playback volume"
             android:summary="Applied when playback starts (%)"
             app:min="10"
-            app:max="100"
+            android:max="100"
             app:showSeekBarValue="true" />
     </PreferenceCategory>
 
@@ -228,7 +228,7 @@
             android:title="@string/pref_screen_size"
             android:summary="Relative width of the virtual cinema screen (%)"
             app:min="40"
-            app:max="220"
+            android:max="220"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -236,7 +236,7 @@
             android:title="@string/pref_screen_distance_virtual"
             android:summary="Distance to the screen (decimetres)"
             app:min="25"
-            app:max="160"
+            android:max="160"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -244,7 +244,7 @@
             android:title="@string/pref_curvature"
             android:summary="0 = flat panel, 100 = strongly curved"
             app:min="0"
-            app:max="100"
+            android:max="100"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -252,7 +252,7 @@
             android:title="Screen height offset"
             android:summary="Raises or lowers the screen (cm)"
             app:min="-150"
-            app:max="150"
+            android:max="150"
             app:showSeekBarValue="true" />
 
         <SeekBarPreference
@@ -260,7 +260,7 @@
             android:title="@string/pref_dwell_time"
             android:summary="How long to look at a panel before it activates (ms)"
             app:min="500"
-            app:max="3000"
+            android:max="3000"
             app:showSeekBarValue="true" />
 
         <ListPreference
@@ -275,7 +275,7 @@
             android:title="@string/pref_ui_scale"
             android:summary="Size of the gaze reticle and controls (%)"
             app:min="60"
-            app:max="160"
+            android:max="160"
             app:showSeekBarValue="true" />
 
         <SwitchPreferenceCompat
