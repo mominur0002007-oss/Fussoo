@@ -76,8 +76,11 @@ small `⋮` button in the corner of every VR screen.
 
 ## Privacy
 
-* No internet permission is used outside the web screen (single `INTERNET` permission,
-  used by `BrowserActivity` / `VrBrowserActivity` only).
+* The only network-related permission this app declares is `INTERNET`, used by
+  `BrowserActivity` / `VrBrowserActivity`. Media3 additionally contributes
+  `ACCESS_NETWORK_STATE` (a normal permission it uses to detect connectivity) and AndroidX
+  contributes the internal `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`; neither is used to
+  send anything anywhere — there is no analytics or crash-upload code in the app.
 * No advertising, analytics, crash reporting or account code — the diagnostics screen
   reads *local* data and only shares it if you press *Share*.
 * Video files are read in place through MediaStore or the Storage Access Framework;
