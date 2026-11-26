@@ -68,7 +68,7 @@ public class GalleryActivity extends AppCompatActivity implements MediaAdapter.L
     private String query = "";
     private boolean showingFolders;
 
-    private ActivityResultLauncher<String> permissionLauncher;
+    private ActivityResultLauncher<String[]> permissionLauncher;
     private ActivityResultLauncher<String[]> openDocumentLauncher;
 
     @Override
@@ -127,8 +127,8 @@ public class GalleryActivity extends AppCompatActivity implements MediaAdapter.L
         });
 
         permissionLauncher = registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(), granted -> {
-                    if (granted) {
+                new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                    if (VideoLibrary.hasPermission(this)) {
                         reload();
                     } else {
                         showEmpty(getString(R.string.gallery_permission_needed));
@@ -145,7 +145,7 @@ public class GalleryActivity extends AppCompatActivity implements MediaAdapter.L
 
         emptyAction.setOnClickListener(v -> {
             if (!VideoLibrary.hasPermission(this)) {
-                permissionLauncher.launch(VideoLibrary.requiredPermission());
+                permissionLauncher.launch(VideoLibrary.requiredPermissions());
             } else {
                 pickFile();
             }
@@ -189,7 +189,7 @@ public class GalleryActivity extends AppCompatActivity implements MediaAdapter.L
                 != PackageManager.PERMISSION_GRANTED) {
             // Ask once; if the user declines we still show SAF-picked files.
             if (allItems.isEmpty()) {
-                permissionLauncher.launch(VideoLibrary.requiredPermission());
+                permissionLauncher.launch(VideoLibrary.requiredPermissions());
             }
         }
         reload();

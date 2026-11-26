@@ -68,11 +68,27 @@ public final class CrashLog {
         if (crashFile == null || !crashFile.exists()) {
             return null;
         }
+        // java.nio.file is API 26+, and the app supports Android 7, so read the
+        // file with plain streams.
+        java.io.FileInputStream in = null;
         try {
-            byte[] data = java.nio.file.Files.readAllBytes(crashFile.toPath());
-            return new String(data, java.nio.charset.StandardCharsets.UTF_8);
+            in = new java.io.FileInputStream(crashFile);
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buffer = new byte[4096];
+            int read;
+            while ((read = in.read(buffer)) > 0) {
+                out.write(buffer, 0, read);
+            }
+            return new String(out.toByteArray(), java.nio.charset.StandardCharsets.UTF_8);
         } catch (Exception e) {
             return null;
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (Exception ignored) {
+                }
+            }
         }
     }
 

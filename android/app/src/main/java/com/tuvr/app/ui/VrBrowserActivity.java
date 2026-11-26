@@ -204,6 +204,17 @@ public class VrBrowserActivity extends VrActivity implements BrowserScene.Bridge
 
     @Override
     public void onBackPressed() {
+        // Hardware/gesture back: navigate the page if possible, otherwise leave.
+        if (webView != null && webView.canGoBack()) {
+            webView.goBack();
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    /** In-scene Back panel: never exits the VR screen by accident. */
+    @Override
+    public void onBack() {
         runOnUiThread(() -> {
             if (webView != null && webView.canGoBack()) {
                 webView.goBack();

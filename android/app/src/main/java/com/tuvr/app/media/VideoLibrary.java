@@ -48,6 +48,20 @@ public final class VideoLibrary {
         return Manifest.permission.READ_EXTERNAL_STORAGE;
     }
 
+    /**
+     * Permissions to request. On Android 14+ the "select photos and videos" dialog
+     * also needs {@code READ_MEDIA_VISUAL_USER_SELECTED}; the app then simply shows
+     * whatever the user allowed and can re-ask on the next launch.
+     */
+    public static String[] requiredPermissions() {
+        if (Build.VERSION.SDK_INT >= 34) {
+            return new String[]{
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                    "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"};
+        }
+        return new String[]{requiredPermission()};
+    }
+
     public static boolean hasPermission(Context context) {
         return ContextCompat.checkSelfPermission(context, requiredPermission())
                 == PackageManager.PERMISSION_GRANTED;

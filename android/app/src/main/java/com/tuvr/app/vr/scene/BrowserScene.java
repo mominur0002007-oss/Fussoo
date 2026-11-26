@@ -33,7 +33,8 @@ public class BrowserScene implements VrScene {
 
         void onExit();
 
-        void onBackPressed();
+        /** In-scene Back panel: go back in history, do not exit. */
+        void onBack();
 
         void onForward();
 
@@ -114,7 +115,7 @@ public class BrowserScene implements VrScene {
         urlPanel.tag = (Runnable) bridge::onEditUrl;
         panels.add(urlPanel);
 
-        addButton(renderer, "back", "\u25C0", "Back", -30f, () -> bridge.onBackPressed());
+        addButton(renderer, "back", "\u25C0", "Back", -30f, () -> bridge.onBack());
         addButton(renderer, "forward", "\u25B6", "Forward", -14f, () -> bridge.onForward());
         addButton(renderer, "reload", "\u21BB", "Reload", 2f, () -> bridge.onReload());
         addButton(renderer, "url", "\u270E", "URL", 18f, () -> bridge.onEditUrl());

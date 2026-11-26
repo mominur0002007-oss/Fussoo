@@ -47,8 +47,8 @@ public class CalibrationActivity extends VrActivity {
         super.onCreate(savedInstanceState);
         settings = AppSettings.get(this);
 
-        panel = LayoutInflater.from(this).inflate(R.layout.view_calibration_panel, null, false);
         ScrollView scroll = new ScrollView(this);
+        panel = LayoutInflater.from(this).inflate(R.layout.view_calibration_panel, scroll, false);
         scroll.addView(panel);
         scroll.setBackgroundColor(0xCC070A10);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
