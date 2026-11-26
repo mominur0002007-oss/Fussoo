@@ -233,7 +233,7 @@
 
         <SeekBarPreference
             android:key="screen_distance_dm"
-            android:title="@string/pref_screen_distance"
+            android:title="@string/pref_screen_distance_virtual"
             android:summary="Distance to the screen (decimetres)"
             app:min="25"
             app:max="160"

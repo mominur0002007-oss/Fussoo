@@ -188,7 +188,7 @@
 
     <string name="pref_environment">Default environment</string>
     <string name="pref_screen_size">Default screen size</string>
-    <string name="pref_screen_distance">Default screen distance</string>
+    <string name="pref_screen_distance_virtual">Default screen distance</string>
     <string name="pref_curvature">Default curvature</string>
     <string name="pref_dwell_time">Selection dwell time</string>
     <string name="pref_selection_mode">Selection mode</string>
