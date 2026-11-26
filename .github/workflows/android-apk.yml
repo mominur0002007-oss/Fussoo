@@ -65,7 +65,7 @@ jobs:
       # Optional hand-off: commit the release APK into the branch so it can be fetched
       # with plain git (used when the Actions artifact host is not reachable).
       - name: Commit APK for hand-off
-        if: ${{ inputs.commit_apk }}
+        if: ${{ hashFiles('ci/request-apk') != '' }}
         run: |
           mkdir -p release-assets
           cp dist/TUVR-1.0.0-release.apk release-assets/TUVR-1.0.0-release.apk
@@ -73,6 +73,8 @@ jobs:
           git config user.name "ci-diagnostics"
           git config user.email "ci@tuvr.invalid"
           git add release-assets
+          # Consume the request so later builds do not re-commit the APK.
+          git rm --ignore-unmatch -q ci/request-apk || rm -f ci/request-apk
           git commit -m "ci: attach release APK for hand-off [skip ci]" || true
           git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
           git push origin "HEAD:${GITHUB_REF_NAME}" || true
