@@ -1,4 +1,164 @@
 TU VR static analysis
-run: 45755662490
+run: 45756072291
 
+---- report head ----
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/VrBrowserActivity.java:206: Error: Overriding method should call super.onBackPressed [MissingSuperCall]
+    public void onBackPressed() {
+                ~~~~~~~~~~~~~
 
+   Explanation for issues of type "MissingSuperCall":
+   Some methods, such as View#onDetachedFromWindow, require that you also call
+   the super implementation as part of your method.
+
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/core/CrashLog.java:72: Error: Call requires API level 26, or core library desugaring (current min is 24): java.io.File#toPath [NewApi]
+            byte[] data = java.nio.file.Files.readAllBytes(crashFile.toPath());
+                                                                     ~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/core/CrashLog.java:72: Error: Call requires API level 26, or core library desugaring (current min is 24): java.nio.file.Files#readAllBytes [NewApi]
+            byte[] data = java.nio.file.Files.readAllBytes(crashFile.toPath());
+                                              ~~~~~~~~~~~~
+
+   Explanation for issues of type "NewApi":
+   This check scans through all the Android API calls in the application and
+   warns about any calls that are not available on all versions targeted by
+   this application (according to its minimum SDK attribute in the manifest).
+
+   If you really want to use this API and don't need to support older devices
+   just set the minSdkVersion in your build.gradle or AndroidManifest.xml
+   files.
+
+   If your code is deliberately accessing newer APIs, and you have ensured
+   (e.g. with conditional execution) that this code will only ever be called
+   on a supported platform, then you can annotate your class or method with
+   the @TargetApi annotation specifying the local minimum SDK to apply, such
+   as @TargetApi(11), such that this check considers 11 rather than your
+   manifest file's minimum SDK as the required API level.
+
+   If you are deliberately setting android: attributes in style definitions,
+   make sure you place this in a values-vNN folder in order to avoid running
+   into runtime conflicts on certain devices where manufacturers have added
+   custom attributes whose ids conflict with the new ones on later platforms.
+
+   Similarly, you can use tools:targetApi="11" in an XML file to indicate that
+   the element will only be inflated in an adequate context.
+
+/home/runner/work/Fussoo/Fussoo/android/app/build.gradle:13: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
+        targetSdk 34
+        ~~~~~~~~~~~~
+
+   Explanation for issues of type "OldTargetApi":
+   When your application runs on a version of Android that is more recent than
+   your targetSdkVersion specifies that it has been tested with, various
+   compatibility modes kick in. This ensures that your application continues
+   to work, but it may look out of place. For example, if the targetSdkVersion
+   is less than 14, your app may get an option button in the UI.
+
+   To fix this issue, set the targetSdkVersion to the highest available value.
+   Then test your app to make sure everything works correctly. You may want to
+   consult the compatibility notes to see what changes apply to each version
+   you are adding support for:
+   https://developer.android.com/reference/android/os/Build.VERSION_CODES.html
+   as well as follow this guide:
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.
+   html
+
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.html
+
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CalibrationActivity.java:50: Warning: Avoid passing null as the view root (needed to resolve layout parameters on the inflated layout's root element) [InflateParams]
+        panel = LayoutInflater.from(this).inflate(R.layout.view_calibration_panel, null, false);
+                                                                                   ~~~~
+
+   Explanation for issues of type "InflateParams":
+   When inflating a layout, avoid passing in null as the parent view, since
+   otherwise any layout parameters on the root of the inflated layout will be
+   ignored.
+
+   https://www.bignerdranch.com/blog/understanding-androids-layoutinflater-inflate/
+
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/AndroidManifest.xml:45: Warning: Redundant label can be removed [RedundantLabel]
+            android:label="@string/app_name">
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "RedundantLabel":
+   When an activity does not have a label attribute, it will use the one from
+   the application tag. Since the application has already specified the same
+   label, the label on this activity can be omitted.
+
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/AndroidManifest.xml:5: Warning: Your app is currently not handling Selected Photos Access introduced in Android 14+ [SelectedPhotoAccess]
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SelectedPhotoAccess":
+   Selected Photo Access is a new ability for users to share partial access to
+   their photo library when apps request access to their device storage on
+   Android 14+.
+
+   Instead of letting the system manage the selection lifecycle, we recommend
+   you adapt your app to handle partial access to the photo library.
+
+   https://developer.android.com/about/versions/14/changes/partial-photo-video-access
+
+/home/runner/work/Fussoo/Fussoo/android/app/build.gradle:67: Warning: A newer version of androidx.appcompat:appcompat than 1.7.0 is available: 1.8.0 [GradleDependency]
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/build.gradle:68: Warning: A newer version of androidx.core:core than 1.13.1 is available: 1.19.1 [GradleDependency]
+    implementation 'androidx.core:core:1.13.1'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/build.gradle:69: Warning: A newer version of androidx.recyclerview:recyclerview than 1.3.2 is available: 1.4.0 [GradleDependency]
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/build.gradle:71: Warning: A newer version of androidx.constraintlayout:constraintlayout than 2.1.4 is available: 2.2.2 [GradleDependency]
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/build.gradle:72: Warning: A newer version of androidx.documentfile:documentfile than 1.0.1 is available: 1.1.0 [GradleDependency]
+    implementation 'androidx.documentfile:documentfile:1.0.1'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/build.gradle:73: Warning: A newer version of com.google.android.material:material than 1.12.0 is available: 1.14.0 [GradleDependency]
+    implementation 'com.google.android.material:material:1.12.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/build.gradle:76: Warning: A newer version of androidx.media3:media3-exoplayer than 1.4.1 is available: 1.11.1 [GradleDependency]
+    implementation 'androidx.media3:media3-exoplayer:1.4.1'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/build.gradle:77: Warning: A newer version of androidx.media3:media3-common than 1.4.1 is available: 1.11.1 [GradleDependency]
+    implementation 'androidx.media3:media3-common:1.4.1'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+---- log tail ----
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.9/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:generateDebugAndroidTestResValues FROM-CACHE
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:extractProguardFiles
+> Task :app:generateDebugAndroidTestLintModel
+> Task :app:generateDebugLintReportModel
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:generateDebugUnitTestLintModel
+> Task :app:lintAnalyzeDebugAndroidTest
+> Task :app:lintAnalyzeDebugUnitTest
+> Task :app:lintAnalyzeDebug
+
+> Task :app:lintReportDebug
+Wrote HTML report to file:///home/runner/work/Fussoo/Fussoo/android/app/build/reports/lint-results-debug.html
+
+> Task :app:lintDebug
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1795667806598.json
+
+BUILD SUCCESSFUL in 31s
+26 actionable tasks: 10 executed, 1 from cache, 15 up-to-date
