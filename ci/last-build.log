@@ -1,11 +1,16 @@
 TU VR build diagnostics
-run: 45753683217  commit: 6f7212380d40908fa82e200d1cc88d2a990e1412
+run: 45753831588  commit: a0120c6efac4f735f75fb38e3b4f3bfd1158dd3b
 
-> Task :app:mergeDebugResources FAILED
+> Task :app:processDebugResources FAILED
 * What went wrong:
-Execution failed for task ':app:mergeDebugResources'.
-> /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/values/strings.xml: Error: Found item String/pref_screen_distance more than one time
-BUILD FAILED in 34s
+Execution failed for task ':app:processDebugResources'.
+     error: resource style/Text.TuVr (aka com.tuvr.app:style/Text.TuVr) not found.
+     error: resource style/Text.TuVr (aka com.tuvr.app:style/Text.TuVr) not found.
+     error: resource style/Text.TuVr (aka com.tuvr.app:style/Text.TuVr) not found.
+     error: resource style/Text.TuVr (aka com.tuvr.app:style/Text.TuVr) not found.
+     com.tuvr.app-mergeDebugResources-39:/values/values.xml:6560: error: style attribute 'android:attr/textStyle-bold' not found.
+     error: failed linking references.
+BUILD FAILED in 37s
 
 ---- tail ----
 
@@ -28,16 +33,36 @@ Daemon will be stopped at the end of the build
 > Task :app:checkDebugAarMetadata
 > Task :app:mapDebugSourceSetPaths
 > Task :app:generateDebugResources
-
-> Task :app:mergeDebugResources FAILED
-ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/values/strings.xml: Resource and asset merger: Found item String/pref_screen_distance more than one time
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_2-1795666355939.json
+> Task :app:packageDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:parseDebugLocalResources
+> Task :app:processDebugMainManifest
+> Task :app:mergeDebugResources
+> Task :app:processDebugManifest
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:processDebugManifestForPackage
+> Task :app:desugarDebugFileDependencies
+> Task :app:compressDebugAssets
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :app:processDebugResources FAILED
+> Task :app:mergeDebugJavaResource
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_2-1795666433836.json
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':app:mergeDebugResources'.
-> /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/values/strings.xml: Error: Found item String/pref_screen_distance more than one time
+Execution failed for task ':app:processDebugResources'.
+> A failure occurred while executing com.android.build.gradle.internal.res.LinkApplicationAndroidResourcesTask$TaskAction
+   > Android resource linking failed
+     error: resource style/Text.TuVr (aka com.tuvr.app:style/Text.TuVr) not found.
+     error: resource style/Text.TuVr (aka com.tuvr.app:style/Text.TuVr) not found.
+     error: resource style/Text.TuVr (aka com.tuvr.app:style/Text.TuVr) not found.
+     error: resource style/Text.TuVr (aka com.tuvr.app:style/Text.TuVr) not found.
+     com.tuvr.app-mergeDebugResources-39:/values/values.xml:6560: error: style attribute 'android:attr/textStyle-bold' not found.
+     error: failed linking references.
+
 
 * Try:
 > Run with --stacktrace option to get the stack trace.
@@ -45,5 +70,5 @@ Execution failed for task ':app:mergeDebugResources'.
 > Run with --scan to get full insights.
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 34s
-6 actionable tasks: 6 executed
+BUILD FAILED in 37s
+18 actionable tasks: 18 executed
