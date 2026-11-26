@@ -32,6 +32,7 @@ import java.util.List;
  * The same session is used by the flat phone player and by the VR renderer
  * (which simply attaches a SurfaceTexture instead of a SurfaceView).
  */
+@androidx.media3.common.util.UnstableApi
 public final class VideoSession {
 
     public interface Listener {
