@@ -6,6 +6,11 @@ name: TU VR APK
 
 on:
   workflow_dispatch:
+    inputs:
+      commit_apk:
+        description: 'Commit the release APK to the branch (used to hand a build over to Drive)'
+        type: boolean
+        default: false
   push:
     paths:
       - 'android/**'
@@ -56,6 +61,21 @@ jobs:
           path: dist/**
           if-no-files-found: error
           retention-days: 30
+
+      # Optional hand-off: commit the release APK into the branch so it can be fetched
+      # with plain git (used when the Actions artifact host is not reachable).
+      - name: Commit APK for hand-off
+        if: ${{ inputs.commit_apk }}
+        run: |
+          mkdir -p release-assets
+          cp dist/TUVR-1.0.0-release.apk release-assets/TUVR-1.0.0-release.apk
+          cp dist/SHA256SUMS.txt release-assets/SHA256SUMS.txt
+          git config user.name "ci-diagnostics"
+          git config user.email "ci@tuvr.invalid"
+          git add release-assets
+          git commit -m "ci: attach release APK for hand-off [skip ci]" || true
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" || true
 
       # Lint findings and the packaged-APK report are committed back so they can be
       # reviewed without access to the Actions log.
