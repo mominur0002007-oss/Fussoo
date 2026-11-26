@@ -1,5 +1,5 @@
 TU VR static analysis
-run: 45757347627
+run: 45757660323
 
 ---- report head ----
 /home/runner/work/Fussoo/Fussoo/android/app/build.gradle:13: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
@@ -89,18 +89,6 @@ run: 45757347627
 /home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:326: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
                     currentSession.setVideoSurface(renderer.videoTexture().surface()));
                                    ~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/Intents.java:30: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        Intent intent = new Intent(context, PlayerActivity.class);
-                                            ~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/MainActivity.java:63: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-                () -> startActivity(new Intent(this, CinemaActivity.class)));
-                                                     ~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/MediaActions.java:36: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-                            Intent intent = new Intent(activity, CinemaActivity.class);
-                                                                 ~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrActivity.java:344: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        Intent intent = new Intent(this, CinemaActivity.class);
-                                         ~~~~~~~~~~~~~~~~~~~~
 
    Explanation for issues of type "UnsafeOptInUsageError":
    This API has been flagged as opt-in with error-level severity.
@@ -122,6 +110,18 @@ run: 45757347627
    <lint>
        <issue id="UnsafeOptInUsageError">
            <option name="opt-in" value="com.foo.ExperimentalBarAnnotation" />
+       </issue>
+   </lint>
+
+   Vendor: Android Open Source Project
+   Identifier: androidx.annotation.experimental
+   Feedback: https://issuetracker.google.com/issues/new?component=459778
+
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_apps.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_audio.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
+    android:tint="@color/text_primary"
 ---- log tail ----
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.9/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
@@ -150,24 +150,24 @@ Daemon will be stopped at the end of the build
 > Task :app:generateDebugAndroidTestLintModel
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
 > Task :app:generateDebugUnitTestLintModel
-> Task :app:lintAnalyzeDebugAndroidTest
 > Task :app:lintAnalyzeDebugUnitTest
+> Task :app:lintAnalyzeDebugAndroidTest
 > Task :app:lintAnalyzeDebug
 
 > Task :app:lintReportDebug
 Wrote HTML report to file:///home/runner/work/Fussoo/Fussoo/android/app/build/reports/lint-results-debug.html
 
 > Task :app:lintDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1795668527287.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1795668716570.json
 
-BUILD SUCCESSFUL in 27s
+BUILD SUCCESSFUL in 30s
 26 actionable tasks: 10 executed, 1 from cache, 15 up-to-date
 
 ======== packaged APK ========
 total 14340
--rw-r--r-- 1 runner runner     176 Nov 26 04:48 SHA256SUMS.txt
--rw-r--r-- 1 runner runner 8169955 Nov 26 04:48 TUVR-1.0.0-debug.apk
--rw-r--r-- 1 runner runner 6508313 Nov 26 04:48 TUVR-1.0.0-release.apk
+-rw-r--r-- 1 runner runner     176 Nov 26 04:51 SHA256SUMS.txt
+-rw-r--r-- 1 runner runner 8169955 Nov 26 04:51 TUVR-1.0.0-debug.apk
+-rw-r--r-- 1 runner runner 6508313 Nov 26 04:51 TUVR-1.0.0-release.apk
 
 package: name='com.tuvr.app' versionCode='1' versionName='1.0.0' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
 minSdkVersion:'24'
