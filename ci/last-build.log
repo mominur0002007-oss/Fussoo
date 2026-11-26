@@ -1,0 +1,49 @@
+TU VR build diagnostics
+run: 45753683217  commit: 6f7212380d40908fa82e200d1cc88d2a990e1412
+
+> Task :app:mergeDebugResources FAILED
+* What went wrong:
+Execution failed for task ':app:mergeDebugResources'.
+> /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/values/strings.xml: Error: Found item String/pref_screen_distance more than one time
+BUILD FAILED in 34s
+
+---- tail ----
+
+Welcome to Gradle 8.9!
+
+Here are the highlights of this release:
+ - Enhanced Error and Warning Messages
+ - IDE Integration Improvements
+ - Daemon JVM Information
+
+For more details see https://docs.gradle.org/8.9/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.9/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:javaPreCompileDebug
+> Task :app:generateDebugResValues
+> Task :app:checkDebugAarMetadata
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+
+> Task :app:mergeDebugResources FAILED
+ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/values/strings.xml: Resource and asset merger: Found item String/pref_screen_distance more than one time
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_2-1795666355939.json
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:mergeDebugResources'.
+> /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/values/strings.xml: Error: Found item String/pref_screen_distance more than one time
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 34s
+6 actionable tasks: 6 executed
