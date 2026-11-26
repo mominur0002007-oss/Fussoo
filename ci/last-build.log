@@ -1,30 +1,8 @@
 TU VR build diagnostics
-run: 45754119507  commit: a62af3677f217cc3e1c47fffed2a3ae8a6fd419c
+run: 45754261065  commit: 5c1621c00ccb7e9e0ae86c893cb24f93443883b8
 
-> Task :app:processDebugResources FAILED
 * What went wrong:
-Execution failed for task ':app:processDebugResources'.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:27: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:35: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:43: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:51: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:59: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:67: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:75: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:83: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:91: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:114: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:122: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:169: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:177: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:185: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:232: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:240: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:248: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:256: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:264: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:279: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-BUILD FAILED in 35s
+BUILD FAILED in 12s
 
 ---- tail ----
 
@@ -39,77 +17,16 @@ For more details see https://docs.gradle.org/8.9/release-notes.html
 
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.9/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
-> Task :app:preBuild UP-TO-DATE
-> Task :app:preDebugBuild UP-TO-DATE
-> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
-> Task :app:javaPreCompileDebug
-> Task :app:generateDebugResValues
-> Task :app:checkDebugAarMetadata
-> Task :app:mapDebugSourceSetPaths
-> Task :app:generateDebugResources
-> Task :app:packageDebugResources
-> Task :app:createDebugCompatibleScreenManifests
-> Task :app:extractDeepLinksDebug
-> Task :app:mergeDebugResources
-> Task :app:parseDebugLocalResources
-> Task :app:processDebugMainManifest
-> Task :app:processDebugManifest
-> Task :app:generateDebugAssets UP-TO-DATE
-> Task :app:mergeDebugAssets
-> Task :app:processDebugManifestForPackage
-> Task :app:compressDebugAssets
-> Task :app:desugarDebugFileDependencies
-> Task :app:processDebugJavaRes NO-SOURCE
-> Task :app:processDebugResources FAILED
-> Task :app:mergeDebugJavaResource
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_2-1795666590798.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_2-1795666671863.json
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':app:processDebugResources'.
-> A failure occurred while executing com.android.build.gradle.internal.res.LinkApplicationAndroidResourcesTask$TaskAction
-   > Android resource linking failed
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:27: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:35: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:43: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:51: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:59: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:67: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:75: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:83: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:91: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:114: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:122: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:169: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:177: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:185: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:232: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:240: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:248: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:256: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:264: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
-     ERROR: /home/runner/work/Fussoo/Fussoo/android/app/src/main/res/xml/pref_root.xml:279: AAPT: error: attribute max (aka com.tuvr.app:max) not found.
-         
+A problem occurred configuring root project 'TuVr'.
+> Could not resolve all artifacts for configuration ':classpath'.
+   > Could not find perfmark-api-0.26.0.jar (io.perfmark:perfmark-api:0.26.0).
+     Searched in the following locations:
+         https://repo.maven.apache.org/maven2/io/perfmark/perfmark-api/0.26.0/perfmark-api-0.26.0.jar
 
 * Try:
 > Run with --stacktrace option to get the stack trace.
@@ -117,5 +34,4 @@ Execution failed for task ':app:processDebugResources'.
 > Run with --scan to get full insights.
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 35s
-18 actionable tasks: 18 executed
+BUILD FAILED in 12s
