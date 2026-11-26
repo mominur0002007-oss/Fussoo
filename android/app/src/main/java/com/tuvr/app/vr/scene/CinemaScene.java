@@ -171,6 +171,8 @@ public class CinemaScene implements VrScene {
                 () -> changeBrightness(1));
         addControl(renderer, "volume", "\u25B6\u25B6", "Volume", yaws2[5], row2, iconRowDistance,
                 this::toggleVolumeStep);
+        addControl(renderer, "environment", "\u25A3", "Env", 52f, row2, iconRowDistance,
+                this::cycleEnvironment);
 
         progressPanel = new Panel("progress");
         progressPanel.interactive = false;
@@ -283,6 +285,17 @@ public class CinemaScene implements VrScene {
             session.setVolume(volume);
         }
         host.showWhisper("Volume " + Formats.percent(volume));
+    }
+
+    /** Cycles the virtual environment without leaving the cinema. */
+    private void cycleEnvironment() {
+        int count = com.tuvr.app.vr.EnvironmentBuilder.NAMES.length;
+        int next = (settings.environment() + 1) % count;
+        settings.setEnvironment(next);
+        if (rendererRef != null) {
+            rendererRef.reloadSettings();
+        }
+        host.showWhisper(com.tuvr.app.vr.EnvironmentBuilder.name(next));
     }
 
     private void resetScreen() {

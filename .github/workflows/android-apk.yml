@@ -57,6 +57,28 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      # Lint findings are committed back so they can be reviewed without log access.
+      - name: Static analysis (lint)
+        run: |
+          set +e
+          gradle --no-daemon --project-dir android --console=plain :app:lintDebug \
+            > "$RUNNER_TEMP/lint.log" 2>&1
+          mkdir -p ci
+          {
+            echo "TU VR static analysis"
+            echo "run: $GITHUB_RUN_ID"
+            echo
+            grep -E "^(/|[A-Za-z]:).*(Error|Warning):" "$RUNNER_TEMP/lint.log" | head -150
+            echo
+            grep -E "errors?, [0-9]+ warnings?" "$RUNNER_TEMP/lint.log" | tail -3
+          } > ci/lint.txt
+          git config user.name "ci-diagnostics"
+          git config user.email "ci@tuvr.invalid"
+          git add ci/lint.txt
+          git commit -m "ci: lint report for $GITHUB_RUN_ID [skip ci]" || true
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" || true
+
       # On failure the compile errors are committed back to the branch so that
       # they can be read without access to the Actions log.
       - name: Publish build diagnostics
