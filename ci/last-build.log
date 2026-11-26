@@ -1,8 +1,41 @@
 TU VR build diagnostics
-run: 45754261065  commit: 5c1621c00ccb7e9e0ae86c893cb24f93443883b8
+run: 45754376023  commit: 95b134796b8ee0166408d6b2f07a3f699df385d5
+
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:499: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:532: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:535: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:538: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:544: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:573: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:627: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:814: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:825: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:848: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:858: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:868: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:891: error: incompatible types: float[] cannot be converted to int[]
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:126: error: incompatible types: Surface cannot be converted to SurfaceTexture
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:299: error: incompatible types: Surface cannot be converted to SurfaceTexture
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/GridScene.java:245: error: cannot find symbol
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrActivity.java:336: error: cannot find symbol
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrActivity.java:366: error: cannot find symbol
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/MediaAdapter.java:90: error: variable meta is already defined in method onBindViewHolder(VH,int)
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CalibrationActivity.java:161: error: showWhisper(String) in CalibrationActivity cannot implement showWhisper(String) in VrHost
+> Task :app:compileDebugJavaWithJavac FAILED
+* What went wrong:
+Execution failed for task ':app:compileDebugJavaWithJavac'.
+BUILD FAILED in 1m 26s
 
 * What went wrong:
-BUILD FAILED in 12s
+Execution failed for task ':app:compileDebugJavaWithJavac'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+BUILD FAILED in 1m 26s
+21 actionable tasks: 21 executed
 
 ---- tail ----
 
@@ -17,21 +50,117 @@ For more details see https://docs.gradle.org/8.9/release-notes.html
 
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.9/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_2-1795666671863.json
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:javaPreCompileDebug
+> Task :app:generateDebugResValues
+> Task :app:checkDebugAarMetadata
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:mergeDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:parseDebugLocalResources
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:desugarDebugFileDependencies
+> Task :app:compressDebugAssets
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :app:processDebugManifestForPackage
+> Task :app:checkDebugDuplicateClasses
+> Task :app:mergeDebugJavaResource
+> Task :app:processDebugResources
+> Task :app:mergeExtDexDebug
+
+> Task :app:compileDebugJavaWithJavac
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:499: error: incompatible types: float[] cannot be converted to int[]
+        fullScreenQuad.draw(ATTR_POS);
+                            ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:532: error: incompatible types: float[] cannot be converted to int[]
+            environment.backdrop.draw(ATTR_POS_COLOR);
+                                      ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:535: error: incompatible types: float[] cannot be converted to int[]
+            environment.floor.draw(ATTR_POS_COLOR);
+                                   ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:538: error: incompatible types: float[] cannot be converted to int[]
+            environment.accents.drawLines(ATTR_POS_COLOR);
+                                          ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:544: error: incompatible types: float[] cannot be converted to int[]
+            environment.stars.drawPoints(ATTR_POS_COLOR);
+                                         ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:573: error: incompatible types: float[] cannot be converted to int[]
+            fullScreenQuad.draw(ATTR_POS_UV);
+                                ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:627: error: incompatible types: float[] cannot be converted to int[]
+        fullScreenQuad.draw(ATTR_POS_UV);
+                            ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:814: error: incompatible types: float[] cannot be converted to int[]
+        mesh.draw(ATTR_POS_UV);
+                  ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:825: error: incompatible types: float[] cannot be converted to int[]
+        mesh.draw(ATTR_POS_COLOR);
+                  ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:848: error: incompatible types: float[] cannot be converted to int[]
+        mesh.draw(ATTR_POS_UV);
+                  ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:858: error: incompatible types: float[] cannot be converted to int[]
+        mesh.draw(ATTR_POS_COLOR);
+                  ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:868: error: incompatible types: float[] cannot be converted to int[]
+        mesh.drawLines(ATTR_POS_COLOR);
+                       ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrRenderer.java:891: error: incompatible types: float[] cannot be converted to int[]
+        mesh.draw(ATTR_POS_UV);
+                  ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:126: error: incompatible types: Surface cannot be converted to SurfaceTexture
+                    currentSession.setSurfaceFromTexture(renderer.videoTexture().surface()));
+                                                                                        ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:299: error: incompatible types: Surface cannot be converted to SurfaceTexture
+                    currentSession.setSurfaceFromTexture(renderer.videoTexture().surface()));
+                                                                                        ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/GridScene.java:245: error: cannot find symbol
+        Bitmap bitmap = factory.blankPublic(PanelFactory.THUMB_W, PanelFactory.THUMB_H);
+                               ^
+  symbol:   method blankPublic(int,int)
+  location: variable factory of type PanelFactory
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrActivity.java:336: error: cannot find symbol
+        startActivity(new Intent(this, VrHomeActivity.class));
+                                       ^
+  symbol:   class VrHomeActivity
+  location: class VrActivity
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrActivity.java:366: error: cannot find symbol
+        Intent intent = new Intent(this, VrBrowserActivity.class);
+                                         ^
+  symbol:   class VrBrowserActivity
+  location: class VrActivity
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/MediaAdapter.java:90: error: variable meta is already defined in method onBindViewHolder(VH,int)
+            ThumbLoader.get().loadMetadata(holder.itemView.getContext(), item, meta -> {
+                                                                               ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CalibrationActivity.java:161: error: showWhisper(String) in CalibrationActivity cannot implement showWhisper(String) in VrHost
+    private void showWhisper(String message) {
+                 ^
+  attempting to assign weaker access privileges; was public
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+20 errors
+
+> Task :app:compileDebugJavaWithJavac FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_2-1795666734826.json
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-A problem occurred configuring root project 'TuVr'.
-> Could not resolve all artifacts for configuration ':classpath'.
-   > Could not find perfmark-api-0.26.0.jar (io.perfmark:perfmark-api:0.26.0).
-     Searched in the following locations:
-         https://repo.maven.apache.org/maven2/io/perfmark/perfmark-api/0.26.0/perfmark-api-0.26.0.jar
+Execution failed for task ':app:compileDebugJavaWithJavac'.
+> Compilation failed; see the compiler error output for details.
 
 * Try:
-> Run with --stacktrace option to get the stack trace.
-> Run with --info or --debug option to get more log output.
+> Run with --info option to get more log output.
 > Run with --scan to get full insights.
-> Get more help at https://help.gradle.org.
 
-BUILD FAILED in 12s
+BUILD FAILED in 1m 26s
+21 actionable tasks: 21 executed
