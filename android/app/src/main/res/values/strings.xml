@@ -261,4 +261,5 @@
     <string name="cd_seek_forward">Forward 10 seconds</string>
     <string name="cd_thumbnail">Thumbnail</string>
     <string name="cd_menu">Menu</string>
+    <string name="browser_blank_capture">This device does not expose page pixels for VR capture. Use the phone browser for full pages.</string>
 </resources>

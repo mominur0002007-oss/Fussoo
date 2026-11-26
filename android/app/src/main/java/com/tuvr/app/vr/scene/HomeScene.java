@@ -29,6 +29,9 @@ public class HomeScene implements VrScene {
     private Panel resumePanel;
     private long lastRefreshMs;
     private String resumeLabel = "";
+    /** Written on a worker thread, read on the GL thread. */
+    private volatile String pendingResumeLabel;
+    private volatile boolean resumeQueryInFlight;
 
     public HomeScene(Context context, VrHost host) {
         this.context = context;
@@ -113,27 +116,48 @@ public class HomeScene implements VrScene {
         panel.setContent(bitmap);
     }
 
+    /**
+     * The resume label needs a MediaStore lookup, which must not run on the GL
+     * thread. The query runs on a worker thread and the result is applied on the
+     * next frame.
+     */
     private void refreshResume(VrRenderer renderer) {
-        AppSettings settings = AppSettings.get(context);
-        String uri = settings.lastVideoUri();
-        String label = "";
-        if (uri != null) {
-            VideoItem item = VideoLibrary.find(context, uri);
-            if (item != null && item.name != null) {
-                label = item.name;
-            }
-            long position = MediaStateDb.get(context).resumePosition(uri);
-            if (position > 0) {
-                label = label + "  @" + com.tuvr.app.core.Formats.duration(position);
-            }
+        if (resumeQueryInFlight) {
+            return;
         }
-        if (!label.equals(resumeLabel)) {
-            resumeLabel = label;
-            for (Panel panel : panels) {
-                if ("resume".equals(panel.id)) {
-                    setPanelContent(panel, renderer.panelFactory().tile("\u21BB", "Continue",
-                            label.isEmpty() ? "no recent video" : label, false));
+        resumeQueryInFlight = true;
+        final Context appContext = context.getApplicationContext();
+        com.tuvr.app.core.Background.run(() -> {
+            String label = "";
+            try {
+                String uri = AppSettings.get(appContext).lastVideoUri();
+                if (uri != null) {
+                    VideoItem item = VideoLibrary.find(appContext, uri);
+                    if (item != null && item.name != null) {
+                        label = item.name;
+                    }
+                    long position = MediaStateDb.get(appContext).resumePosition(uri);
+                    if (position > 0) {
+                        label = label + "  @" + com.tuvr.app.core.Formats.duration(position);
+                    }
                 }
+            } catch (RuntimeException ignored) {
+                label = "";
+            }
+            pendingResumeLabel = label;
+            resumeQueryInFlight = false;
+        });
+    }
+
+    private void applyResumeLabel(VrRenderer renderer, String label) {
+        if (label.equals(resumeLabel)) {
+            return;
+        }
+        resumeLabel = label;
+        for (Panel panel : panels) {
+            if ("resume".equals(panel.id)) {
+                setPanelContent(panel, renderer.panelFactory().tile("\u21BB", "Continue",
+                        label.isEmpty() ? "no recent video" : label, false));
             }
         }
     }
@@ -150,6 +174,12 @@ public class HomeScene implements VrScene {
 
     @Override
     public void update(VrRenderer renderer, float dt) {
+        // A finished background lookup is applied as soon as it is available.
+        String fresh = pendingResumeLabel;
+        if (fresh != null) {
+            pendingResumeLabel = null;
+            applyResumeLabel(renderer, fresh);
+        }
         long now = System.currentTimeMillis();
         if (now - lastRefreshMs > 4000L) {
             lastRefreshMs = now;

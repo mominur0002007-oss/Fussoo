@@ -75,6 +75,15 @@ public class HeadTracker implements SensorEventListener {
     private final float[] qTouch = {0f, 0f, 0f, 1f};
     /** Rotation from the UI (screen) frame to the device frame. */
     private final float[] qDisplay = {0f, 0f, 0f, 1f};
+    /**
+     * Android's rotation vector reports orientation in an east-north-up world
+     * (Z up). The renderer works in a Y-up world, so every sample is rotated by
+     * -90 degrees around X. Without this the horizon would be rolled by 90 deg.
+     */
+    private final float[] qWorldFix = {0f, 0f, 0f, 1f};
+    private final float[] scratchA = new float[4];
+    private final float[] scratchB = new float[4];
+    private final float[] scratchEuler = new float[3];
     private final float[] eulerDeg = new float[3];
     private boolean smoothInitialized;
 
@@ -100,6 +109,7 @@ public class HeadTracker implements SensorEventListener {
         gyroBias[0] = settings.gyroBias(0);
         gyroBias[1] = settings.gyroBias(1);
         gyroBias[2] = settings.gyroBias(2);
+        MathUtil.quatFromAxisAngle(1f, 0f, 0f, -MathUtil.DEG_TO_RAD * 90f, qWorldFix);
         probeSensors();
     }
 
@@ -472,26 +482,25 @@ public class HeadTracker implements SensorEventListener {
             return;
         }
 
-        float[] deviceQuat = new float[4];
         synchronized (rawLock) {
-            System.arraycopy(qRaw, 0, deviceQuat, 0, 4);
+            System.arraycopy(qRaw, 0, scratchA, 0, 4);
         }
-        // Device frame -> UI (screen) frame.
-        MathUtil.quatMultiply(deviceQuat, qDisplay, qScratch);
+        // Device frame -> UI (screen) frame -> Y-up world.
+        MathUtil.quatMultiply(scratchA, qDisplay, scratchB);
+        MathUtil.quatMultiply(qWorldFix, scratchB, qScratch);
 
         // Sensitivity: scale yaw/pitch angles without touching roll.
         if (Math.abs(sensitivity - 1f) > 0.001f) {
-            MathUtil.quatToEuler(qScratch, eulerDeg);
-            float yaw = eulerDeg[0] * MathUtil.DEG_TO_RAD * sensitivity;
-            float pitch = eulerDeg[1] * MathUtil.DEG_TO_RAD * sensitivity;
-            float roll = eulerDeg[2] * MathUtil.DEG_TO_RAD;
+            MathUtil.quatToEuler(qScratch, scratchEuler);
+            float yaw = scratchEuler[0] * MathUtil.DEG_TO_RAD * sensitivity;
+            float pitch = scratchEuler[1] * MathUtil.DEG_TO_RAD * sensitivity;
+            float roll = scratchEuler[2] * MathUtil.DEG_TO_RAD;
             MathUtil.quatFromEuler(yaw, pitch, roll, qScratch);
         }
 
         if (recenterPending) {
-            float[] yawQuat = new float[4];
-            MathUtil.quatYawOnly(qScratch, yawQuat);
-            MathUtil.quatConjugate(yawQuat, qRecenterOffset);
+            MathUtil.quatYawOnly(qScratch, scratchB);
+            MathUtil.quatConjugate(scratchB, qRecenterOffset);
             recenterPending = false;
             smoothInitialized = false;
         }

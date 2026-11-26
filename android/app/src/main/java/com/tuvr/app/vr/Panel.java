@@ -22,7 +22,7 @@ public final class Panel {
     public Object tag;
 
     /** Texture content; may be replaced at any time (texture is re-uploaded). */
-    public Bitmap content;
+    public volatile Bitmap content;
     /** Previous bitmap, recycled on the GL thread right after its upload. */
     public Bitmap pendingRecycle;
     /** When false the panel never recycles bitmaps, because the owner does. */
@@ -109,12 +109,14 @@ public final class Panel {
         if (!interactive || !visible) {
             return -1f;
         }
-        // Panel plane: dot(p - center, normal) = 0 -> t = dot(center, normal) / dot(dir, normal)
-        float denom = dirX * (-normal[0]) + dirY * (-normal[1]) + dirZ * (-normal[2]);
-        if (Math.abs(denom) < 1e-5f) {
+        // Ray from the user: p = t * dir. The panel plane contains the centre and
+        // has the (unit) normal that points away from the user.
+        //   dot(t * dir - center, normal) = 0  ->  t = dot(center, normal) / dot(dir, normal)
+        float denom = dirX * normal[0] + dirY * normal[1] + dirZ * normal[2];
+        if (Math.abs(denom) < 1e-4f) {
             return -1f;
         }
-        float t = -(center[0] * -normal[0] + center[1] * -normal[1] + center[2] * -normal[2]) / denom;
+        float t = (center[0] * normal[0] + center[1] * normal[1] + center[2] * normal[2]) / denom;
         if (t <= 0.05f) {
             return -1f;
         }
@@ -129,7 +131,7 @@ public final class Panel {
         return -1f;
     }
 
-    public void setContent(Bitmap bitmap) {
+    public synchronized void setContent(Bitmap bitmap) {
         if (content != null && content != bitmap && recycleOnReplace) {
             if (pendingRecycle != null && !pendingRecycle.isRecycled()) {
                 pendingRecycle.recycle();
@@ -140,7 +142,7 @@ public final class Panel {
         this.contentDirty = true;
     }
 
-    public void release() {
+    public synchronized void release() {
         // GL resources are released by the renderer on the GL thread.
         if (recycleOnReplace && content != null && !content.isRecycled()) {
             content.recycle();

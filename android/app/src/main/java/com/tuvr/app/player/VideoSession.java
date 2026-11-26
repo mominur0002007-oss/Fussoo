@@ -240,6 +240,18 @@ public final class VideoSession {
         }
     }
 
+    /** Current playback speed; 1.0 when no player exists yet. */
+    public float speed() {
+        if (player == null) {
+            return 1f;
+        }
+        try {
+            return player.getPlaybackParameters().speed;
+        } catch (RuntimeException e) {
+            return 1f;
+        }
+    }
+
     public void setVolume(float volume) {
         if (player != null) {
             player.setVolume(Math.max(0f, Math.min(1f, volume)));

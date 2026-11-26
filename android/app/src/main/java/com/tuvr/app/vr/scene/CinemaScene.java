@@ -44,6 +44,8 @@ public class CinemaScene implements VrScene {
     private Mesh hemisphereMesh;
     private float meshAspect = -1f;
     private float meshCurvature = -1f;
+    private float meshWidth = -1f;
+    private float meshHeight = -1f;
 
     private Panel playPanel;
     private Panel progressPanel;
@@ -63,6 +65,7 @@ public class CinemaScene implements VrScene {
 
     private float volume = 1f;
     private float brightness = 0.6f;
+    private VrRenderer rendererRef;
     private final float[] modelMatrix = new float[16];
 
     public CinemaScene(Context context, VrHost host, VideoSession session, VideoFormat format) {
@@ -72,6 +75,7 @@ public class CinemaScene implements VrScene {
         this.session = session;
         this.format = format;
         this.brightness = MathUtil.clamp(host.screenBrightness(), 0.05f, 1f);
+        this.volume = MathUtil.clamp(settings.volumeFraction(), 0.05f, 1f);
     }
 
     @Override
@@ -114,6 +118,7 @@ public class CinemaScene implements VrScene {
 
     @Override
     public void onCreated(final VrRenderer renderer) {
+        rendererRef = renderer;
         flatMesh = null;
         sphereMesh = MeshBuilder.sphere(10f, 48, 24);
         hemisphereMesh = MeshBuilder.hemisphere(10f, 40, 20);
@@ -249,11 +254,17 @@ public class CinemaScene implements VrScene {
 
     private void changeSize(int direction) {
         settings.setScreenSize(settings.screenSize() + direction * 0.08f);
+        if (rendererRef != null) {
+            rendererRef.reloadSettings();
+        }
         host.showWhisper("Screen " + Formats.percent(settings.screenSize() / 2.2f));
     }
 
     private void changeDistance(int direction) {
         settings.setScreenDistance(settings.screenDistance() + direction * 0.5f);
+        if (rendererRef != null) {
+            rendererRef.reloadSettings();
+        }
         host.showWhisper("Distance " + Formats.oneDecimal(settings.screenDistance()) + " m");
     }
 
@@ -279,6 +290,9 @@ public class CinemaScene implements VrScene {
         settings.setScreenDistance(6f);
         settings.setCurvature(0.25f);
         settings.setScreenY(0f);
+        if (rendererRef != null) {
+            rendererRef.reloadSettings();
+        }
         host.showWhisper("Screen reset");
     }
 
@@ -368,10 +382,9 @@ public class CinemaScene implements VrScene {
             return;
         }
         float[] model = modelMatrix;
+        // Left/right eye swapping is handled once for the whole frame by the
+        // renderer's composite pass, so both eyes must sample their natural half.
         int uvEye = eye;
-        if (settings.swapEyes()) {
-            uvEye = 1 - uvEye;
-        }
 
         float scaleX = 1f;
         float scaleY = 1f;
@@ -393,7 +406,8 @@ public class CinemaScene implements VrScene {
             if (flatMesh == null
                     || Math.abs(meshAspect - aspect) > 0.01f
                     || Math.abs(meshCurvature - settings.curvature()) > 0.01f
-                    || (curved && meshCurvature < 0f)) {
+                    || Math.abs(meshWidth - width) > 0.005f
+                    || Math.abs(meshHeight - height) > 0.005f) {
                 if (flatMesh != null) {
                     flatMesh.release();
                 }
@@ -402,15 +416,15 @@ public class CinemaScene implements VrScene {
                         : MeshBuilder.quad(width, height);
                 meshAspect = aspect;
                 meshCurvature = settings.curvature();
+                meshWidth = width;
+                meshHeight = height;
             }
             MathUtil.identity(model);
             model[12] = 0f;
             model[13] = settings.screenY();
             model[14] = -settings.screenDistance();
-            float rotation = format.rotationDeg * MathUtil.DEG_TO_RAD
-                    + (format.stereo == VideoFormat.STEREO_SBS && eye == 1 ? 0f : 0f);
             renderer.drawVideo(flatMesh, model, scaleX, scaleY, offsetX, offsetY,
-                    format.projection == VideoFormat.PROJ_FLAT ? rotation : 0f, 1f);
+                    format.rotationDeg * MathUtil.DEG_TO_RAD, 1f);
         } else {
             MathUtil.identity(model);
             if (format.projection == VideoFormat.PROJ_VR360) {

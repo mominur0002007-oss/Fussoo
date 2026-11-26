@@ -62,6 +62,11 @@ public class BrowserScene implements VrScene {
     private int bufferIndex;
     private boolean captureEnabled = true;
 
+    /** Consecutive captures that came back as one flat colour (blank page). */
+    private int blankCaptures;
+    private boolean blankReported;
+    private VrRenderer rendererRef;
+
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable captureTask = new Runnable() {
         @Override
@@ -115,6 +120,7 @@ public class BrowserScene implements VrScene {
         addButton(renderer, "url", "\u270E", "URL", 18f, () -> bridge.onEditUrl());
         addButton(renderer, "exit", "\u23FB", "Exit", 34f, () -> bridge.onExit());
 
+        rendererRef = renderer;
         startCapture();
     }
 
@@ -156,9 +162,45 @@ public class BrowserScene implements VrScene {
             canvas.setBitmap(target);
             webView.draw(canvas);
             pagePanel.setContent(target);
+            checkForBlankCapture(target);
         } catch (Exception ignored) {
         }
         updateUrlPanel();
+    }
+
+    /**
+     * Some devices refuse to give a software WebView real pixels. Rather than
+     * silently showing a black rectangle, detect it and tell the user once.
+     */
+    private void checkForBlankCapture(Bitmap bitmap) {
+        if (blankReported) {
+            return;
+        }
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        if (width <= 0 || height <= 0) {
+            return;
+        }
+        int[] row = new int[width];
+        bitmap.getPixels(row, 0, width, 0, height / 2, width, 1);
+        int first = row[0];
+        boolean uniform = true;
+        for (int i = 1; i < width; i++) {
+            if (row[i] != first) {
+                uniform = false;
+                break;
+            }
+        }
+        if (!uniform) {
+            blankCaptures = 0;
+            return;
+        }
+        blankCaptures++;
+        if (blankCaptures >= 8 && rendererRef != null) {
+            blankReported = true;
+            rendererRef.showWhisper(context.getString(com.tuvr.app.R.string.browser_blank_capture),
+                    7000);
+        }
     }
 
     private String lastUrl = "";

@@ -42,7 +42,8 @@ public class CinemaActivity extends VrActivity implements VideoSession.Listener 
             if (session != null && cinemaScene != null) {
                 cinemaScene.setPlaybackState(session.isPlaying(), session.position(),
                         session.duration());
-                cinemaScene.setSpeed(AppSettings.get(CinemaActivity.this).playbackSpeed());
+                // Reflect the player's real speed so in-scene speed cycling sticks.
+                cinemaScene.setSpeed(session.speed());
             }
             handler.postDelayed(this, 700);
         }
@@ -73,6 +74,7 @@ public class CinemaActivity extends VrActivity implements VideoSession.Listener 
         if (uri != null) {
             session.prepare(uri, autoPlay);
             session.setSpeed(AppSettings.get(this).playbackSpeed());
+            session.setVolume(AppSettings.get(this).volumeFraction());
             MediaStateDb.get(this).recordPlay(uri);
             AppSettings.get(this).setLastVideo(uri, startPositionMs);
             if (startPositionMs <= 0L) {

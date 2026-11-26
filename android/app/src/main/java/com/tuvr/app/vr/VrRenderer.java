@@ -77,7 +77,8 @@ public class VrRenderer implements GLSurfaceView.Renderer {
     private VrScene scene;
     private VrScene pendingScene;
     private final List<Panel> panels = new ArrayList<>();
-    private final List<Panel> internalPanels = new ArrayList<>();
+    private final List<Panel> internalPanels =
+            new java.util.concurrent.CopyOnWriteArrayList<>();
     private Panel fpsPanel;
     private Panel whisperPanel;
     private long whisperUntilMs;
@@ -120,9 +121,9 @@ public class VrRenderer implements GLSurfaceView.Renderer {
     private long lastWarningMs;
 
     private boolean glReady;
-    private boolean settingsDirty = true;
-    private boolean monoPreview;
-    private boolean paused;
+    private volatile boolean settingsDirty = true;
+    private volatile boolean monoPreview;
+    private volatile boolean paused;
 
     public VrRenderer(Context context, HeadTracker tracker) {
         this.context = context.getApplicationContext();
@@ -540,7 +541,7 @@ public class VrRenderer implements GLSurfaceView.Renderer {
         if (environment.stars != null && pointsProgram != null) {
             pointsProgram.use();
             pointsProgram.setMatrix("uMvp", vpMatrix);
-            pointsProgram.set1f("uPointScale", 2.4f);
+            pointsProgram.set1f("uPointScale", 3.5f);
             environment.stars.drawPoints(ATTR_POS_COLOR);
         }
     }
@@ -582,23 +583,27 @@ public class VrRenderer implements GLSurfaceView.Renderer {
     }
 
     private void uploadPanelTexture(Panel panel) {
-        if (panel.content == null) {
-            return;
-        }
-        if (!panel.contentDirty && panel.textureId != 0) {
-            return;
-        }
-        if (panel.textureId == 0) {
-            panel.textureId = GlUtil.textureFromBitmap(panel.content);
-        } else {
-            GlUtil.updateTexture(panel.textureId, panel.content);
-        }
-        panel.contentDirty = false;
-        if (panel.pendingRecycle != null) {
-            if (!panel.pendingRecycle.isRecycled()) {
-                panel.pendingRecycle.recycle();
+        // Synchronised on the panel: a bitmap handed in from the UI thread must
+        // never be recycled while the GL thread is still reading its pixels.
+        synchronized (panel) {
+            if (panel.content == null) {
+                return;
             }
-            panel.pendingRecycle = null;
+            if (!panel.contentDirty && panel.textureId != 0) {
+                return;
+            }
+            if (panel.textureId == 0) {
+                panel.textureId = GlUtil.textureFromBitmap(panel.content);
+            } else {
+                GlUtil.updateTexture(panel.textureId, panel.content);
+            }
+            panel.contentDirty = false;
+            if (panel.pendingRecycle != null) {
+                if (!panel.pendingRecycle.isRecycled()) {
+                    panel.pendingRecycle.recycle();
+                }
+                panel.pendingRecycle = null;
+            }
         }
     }
 
@@ -668,6 +673,9 @@ public class VrRenderer implements GLSurfaceView.Renderer {
         float bestT = Float.MAX_VALUE;
         for (int i = 0; i < panels.size(); i++) {
             Panel panel = panels.get(i);
+            if (!panel.visible || !panel.interactive) {
+                continue;
+            }
             float t = panel.hitTest(dirX, dirY, dirZ);
             if (t > 0f && t < bestT) {
                 bestT = t;

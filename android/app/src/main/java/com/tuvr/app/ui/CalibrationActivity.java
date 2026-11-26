@@ -52,7 +52,7 @@ public class CalibrationActivity extends VrActivity {
         scroll.addView(panel);
         scroll.setBackgroundColor(0xCC070A10);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, (int) (250 * getResources()
+                ViewGroup.LayoutParams.MATCH_PARENT, (int) (190 * getResources()
                 .getDisplayMetrics().density), Gravity.BOTTOM);
         params.setMargins(0, 0, 0, 0);
         scroll.setLayoutParams(params);
@@ -87,20 +87,10 @@ public class CalibrationActivity extends VrActivity {
         Button reset = panel.findViewById(R.id.btn_reset);
         Button save = panel.findViewById(R.id.btn_save);
         reset.setOnClickListener(v -> {
-            settings.setViewerProfileId("shinecon");
-            com.tuvr.app.core.ViewerProfile preset =
-                    com.tuvr.app.core.ViewerProfile.preset("shinecon");
-            settings.setLensSeparationMm(preset.lensSeparationMm);
-            settings.setFovDeg(preset.fovDeg);
-            settings.setScreenLensDistanceMm(preset.screenLensDistanceMm);
-            settings.setEyeOffsetXMm(0f);
-            settings.setEyeOffsetYMm(0f);
-            settings.setDistortionK1(preset.distortionK1);
-            settings.setDistortionK2(preset.distortionK2);
+            if (scene != null) {
+                scene.resetToShinecon();
+            }
             reloadValues();
-            renderer.reloadSettings();
-            scene.markDirty();
-            showWhisper("Viewer reset to Shinecon defaults");
         });
         save.setOnClickListener(v -> {
             settings.setViewerProfileId("custom");
@@ -108,7 +98,7 @@ public class CalibrationActivity extends VrActivity {
             finish();
         });
 
-        findViewById(android.R.id.content).setKeepScreenOn(true);
+        contentRoot().setKeepScreenOn(true);
     }
 
     private interface ValueSink {
@@ -153,8 +143,8 @@ public class CalibrationActivity extends VrActivity {
         });
     }
 
+    /** Rebuilds the slider rows from the stored values. */
     private void reloadValues() {
-        contentRoot().removeAllViews();
         recreate();
     }
 }
