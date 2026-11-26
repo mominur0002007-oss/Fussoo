@@ -1,5 +1,5 @@
 TU VR static analysis
-run: 45757962522
+run: 45758311355
 
 ---- report head ----
 /home/runner/work/Fussoo/Fussoo/android/app/build.gradle:13: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
@@ -56,72 +56,72 @@ run: 45757962522
    However, you may simply not be aware that a more recent version is
    available, and that is what this lint check helps find.
 
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_apps.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_audio.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_back.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_brightness.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_browser.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_cinema.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_exit.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_folder.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_forward.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_gallery.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_info.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_pause.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_play.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_recenter.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_reload.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_screen_size.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_search.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_settings.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_speed.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_star.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_subtitles.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/drawable/ic_vr.xml:5: Error: Unexpected text found in drawable file: "android:tint="@color/text_primary"" [ExtraText]
-    android:tint="@color/text_primary"
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/AndroidManifest.xml:84: Warning: Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed. [DiscouragedApi]
+            android:screenOrientation="sensorLandscape"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/AndroidManifest.xml:92: Warning: Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed. [DiscouragedApi]
+            android:screenOrientation="sensorLandscape"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/AndroidManifest.xml:100: Warning: Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed. [DiscouragedApi]
+            android:screenOrientation="sensorLandscape"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/AndroidManifest.xml:108: Warning: Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed. [DiscouragedApi]
+            android:screenOrientation="sensorLandscape"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/AndroidManifest.xml:115: Warning: Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed. [DiscouragedApi]
+            android:screenOrientation="sensorLandscape"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "DiscouragedApi":
+   Discouraged APIs are allowed and are not deprecated, but they may be unfit
+   for common use (e.g. due to slow performance or subtle behavior).
+
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/values/arrays.xml:12: Warning: Did you mean "cardboard_v!" instead of "cardboard_v1"? [Typos]
+        <item>cardboard_v1</item>
+              ^
+
+   Explanation for issues of type "Typos":
+   This check looks through the string definitions, and if it finds any words
+   that look like likely misspellings, they are flagged.
+
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/values/strings.xml:46: Warning: Formatting %d followed by words ("videos"): This should probably be a plural rather than a string [PluralsCandidate]
+    <string name="gallery_video_count">%1$d videos</string>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/res/values/strings.xml:47: Warning: Formatting %d followed by words ("files"): This should probably be a plural rather than a string [PluralsCandidate]
+    <string name="gallery_folder_count">%1$d files</string>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "PluralsCandidate":
+   This lint check looks for potential errors in internationalization where
+   you have translated a message which involves a quantity and it looks like
+   other parts of the string may need grammatical changes.
+
+   For example, rather than something like this:
+     <string name="try_again">Try again in %d seconds.</string>
+   you should be using a plural:
+      <plurals name="try_again">
+           <item quantity="one">Try again in %d second</item>
+           <item quantity="other">Try again in %d seconds</item>
+       </plurals>
+   This will ensure that in other languages the right set of translations are
+   provided for the different quantity classes.
+
+   (This check depends on some heuristics, so it may not accurately determine
+   whether a string really should be a quantity. You can use tools:ignore to
+   filter out false positives.
+
+   https://developer.android.com/guide/topics/resources/string-resource.html#Plurals
+
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/AndroidManifest.xml:34: Warning: The attribute android:allowBackup is deprecated from Android 12 and higher and may be removed in future versions. Consider adding the attribute android:dataExtractionRules specifying an @xml resource which configures cloud backups and device transfers on Android 12 and higher. [DataExtractionRules]
+        android:allowBackup="false"
+                             ~~~~~
+
+   Explanation for issues of type "DataExtractionRules":
+   Before Android 12, the attributes android:allowBackup and
+   android:fullBackupContent were used to configure all forms of backup,
+   including cloud backups, device-to-device transfers and adb backup.
+
+   In Android 12 and higher, these attributes have been deprecated and will
 ---- log tail ----
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.9/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
@@ -144,30 +144,30 @@ Daemon will be stopped at the end of the build
 > Task :app:compileDebugJavaWithJavac UP-TO-DATE
 > Task :app:preDebugAndroidTestBuild SKIPPED
 > Task :app:generateDebugAndroidTestResValues FROM-CACHE
-> Task :app:extractProguardFiles
 > Task :app:bundleDebugClassesToCompileJar
-> Task :app:generateDebugLintReportModel
+> Task :app:extractProguardFiles
 > Task :app:generateDebugAndroidTestLintModel
+> Task :app:generateDebugLintReportModel
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
 > Task :app:generateDebugUnitTestLintModel
-> Task :app:lintAnalyzeDebugUnitTest
 > Task :app:lintAnalyzeDebugAndroidTest
+> Task :app:lintAnalyzeDebugUnitTest
 > Task :app:lintAnalyzeDebug
 
 > Task :app:lintReportDebug
 Wrote HTML report to file:///home/runner/work/Fussoo/Fussoo/android/app/build/reports/lint-results-debug.html
 
 > Task :app:lintDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1795668911448.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1795669084626.json
 
-BUILD SUCCESSFUL in 28s
+BUILD SUCCESSFUL in 24s
 26 actionable tasks: 10 executed, 1 from cache, 15 up-to-date
 
 ======== packaged APK ========
 total 14340
--rw-r--r-- 1 runner runner     176 Nov 26 04:55 SHA256SUMS.txt
--rw-r--r-- 1 runner runner 8169951 Nov 26 04:55 TUVR-1.0.0-debug.apk
--rw-r--r-- 1 runner runner 6508313 Nov 26 04:55 TUVR-1.0.0-release.apk
+-rw-r--r-- 1 runner runner     176 Nov 26 04:57 SHA256SUMS.txt
+-rw-r--r-- 1 runner runner 8169503 Nov 26 04:57 TUVR-1.0.0-debug.apk
+-rw-r--r-- 1 runner runner 6507873 Nov 26 04:57 TUVR-1.0.0-release.apk
 
 package: name='com.tuvr.app' versionCode='1' versionName='1.0.0' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
 minSdkVersion:'24'
