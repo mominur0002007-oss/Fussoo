@@ -1,5 +1,5 @@
 TU VR static analysis
-run: 45758311355
+run: 45759772150
 
 ---- report head ----
 /home/runner/work/Fussoo/Fussoo/android/app/build.gradle:13: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
@@ -144,10 +144,10 @@ Daemon will be stopped at the end of the build
 > Task :app:compileDebugJavaWithJavac UP-TO-DATE
 > Task :app:preDebugAndroidTestBuild SKIPPED
 > Task :app:generateDebugAndroidTestResValues FROM-CACHE
-> Task :app:bundleDebugClassesToCompileJar
 > Task :app:extractProguardFiles
-> Task :app:generateDebugAndroidTestLintModel
+> Task :app:bundleDebugClassesToCompileJar
 > Task :app:generateDebugLintReportModel
+> Task :app:generateDebugAndroidTestLintModel
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
 > Task :app:generateDebugUnitTestLintModel
 > Task :app:lintAnalyzeDebugAndroidTest
@@ -158,16 +158,16 @@ Daemon will be stopped at the end of the build
 Wrote HTML report to file:///home/runner/work/Fussoo/Fussoo/android/app/build/reports/lint-results-debug.html
 
 > Task :app:lintDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1795669084626.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_5-1795669920997.json
 
-BUILD SUCCESSFUL in 24s
+BUILD SUCCESSFUL in 25s
 26 actionable tasks: 10 executed, 1 from cache, 15 up-to-date
 
 ======== packaged APK ========
 total 14340
--rw-r--r-- 1 runner runner     176 Nov 26 04:57 SHA256SUMS.txt
--rw-r--r-- 1 runner runner 8169503 Nov 26 04:57 TUVR-1.0.0-debug.apk
--rw-r--r-- 1 runner runner 6507873 Nov 26 04:57 TUVR-1.0.0-release.apk
+-rw-r--r-- 1 runner runner     176 Nov 26 05:11 SHA256SUMS.txt
+-rw-r--r-- 1 runner runner 8169503 Nov 26 05:11 TUVR-1.0.0-debug.apk
+-rw-r--r-- 1 runner runner 6507873 Nov 26 05:11 TUVR-1.0.0-release.apk
 
 package: name='com.tuvr.app' versionCode='1' versionName='1.0.0' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
 minSdkVersion:'24'
