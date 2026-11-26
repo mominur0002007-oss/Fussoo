@@ -1,5 +1,5 @@
 TU VR static analysis
-run: 45756815806
+run: 45757347627
 
 ---- report head ----
 /home/runner/work/Fussoo/Fussoo/android/app/build.gradle:13: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
@@ -56,72 +56,72 @@ run: 45756815806
    However, you may simply not be aware that a more recent version is
    available, and that is what this lint check helps find.
 
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:27: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-    private VideoSession session;
-            ~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:43: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-                cinemaScene.setPlaybackState(session.isPlaying(), session.position(),
-                                                     ~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:43: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-                cinemaScene.setPlaybackState(session.isPlaying(), session.position(),
-                                                                          ~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:44: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-                        session.duration());
-                                ~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:46: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-                cinemaScene.setSpeed(session.speed());
-                                             ~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:70: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        session = new VideoSession(this);
-        ~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:70: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        session = new VideoSession(this);
-                  ~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:71: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        session.setListener(this);
-                ~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:75: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-            session.prepare(uri, autoPlay);
-                    ~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:76: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-            session.setSpeed(AppSettings.get(this).playbackSpeed());
-                    ~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:77: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-            session.setVolume(AppSettings.get(this).volumeFraction());
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:37: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+    private final VideoSession session;
+                  ~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:71: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+    public CinemaScene(Context context, VrHost host, VideoSession session, VideoFormat format) {
+                                                     ~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:128: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+        final VideoSession currentSession = session;
+              ~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:131: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+                    currentSession.setVideoSurface(renderer.videoTexture().surface()));
+                                   ~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:227: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+        session.togglePlayPause();
+                ~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:234: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+        long target = Math.max(0L, session.position() + deltaMs);
+                                           ~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:235: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+        session.seekTo(target);
+                ~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:253: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+        session.setSpeed(speed);
+                ~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:285: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+            session.setVolume(volume);
                     ~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:105: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-            session.pause();
-                    ~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:115: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-            session.setListener(null);
-                    ~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:116: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-            session.release();
-                    ~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:125: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        long position = session.position();
-                                ~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:126: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-        long duration = session.duration();
-                                ~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:137: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-    public void onReady(long durationMs) {
-                ~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:140: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-            session.seekTo(pendingSeekMs);
-                    ~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:144: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-            cinemaScene.setPlaybackState(session.isPlaying(), session.position(), durationMs);
-                                                 ~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:144: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-            cinemaScene.setPlaybackState(session.isPlaying(), session.position(), durationMs);
-                                                                      ~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:149: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-    public void onVideoSize(int width, int height, float pixelRatio) {
-                ~~~~~~~~~~~
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/CinemaActivity.java:164: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
-    public void onError(String message) {
-                ~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:323: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+        final VideoSession currentSession = session;
+              ~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/scene/CinemaScene.java:326: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+                    currentSession.setVideoSurface(renderer.videoTexture().surface()));
+                                   ~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/Intents.java:30: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+        Intent intent = new Intent(context, PlayerActivity.class);
+                                            ~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/MainActivity.java:63: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+                () -> startActivity(new Intent(this, CinemaActivity.class)));
+                                                     ~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/ui/MediaActions.java:36: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+                            Intent intent = new Intent(activity, CinemaActivity.class);
+                                                                 ~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/tuvr/app/vr/VrActivity.java:344: Error: This declaration is opt-in and its usage should be marked with @androidx.media3.common.util.UnstableApi or @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class) [UnsafeOptInUsageError from androidx.annotation.experimental]
+        Intent intent = new Intent(this, CinemaActivity.class);
+                                         ~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UnsafeOptInUsageError":
+   This API has been flagged as opt-in with error-level severity.
+
+   Any declaration annotated with this marker is considered part of an
+   unstable or
+   otherwise non-standard API surface and its call sites should accept the
+   opt-in
+   aspect of it by using the @OptIn annotation, using the marker annotation
+   --
+   effectively causing further propagation of the opt-in aspect -- or
+   configuring
+   the UnsafeOptInUsageError check's options for project-wide opt-in.
+
+   To configure project-wide opt-in, specify the opt-in option value in
+   lint.xml
+   as a comma-delimited list of opted-in annotations:
+
+   <lint>
+       <issue id="UnsafeOptInUsageError">
+           <option name="opt-in" value="com.foo.ExperimentalBarAnnotation" />
 ---- log tail ----
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.9/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
@@ -158,7 +158,37 @@ Daemon will be stopped at the end of the build
 Wrote HTML report to file:///home/runner/work/Fussoo/Fussoo/android/app/build/reports/lint-results-debug.html
 
 > Task :app:lintDebug
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1795668214772.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1795668527287.json
 
 BUILD SUCCESSFUL in 27s
 26 actionable tasks: 10 executed, 1 from cache, 15 up-to-date
+
+======== packaged APK ========
+total 14340
+-rw-r--r-- 1 runner runner     176 Nov 26 04:48 SHA256SUMS.txt
+-rw-r--r-- 1 runner runner 8169955 Nov 26 04:48 TUVR-1.0.0-debug.apk
+-rw-r--r-- 1 runner runner 6508313 Nov 26 04:48 TUVR-1.0.0-release.apk
+
+package: name='com.tuvr.app' versionCode='1' versionName='1.0.0' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
+minSdkVersion:'24'
+targetSdkVersion:'34'
+uses-permission: name='android.permission.READ_MEDIA_VIDEO'
+uses-permission: name='android.permission.READ_MEDIA_VISUAL_USER_SELECTED'
+uses-permission: name='android.permission.READ_EXTERNAL_STORAGE' maxSdkVersion='32'
+uses-permission: name='android.permission.INTERNET'
+uses-permission: name='android.permission.ACCESS_NETWORK_STATE'
+uses-permission: name='com.tuvr.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'
+application-label:'TU VR'
+application-icon-120:'res/BW.xml'
+application-icon-160:'res/BW.xml'
+application-icon-240:'res/BW.xml'
+application-icon-320:'res/BW.xml'
+application-icon-480:'res/BW.xml'
+application-icon-640:'res/BW.xml'
+application-icon-65534:'res/BW.xml'
+application: label='TU VR' icon='res/BW.xml'
+
+Signer #1 certificate DN: CN=TU VR, OU=Personal, O=TU VR Project, L=Dhaka, C=BD
+Signer #1 certificate SHA-256 digest: c1e2b519159c53f1c611f912b7c1be2a297fdf067d1c45f41fce62428ff11d41
+Signer #1 certificate SHA-1 digest: d2a65084bc7e43abac88b378b74fe3c8c6bc5e2a
+Signer #1 certificate MD5 digest: aea8eb77d15e320792c7574b81027386
