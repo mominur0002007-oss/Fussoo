@@ -109,10 +109,17 @@ public final class TheatreActivity extends Activity implements VrRenderer.Callba
 
         tracker = new Tracker(this);
         surface = new VrSurface(this);
-        surface.boot(tracker);
-        renderer = surface.renderer();
-        renderer.setCallback(this);
         setContentView(surface);
+        // The GLSurfaceView needs a live Surface before setRenderer, so the renderer is
+        // created from onAttachedToWindow via this listener (fires once).
+        surface.onSurfaceReady(new VrSurface.Ready() {
+            @Override
+            public void go() {
+                surface.boot(tracker);
+                renderer = surface.renderer();
+                renderer.setCallback(TheatreActivity.this);
+            }
+        });
 
         loadStageFromPrefs();
         videoId = getIntent().getStringExtra(EXTRA_VIDEO_ID);
@@ -155,12 +162,12 @@ public final class TheatreActivity extends Activity implements VrRenderer.Callba
 
     private ExoPlayer buildPlayer() {
         DefaultHttpDataSource.Factory http = new DefaultHttpDataSource.Factory()
-                .setUserAgent(Yt.downloader().client() != null
-                        ? com.fussoo.vr.net.YtDownloader.USER_AGENT
-                        : "FussooVR/1.0")
+                .setUserAgent(com.fussoo.vr.net.YtDownloader.USER_AGENT)
                 .setAllowCrossProtocolRedirects(true)
                 .setConnectTimeoutMs(15000)
-                .setReadTimeoutMs(20000);
+                .setReadTimeoutMs(20000)
+                .setDefaultRequestProperties(java.util.Collections.singletonMap(
+                        "Referer", "https://www.youtube.com/"));
         httpFactory = http;
         DefaultMediaSourceFactory factory = new DefaultMediaSourceFactory(http);
         ExoPlayer p = new ExoPlayer.Builder(this)
@@ -268,7 +275,9 @@ public final class TheatreActivity extends Activity implements VrRenderer.Callba
 
         MediaItem videoItem = new MediaItem.Builder().setUri(play.videoUrl).build();
         ProgressiveMediaSource.Factory factory =
-                new ProgressiveMediaSource.Factory(httpFactory);
+                new ProgressiveMediaSource.Factory(httpFactory != null ? httpFactory
+                        : new DefaultHttpDataSource.Factory()
+                        .setUserAgent(com.fussoo.vr.net.YtDownloader.USER_AGENT));
         if (play.audioUrl == null) {
             player.setMediaSource(factory.createMediaSource(videoItem));
         } else {

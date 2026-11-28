@@ -163,11 +163,11 @@ public final class Hud {
         // Progress: track, buffer, playhead.
         float h = Math.max(0.020f, s.screenWidth * 0.0062f);
         Atlas.Region track = atlas.use("bar.track",
-                Atlas.roundRect(64, 10, 0x38FFFFFF, 0, 5f));
+                () -> Atlas.roundRect(64, 10, 0x38FFFFFF, 0, 5f));
         Atlas.Region buffered = atlas.use("bar.buf",
-                Atlas.roundRect(64, 10, 0x66FFFFFF, 0, 5f));
+                () -> Atlas.roundRect(64, 10, 0x66FFFFFF, 0, 5f));
         Atlas.Region head = atlas.use("bar.head",
-                Atlas.roundRect(64, 10, 0xFFF2F5FA, 0, 5f));
+                () -> Atlas.roundRect(64, 10, 0xFFF2F5FA, 0, 5f));
         layer.quad(track, barX0, barY - h / 2, barX1, barY + h / 2, 0.75f * a);
         if (s.durationMs > 0 && s.buffered > 0.01f) {
             float bx = barX0 + (barX1 - barX0) * Math.min(1f, s.buffered);
@@ -176,7 +176,7 @@ public final class Hud {
                     * Math.min(1f, s.positionMs / (float) s.durationMs);
             layer.quad(head, barX0, barY - h / 2, px, barY + h / 2, a);
             Atlas.Region dot = atlas.use("bar.dot",
-                    Atlas.circle(28, 0xFFF2F5FA, 0));
+                    () -> Atlas.circle(28, 0xFFF2F5FA, 0));
             float dr = h * 1.15f;
             layer.quad(dot, px - dr, barY - dr, px + dr, barY + dr, a);
         }
@@ -184,7 +184,8 @@ public final class Hud {
         // Title above the bar.
         if (s.title != null && s.title.length() > 0) {
             String t = truncate(s.title, 54);
-            Atlas.Region r = atlas.use("t." + t, Atlas.label(t, 44, 0xFFF5F8FC, 0xCC000000, true));
+            Atlas.Region r = atlas.use("t." + t,
+                    () -> Atlas.label(t, 44, 0xFFF5F8FC, 0xCC000000, true));
             float th = s.screenWidth * 0.020f;
             float tw = layer.textWidth(r, th);
             float maxW = s.screenWidth * 0.70f;
@@ -196,12 +197,13 @@ public final class Hud {
 
         // Time on the left, quality on the right.
         String time = Formats.duration(s.positionMs) + " / " + Formats.duration(s.durationMs);
-        Atlas.Region tr = atlas.use("time." + time, Atlas.label(time, 34, 0xFFB9C3D2, 0xCC000000, false));
+        Atlas.Region tr = atlas.use("time." + time,
+                () -> Atlas.label(time, 34, 0xFFB9C3D2, 0xCC000000, false));
         float th = s.screenWidth * 0.0128f;
         layer.text(tr, barX0, barY + 0.012f, th, 0.9f * a);
         if (s.qualityText != null && s.qualityText.length() > 0) {
             Atlas.Region q = atlas.use("q." + s.qualityText,
-                    Atlas.label(s.qualityText, 34, 0xFFB9C3D2, 0xCC000000, false));
+                    () -> Atlas.label(s.qualityText, 34, 0xFFB9C3D2, 0xCC000000, false));
             float qw = layer.textWidth(q, th);
             layer.text(q, barX1 - qw, barY + 0.012f, th, 0.9f * a);
         }
@@ -217,7 +219,7 @@ public final class Hud {
                     : (hot ? 0xF23A4357 : 0xD9121720);
             int fg = 0xFFF7FAFF;
             Atlas.Region r = atlas.use("b" + sl.id + glyph + (hot ? "h" : ""),
-                    Atlas.icon(glyph, d, fill, fg));
+                    () -> Atlas.icon(glyph, d, fill, fg));
             layer.quad(r, sl.x0, sl.y0, sl.x1, sl.y1, a);
         }
 
@@ -226,7 +228,7 @@ public final class Hud {
             Slot sl = slots[Math.max(0, Math.min(COUNT - 1, s.hover))];
             float rr = sl.size() * 0.78f;
             Atlas.Region ring = atlas.use("dwell" + (int) (s.dwell * 30f),
-                    Atlas.arc(96, s.dwell, 0xFF63B8FF));
+                    () -> Atlas.arc(96, s.dwell, 0xFF63B8FF));
             layer.quad(ring, sl.cx() - rr, sl.cy() - rr, sl.cx() + rr, sl.cy() + rr, a);
         }
 
@@ -238,7 +240,8 @@ public final class Hud {
         if (note == null || note.length() == 0) {
             return;
         }
-        Atlas.Region r = atlas.use("s." + note, Atlas.label(note, 36, 0xFFF2F6FC, 0xCC000000, true));
+        Atlas.Region r = atlas.use("s." + note,
+                () -> Atlas.label(note, 36, 0xFFF2F6FC, 0xCC000000, true));
         float th = s.screenWidth * 0.0155f;
         float tw = layer.textWidth(r, th);
         float cy = -screenHalfH * 0.72f;
@@ -258,7 +261,8 @@ public final class Hud {
                 String key = "poster" + i + "_" + bmp.getGenerationId();
                 r = atlas.use(key, Atlas.shade(bmp));
             } else {
-                r = atlas.use("poster.blank", Atlas.roundRect(96, 54, 0x12FFFFFF, 0x33FFFFFF, 12f));
+                r = atlas.use("poster.blank",
+                        () -> Atlas.roundRect(96, 54, 0x12FFFFFF, 0x33FFFFFF, 12f));
             }
             float lift = (s.hover == 100 + i) ? 0.02f : 0f;
             layer.quad(r, x0, cardY0 + lift, x1, cardY1 + lift, 0.97f * a);
@@ -267,11 +271,11 @@ public final class Hud {
                 float cx = (x0 + x1) / 2f;
                 float cy = (cardY0 + cardY1) / 2f;
                 Atlas.Region play = atlas.use("browse.play",
-                        Atlas.icon("▶", 128, 0xF2E8322B, 0xFFFFFFFF));
+                        () -> Atlas.icon("\u25B6", 128, 0xF2E8322B, 0xFFFFFFFF));
                 layer.quad(play, cx - rr, cy - rr, cx + rr, cy + rr, a);
                 if (s.dwell > 0.01f) {
                     Atlas.Region ring = atlas.use("dwell" + (int) (s.dwell * 30f),
-                            Atlas.arc(96, s.dwell, 0xFF63B8FF));
+                            () -> Atlas.arc(96, s.dwell, 0xFF63B8FF));
                     layer.quad(ring, cx - rr * 1.25f, cy - rr * 1.25f,
                             cx + rr * 1.25f, cy + rr * 1.25f, a);
                 }
@@ -279,7 +283,7 @@ public final class Hud {
             if (names != null && i < names.length && names[i] != null) {
                 String t = truncate(names[i], 30);
                 Atlas.Region tr = atlas.use("cap" + i + t,
-                        Atlas.label(t, 30, 0xFFE6ECF5, 0xCC000000, true));
+                        () -> Atlas.label(t, 30, 0xFFE6ECF5, 0xCC000000, true));
                 float th = s.screenWidth * 0.0102f;
                 float tw = layer.textWidth(tr, th);
                 if (tw > cardW) {
@@ -291,7 +295,7 @@ public final class Hud {
         }
 
         Atlas.Region hint = atlas.use("browse.hint",
-                Atlas.label("Gaze at a poster and hold", 34, 0xFFB9C3D2, 0xCC000000, false));
+                () -> Atlas.label("Gaze at a poster and hold", 34, 0xFFB9C3D2, 0xCC000000, false));
         float hh = s.screenWidth * 0.0125f;
         float hw = layer.textWidth(hint, hh);
         float cy = cardY0 - 0.10f;
@@ -307,7 +311,7 @@ public final class Hud {
             return;
         }
         boolean hot = s.hover >= 0;
-        Atlas.Region r = atlas.use(hot ? "gaze.hot" : "gaze", hot
+        Atlas.Region r = atlas.use(hot ? "gaze.hot" : "gaze", () -> hot
                 ? Atlas.circle(48, 0xFF63B8FF, 0xFFFFFFFF)
                 : Atlas.circle(48, 0xB8FFFFFF, 0x88FFFFFF));
         float rr = Math.max(0.014f, s.screenWidth * 0.0048f);

@@ -6,6 +6,21 @@ android {
     namespace 'com.fussoo.vr'
     compileSdk 35
 
+    // A committed development key keeps the app updateable: Android rejects an update
+    // whose signing certificate differs, and CI would otherwise mint a new key per run.
+    signingConfigs {
+        devkey {
+            def ks = rootProject.file('keystore/fussoo-dev.p12')
+            if (ks.exists()) {
+                storeFile ks
+                storeType 'PKCS12'
+                storePassword 'fussoo-dev'
+                keyAlias 'fussoo'
+                keyPassword 'fussoo-dev'
+            }
+        }
+    }
+
     defaultConfig {
         applicationId "com.fussoo.vr"
         minSdk 24
@@ -19,14 +34,13 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix ''
             versionNameSuffix '-dev'
+            signingConfig signingConfigs.devkey
         }
         release {
             minifyEnabled false
-            // Signed with the debug keystore that the GitHub runner generates,
-            // so `adb install` / sideload work without any secret in the repo.
-            signingConfig signingConfigs.debug
+            // Same dev key as debug, so `adb install -r` and in-place updates work.
+            signingConfig signingConfigs.devkey
             // Keep class names: NewPipeExtractor and the GL renderer use reflection-free
             // code today, but stable names make crash reports readable.
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

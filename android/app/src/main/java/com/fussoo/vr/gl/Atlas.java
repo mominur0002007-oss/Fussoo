@@ -51,6 +51,8 @@ public final class Atlas {
 
     private final Map<String, Region> regions = new HashMap<>();
     private final Map<String, Bitmap> sources = new HashMap<>();
+    /** Every art bitmap ever generated, so a repack never re-renders text. */
+    private final Map<String, Bitmap> made = new HashMap<>();
 
     public void init() {
         bitmap = Bitmap.createBitmap(SIZE, SIZE, Bitmap.Config.ARGB_8888);
@@ -80,27 +82,48 @@ public final class Atlas {
     private void reset() {
         regions.clear();
         sources.clear();
+        made.clear();
         penX = 0;
         penY = 0;
         rowH = 0;
     }
 
+    /** Builds a bitmap on demand. Called at most once per key per process. */
+    public interface Art {
+        Bitmap make();
+    }
+
     /**
-     * Ensures {@code key} exists in the atlas. When {@code src} is given and the key is
-     * new, the bitmap is packed. Safe to call every frame.
+     * Returns the region for {@code key}, building the bitmap through {@code art} only when
+     * that key has never been seen. This is the call site for anything drawn every frame:
+     * the bitmap is cached, so a steady frame allocates nothing.
      */
-    public Region use(String key, Bitmap src) {
+    public Region use(String key, Art art) {
         Region r = regions.get(key);
         if (r != null) {
             return r;
         }
+        Bitmap bmp = made.get(key);
+        if (bmp == null) {
+            bmp = art.make();
+            if (bmp == null) {
+                return null;
+            }
+            made.put(key, bmp);
+        }
+        r = pack(bmp);
+        regions.put(key, r);
+        sources.put(key, bmp);
+        return r;
+    }
+
+    /** Convenience for a bitmap that is already in hand (thumbnails). */
+    public Region use(String key, Bitmap src) {
         if (src == null) {
             return null;
         }
-        r = pack(src);
-        regions.put(key, r);
-        sources.put(key, src);
-        return r;
+        made.put(key, src);
+        return use(key, () -> made.get(key));
     }
 
     private Region pack(Bitmap src) {

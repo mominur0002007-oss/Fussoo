@@ -31,6 +31,16 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Stable debug keystore
+        run: |
+          # A committed keystore keeps the signature stable across CI runs; otherwise every
+          # build gets a new debug key and the phone refuses to update the app in place.
+          if [ -f android/keystore/fussoo-dev.jks ]; then
+            echo "using committed keystore"
+          else
+            echo "committed keystore missing; debug key will be generated per run"
+          fi
+
       - name: Assemble
         run: |
           set -o pipefail

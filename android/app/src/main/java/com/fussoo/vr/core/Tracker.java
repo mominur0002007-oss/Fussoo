@@ -6,6 +6,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.view.Surface;
 import android.view.WindowManager;
 
@@ -29,6 +31,7 @@ public final class Tracker implements SensorEventListener {
     private static final float MAX_DT = 0.05f;
     private static final float MAX_RATE = 12f;
 
+    private final Object lock = new Object();
     private final SensorManager sm;
     private final Sensor vec;
     private final Sensor gyro;
@@ -83,6 +86,11 @@ public final class Tracker implements SensorEventListener {
         displayRotation = ((degrees % 360) + 360) % 360;
     }
 
+    /**
+     * Starts tracking. Registration happens on a handler thread and the session reset is
+     * posted as the first sensor event, so no sample can ever land between "registered"
+     * and "ready" and put the view at an odd angle.
+     */
     public void start(Activity activity) {
         if (started || sm == null) {
             return;
@@ -98,20 +106,39 @@ public final class Tracker implements SensorEventListener {
             } catch (Exception ignored) {
             }
         }
-        lastGyroNs = 0L;
-        gravityReady = false;
+        resetSession();
+        HandlerThread ht = new HandlerThread("fussoo-sensors");
+        ht.start();
+        Handler h = new Handler(ht.getLooper());
         useVec = false;
         if (vec != null) {
-            useVec = sm.registerListener(this, vec, SensorManager.SENSOR_DELAY_GAME);
+            useVec = sm.registerListener(this, vec, SensorManager.SENSOR_DELAY_GAME, h);
         }
         if (!useVec) {
             if (gyro != null) {
-                sm.registerListener(this, gyro, SensorManager.SENSOR_DELAY_GAME);
+                sm.registerListener(this, gyro, SensorManager.SENSOR_DELAY_GAME, h);
             }
             if (accel != null && accel != gyro) {
-                sm.registerListener(this, accel, SensorManager.SENSOR_DELAY_GAME);
+                sm.registerListener(this, accel, SensorManager.SENSOR_DELAY_GAME, h);
             }
         }
+        synchronized (lock) {
+            lock.notifyAll();
+        }
+    }
+
+    private void resetSession() {
+        lastGyroNs = 0L;
+        gravityReady = false;
+        haveSmooth = false;
+        q[0] = 0f;
+        q[1] = 0f;
+        q[2] = 0f;
+        q[3] = 1f;
+        qVec[0] = 0f;
+        qVec[1] = 0f;
+        qVec[2] = 0f;
+        qVec[3] = 1f;
     }
 
     public void stop() {
@@ -150,6 +177,9 @@ public final class Tracker implements SensorEventListener {
         if (t == Sensor.TYPE_ROTATION_VECTOR && useVec) {
             SensorManager.getQuaternionFromVector(qVec, e.values);
             norm(qVec);
+            synchronized (lock) {
+                lock.notifyAll();
+            }
         } else if (t == Sensor.TYPE_GYROSCOPE && !useVec) {
             onGyro(e);
         } else if (t == Sensor.TYPE_ACCELEROMETER && !useVec) {
@@ -236,6 +266,15 @@ public final class Tracker implements SensorEventListener {
      * the smoothing can adapt; pass 0 for "no smoothing".
      */
     public float[] view(float frameSeconds) {
+        if (started && !haveSmooth) {
+            synchronized (lock) {
+                try {
+                    lock.wait(60L);
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
         quatToMat3(useVec ? qVec : q, m9);
         float[] r = rotationFix(displayRotation);
         // m9 = R_display * M
