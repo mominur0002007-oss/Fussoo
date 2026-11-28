@@ -17,7 +17,7 @@ public final class VrPrefs {
     // ------------------------------------------------------------- theatre
 
     public float screenWidth() {
-        return p.getFloat("screen_w", 6.6f);
+        return p.getFloat("screen_w", 11.0f);
     }
 
     public void setScreenWidth(float v) {
@@ -25,7 +25,7 @@ public final class VrPrefs {
     }
 
     public float screenDistance() {
-        return p.getFloat("screen_d", 4.4f);
+        return p.getFloat("screen_d", 4.2f);
     }
 
     public void setScreenDistance(float v) {
@@ -33,7 +33,7 @@ public final class VrPrefs {
     }
 
     public float screenHeight() {
-        return p.getFloat("screen_y", 1.95f);
+        return p.getFloat("screen_y", 2.35f);
     }
 
     public void setScreenHeight(float v) {

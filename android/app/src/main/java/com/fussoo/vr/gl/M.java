@@ -42,11 +42,17 @@ public final class M {
         return t;
     }
 
-    /** Symmetric perspective; the eye offset is applied to the view matrix instead. */
-    public static float[] frustum(float halfW, float halfH, float n, float f) {
+    /**
+     * Symmetric perspective from half-angle tangents.
+     *
+     * <p>{@code tanX}/{@code tanY} are tan(halfFov) values, which is how the view angles are
+     * derived from the physical screen. The classic mistake here is {@code n / tan}; the
+     * correct term is {@code 1 / tan}, i.e. the cotangent, or the scene shrinks to a speck.</p>
+     */
+    public static float[] frustum(float tanX, float tanY, float n, float f) {
         float[] m = new float[16];
-        m[0] = n / halfW;
-        m[5] = n / halfH;
+        m[0] = 1f / tanX;
+        m[5] = 1f / tanY;
         m[10] = -(f + n) / (f - n);
         m[11] = -1f;
         m[14] = -(2f * f * n) / (f - n);

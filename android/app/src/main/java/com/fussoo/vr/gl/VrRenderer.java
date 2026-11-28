@@ -265,17 +265,23 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
     }
 
     /**
-     * One shared symmetric frustum. Each eye gets its own view matrix with a small
-     * horizontal translation, which is both physically right and impossible to get the
-     * handedness wrong on.
+     * One shared symmetric frustum, defined the way cardboard optics actually work:
+     *
+     * <p>Each half of the screen sits in front of one lens at {@code screen_distance}, so
+     * the vertical view angle is {@code 2·atan(halfHeight / distance)}. At the default
+     * 4.4 m distance and a 1.86 m tall half-panel that is about 46° per eye, which is
+     * exactly what the lens shows you. Horizontal uses the eye panel's real aspect.</p>
      */
     private void buildProjection(Stage s) {
         float near = 0.05f;
-        float far = 120f;
-        double halfV = Math.toRadians(s.fov * 0.5);
-        float vt = (float) Math.tan(halfV);
+        float far = 150f;
+        float halfW = s.screenWidth * 0.5f;
+        float halfH = halfW / Math.max(0.55f, s.aspect());
+        // The virtual screen is placed at s.screenDistance; its angular size follows.
+        float vt = halfH / Math.max(0.5f, s.screenDistance);
         float aspect = (fboW * 0.5f) / (float) fboH;
-        proj = M.frustum(vt * aspect, vt, near, far);
+        float ht = vt * aspect;
+        proj = M.frustum(ht, vt, near, far);
     }
 
     private void drawEye(Stage s, int eye) {
@@ -343,7 +349,7 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
     private void drawHud(Stage s) {
         float[] model = M.id();
         model[13] = s.screenCenterY - 1.6f;
-        model[14] = -(s.screenDistance - 0.06f);
+        model[14] = -(s.screenDistance - 0.04f);
         mvp = M.mul(proj, M.mul(view, model));
         layer.clear();
         hud.draw(layer, s, shelf, shelfNames);

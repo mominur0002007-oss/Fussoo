@@ -8,9 +8,9 @@ package com.fussoo.vr.gl;
 public final class Stage {
 
     // Geometry, metres.
-    public float screenWidth = 6.6f;
-    public float screenDistance = 4.4f;
-    public float screenCenterY = 1.75f;
+    public float screenWidth = 11.0f;
+    public float screenDistance = 4.2f;
+    public float screenCenterY = 2.35f;
     public float curve = 0.72f;
 
     // Optics.
