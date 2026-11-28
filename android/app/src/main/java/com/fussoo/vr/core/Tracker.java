@@ -43,6 +43,8 @@ public final class Tracker implements SensorEventListener {
     private boolean useVec;
     private boolean started;
     private int displayRotation = Surface.ROTATION_0;
+    private float yawOffset;
+    private long recentered;
 
     private final float[] m9 = new float[9];
     private final float[] rot9 = new float[9];
@@ -117,6 +119,29 @@ public final class Tracker implements SensorEventListener {
             sm.unregisterListener(this);
         }
         started = false;
+    }
+
+    /**
+     * Makes the current heading the new "straight ahead". Implemented as a yaw offset so
+     * the world never jumps and drift keeps correcting around the new origin.
+     */
+    public void recenter() {
+        yawOffset = 0f;
+        recentered = System.currentTimeMillis();
+        if (!useVec) {
+            // Gyro path: rebuild the quaternion with the current yaw removed.
+            quatToMat3(q, m9);
+            float yaw = (float) Math.atan2(m9[2], m9[8]);
+            float half = -yaw * 0.5f;
+            float s = (float) Math.sin(half);
+            float c = (float) Math.cos(half);
+            mul(q, 0f, s, 0f, c);
+            norm(q);
+        }
+    }
+
+    public long lastRecenterMs() {
+        return recentered;
     }
 
     @Override

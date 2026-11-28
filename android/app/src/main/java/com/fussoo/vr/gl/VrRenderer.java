@@ -51,10 +51,10 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
     private int surfaceW = 1280;
     private int surfaceH = 720;
 
-    private final float[] view = new float[16];
-    private final float[] projL = new float[16];
-    private final float[] projR = new float[16];
-    private final float[] mvp = new float[16];
+    private float[] view = new float[16];
+    private float[] projL = new float[16];
+    private float[] projR = new float[16];
+    private float[] mvp = new float[16];
 
     private long lastFrameNs;
     private int frames;

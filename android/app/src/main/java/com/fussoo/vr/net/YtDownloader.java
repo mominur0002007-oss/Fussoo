@@ -1,7 +1,5 @@
 package com.fussoo.vr.net;
 
-import androidx.annotation.NonNull;
-
 import org.schabi.newpipe.extractor.downloader.Downloader;
 import org.schabi.newpipe.extractor.downloader.Request;
 import org.schabi.newpipe.extractor.downloader.Response;
@@ -45,7 +43,7 @@ public final class YtDownloader extends Downloader {
     }
 
     @Override
-    public Response execute(@NonNull Request request) throws IOException, ReCaptchaException {
+    public Response execute(Request request) throws IOException, ReCaptchaException {
         String url = request.url();
         String method = request.httpMethod();
         byte[] body = request.dataToSend();
@@ -103,7 +101,7 @@ public final class YtDownloader extends Downloader {
         }
     }
 
-    public String get(String url) throws IOException {
+    public String fetch(String url) throws IOException {
         okhttp3.Request rq = new okhttp3.Request.Builder()
                 .url(url)
                 .addHeader("User-Agent", USER_AGENT)

@@ -208,7 +208,7 @@ public final class TheatreActivity extends Activity implements VrRenderer.Callba
     private String shortError(PlaybackException e) {
         String m = e.getMessage();
         if (m == null) {
-            return e.errorCodeName;
+            return String.valueOf(e.errorCode);
         }
         int cut = m.indexOf('\n');
         return cut > 0 ? m.substring(0, cut) : m;
