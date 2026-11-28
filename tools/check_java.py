@@ -298,6 +298,74 @@ for path, (src, tree) in files.items():
                 errors.append("%s: %s.%s() — called but not declared (or inherited)"
                               % (path, node.name, nm))
 
+
+
+def _lambdas_in(nodes):
+    """Every lambda inside the given statements, however deeply nested."""
+    for n in nodes:
+        if isinstance(n, tuple):
+            n = n[1]
+        if isinstance(n, javalang.tree.Node):
+            for _, lam in n.filter(javalang.tree.LambdaExpression):
+                yield None, lam
+
+def _all_names(node):
+    """Every identifier-like name referenced anywhere inside a node."""
+    out = set()
+    if isinstance(node, javalang.tree.Node):
+        out.add(getattr(node, "member", None))
+        out.add(getattr(node, "value", None))
+        for attr in (getattr(node, "selectors", None) or []):
+            out |= _all_names(attr)
+        for idx in (getattr(node, "index", None), ):
+            out |= _all_names(idx)
+    elif isinstance(node, (list, tuple)):
+        for n in node:
+            out |= _all_names(n)
+    out.discard(None)
+    return out
+
+
+# ------------------------------------------------------- lambda capture safety
+# A lambda may only capture locals that are final or never reassigned, and loop variables
+# of an index loop count as reassigned. This is a very common source of CI failures, so
+# it is worth checking here: any `x[i]` / loop-declared identifier used inside a lambda
+# body that is declared by the enclosing loop is reported.
+for path, (src, tree) in files.items():
+    for _, m in tree.filter(javalang.tree.MethodDeclaration):
+        if m.body is None:
+            continue
+        for stmt in m.body:
+            loops = []
+            if isinstance(stmt, javalang.tree.ForStatement):
+                if stmt.control and isinstance(
+                        stmt.control, javalang.tree.ForControl) and stmt.control.init:
+                    inits = stmt.control.init
+                    if not isinstance(inits, list):
+                        inits = [inits]
+                    for init in inits:
+                        # javalang stores control clauses as (position, node) tuples.
+                        if isinstance(init, tuple):
+                            init = init[1]
+                        if isinstance(init, javalang.tree.VariableDeclaration):
+                            for d in init.declarators:
+                                loops.append(d.name)
+            if not loops:
+                continue
+            body_nodes = []
+            if isinstance(stmt, javalang.tree.ForStatement):
+                body_nodes = [stmt.body] if stmt.body is not None else []
+            for _, lam in _lambdas_in(body_nodes):
+                names = set()
+                for _, ref in lam.filter(javalang.tree.MemberReference):
+                    names.add(ref.member)
+                names |= _all_names(lam.body)
+                for name in loops:
+                    if name in names:
+                        errors.append("%s: %s — lambda captures loop variable '%s'"
+                                      % (path, m.name, name))
+
+
 print("\n--- errors (%d) ---" % len(errors))
 for e in errors:
     print("  " + e)

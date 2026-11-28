@@ -729,8 +729,12 @@ public final class Scene {
             boolean primary = i == 0;
             int fill = primary ? (hot ? 0xFFFF4A3E : 0xFFE8322B)
                     : (hot ? 0xF23A4357 : 0xD9121720);
+            // Atlas keys are cached forever, so the factory lambda only has to capture
+            // values that never change: copy the loop locals first.
+            final String glyph = glyphs[i];
+            final int fillColor = fill;
             Atlas.Region btn = atlas.use("cb:" + i + (hot ? "h" : ""), () ->
-                    Atlas.button(glyphs[i], 160, fill, 0xFFFFFFFF));
+                    Atlas.button(glyph, 160, fillColor, 0xFFFFFFFF));
             at.quad(btn, bx, -0.235f, bx + bw, 0.125f, a);
             if (hot && w.dwell > 0.01f) {
                 float r = bw * 0.72f;
@@ -762,8 +766,10 @@ public final class Scene {
         float bx = -total * 0.5f;
         for (int i = 0; i < keys.length; i++) {
             boolean hot = keys[i].equals(w.hoverKey);
+            final String label = labels[i];
+            final boolean isHot = hot;
             Atlas.Region lbl = atlas.use("rl:" + i + (hot ? "h" : ""), () ->
-                    Atlas.label(labels[i], 40, hot ? 0xFF63B8FF : 0xFFC8D2E0, 0, hot));
+                    Atlas.label(label, 40, isHot ? 0xFF63B8FF : 0xFFC8D2E0, 0, isHot));
             at.textCentred(lbl, bx + bw * 0.5f, 0f, 0.055f, 0.95f);
             bx += bw + gap;
         }
