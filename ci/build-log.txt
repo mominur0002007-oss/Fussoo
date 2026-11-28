@@ -1,0 +1,101 @@
+# build failed
+42:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/WorldSurface.java:18: error: cannot inherit from final VrSurface
+45:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:394: error: cannot find symbol
+50:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:405: error: cannot find symbol
+55:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:503: error: cannot find symbol
+60:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/WorldSurface.java:54: error: cannot find symbol
+65:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/MainActivity.java:104: error: cannot find symbol
+76:> Task :app:compileDebugJavaWithJavac FAILED
+81:* What went wrong:
+89:BUILD FAILED in 43s
+
+
+Welcome to Gradle 8.9!
+
+Here are the highlights of this release:
+ - Enhanced Error and Warning Messages
+ - IDE Integration Improvements
+ - Daemon JVM Information
+
+For more details see https://docs.gradle.org/8.9/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.9/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugBuildConfig
+> Task :app:javaPreCompileDebug
+> Task :app:generateDebugResValues
+> Task :app:checkDebugAarMetadata
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:mergeDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:parseDebugLocalResources
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+> Task :app:desugarDebugFileDependencies
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :app:processDebugManifestForPackage
+> Task :app:mergeDebugJavaResource
+> Task :app:processDebugResources
+> Task :app:checkDebugDuplicateClasses
+
+> Task :app:compileDebugJavaWithJavac
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/WorldSurface.java:18: error: cannot inherit from final VrSurface
+public final class WorldSurface extends VrSurface {
+                                        ^
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:394: error: cannot find symbol
+            drawHero(at, atlas, w, -1.55f, -0.30f, 1.55f, 1.55f, mvp);
+                                                                 ^
+  symbol:   variable mvp
+  location: class Scene
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:405: error: cannot find symbol
+            drawPoster(at, atlas, t, x, -1.62f, x + cw, -0.52f, "tile:" + i, w, mvp);
+                                                                                ^
+  symbol:   variable mvp
+  location: class Scene
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:503: error: cannot find symbol
+                        "tile:" + idx, w, mvp);
+                                          ^
+  symbol:   variable mvp
+  location: class Scene
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/WorldSurface.java:54: error: cannot find symbol
+        VrRenderer r = renderer();
+        ^
+  symbol:   class VrRenderer
+  location: class WorldSurface
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/MainActivity.java:104: error: cannot find symbol
+            surface.onDestroy();
+                   ^
+  symbol:   method onDestroy()
+  location: variable surface of type WorldSurface
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: /home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/net/Yt.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+6 errors
+
+> Task :app:compileDebugJavaWithJavac FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1795878146090.json
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugJavaWithJavac'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+BUILD FAILED in 43s
+22 actionable tasks: 22 executed
