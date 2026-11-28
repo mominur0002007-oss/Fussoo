@@ -1,13 +1,9 @@
 # build failed
-42:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/WorldSurface.java:18: error: cannot inherit from final VrSurface
-45:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:394: error: cannot find symbol
-50:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:405: error: cannot find symbol
-55:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:503: error: cannot find symbol
-60:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/WorldSurface.java:54: error: cannot find symbol
-65:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/MainActivity.java:104: error: cannot find symbol
-76:> Task :app:compileDebugJavaWithJavac FAILED
-81:* What went wrong:
-89:BUILD FAILED in 43s
+43:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:733: error: local variables referenced from a lambda expression must be final or effectively final
+46:/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:766: error: local variables referenced from a lambda expression must be final or effectively final
+55:> Task :app:compileDebugJavaWithJavac FAILED
+60:* What went wrong:
+68:BUILD FAILED in 1m 15s
 
 
 Welcome to Gradle 8.9!
@@ -45,47 +41,26 @@ Daemon will be stopped at the end of the build
 > Task :app:desugarDebugFileDependencies
 > Task :app:processDebugJavaRes NO-SOURCE
 > Task :app:processDebugManifestForPackage
+> Task :app:checkDebugDuplicateClasses
 > Task :app:mergeDebugJavaResource
 > Task :app:processDebugResources
-> Task :app:checkDebugDuplicateClasses
+> Task :app:mergeExtDexDebug
 
 > Task :app:compileDebugJavaWithJavac
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/WorldSurface.java:18: error: cannot inherit from final VrSurface
-public final class WorldSurface extends VrSurface {
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:733: error: local variables referenced from a lambda expression must be final or effectively final
+                    Atlas.button(glyphs[i], 160, fill, 0xFFFFFFFF));
                                         ^
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:394: error: cannot find symbol
-            drawHero(at, atlas, w, -1.55f, -0.30f, 1.55f, 1.55f, mvp);
-                                                                 ^
-  symbol:   variable mvp
-  location: class Scene
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:405: error: cannot find symbol
-            drawPoster(at, atlas, t, x, -1.62f, x + cw, -0.52f, "tile:" + i, w, mvp);
-                                                                                ^
-  symbol:   variable mvp
-  location: class Scene
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:503: error: cannot find symbol
-                        "tile:" + idx, w, mvp);
-                                          ^
-  symbol:   variable mvp
-  location: class Scene
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/WorldSurface.java:54: error: cannot find symbol
-        VrRenderer r = renderer();
-        ^
-  symbol:   class VrRenderer
-  location: class WorldSurface
-/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/ui/MainActivity.java:104: error: cannot find symbol
-            surface.onDestroy();
-                   ^
-  symbol:   method onDestroy()
-  location: variable surface of type WorldSurface
+/home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/gl/Scene.java:766: error: local variables referenced from a lambda expression must be final or effectively final
+                    Atlas.label(labels[i], 40, hot ? 0xFF63B8FF : 0xFFC8D2E0, 0, hot));
+                                       ^
 Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 Note: /home/runner/work/Fussoo/Fussoo/android/app/src/main/java/com/fussoo/vr/net/Yt.java uses unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
-6 errors
+2 errors
 
 > Task :app:compileDebugJavaWithJavac FAILED
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1795878146090.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1795878282260.json
 
 FAILURE: Build failed with an exception.
 
@@ -97,5 +72,5 @@ Execution failed for task ':app:compileDebugJavaWithJavac'.
 > Run with --info option to get more log output.
 > Run with --scan to get full insights.
 
-BUILD FAILED in 43s
-22 actionable tasks: 22 executed
+BUILD FAILED in 1m 15s
+23 actionable tasks: 23 executed
