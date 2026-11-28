@@ -1,87 +1,125 @@
-# Fussoo VR
+# Fussoo VR 2.0
 
-A phone-only stereoscopic theatre for YouTube. Built for a **TECNO Spark 10C** in a
-passive VR box, but it runs on any Android 7+ phone with a gyroscope.
+An in-world YouTube cinema for Android. Not a video player with a VR viewer bolted on:
+the browsing, the search, the player and the settings all live **inside** the virtual
+room, the way iQIYI VR works.
 
-The idea: you put the phone in the box, and instead of watching a flat video you are
-sitting in a dark IMAX-style room looking at a huge curved screen. Look around, the room
-stays put. Stare at a control, it activates.
+Built for a **TECNO Spark 10C** (Android 13, Unisoc T606) in a passive VR box, and it runs
+on any Android 7+ phone with OpenGL ES 2.
 
 ---
 
 ## Install
 
-**On the phone (no computer needed)**
+**Download:** [FussooVR-2.0.0.apk](https://drive.google.com/file/d/1493v2qyAcJfSKT0xy02irsMt__vttb1Z/view)
 
-1. Download `FussooVR-1.0.1.apk`.
-2. Open it. Android asks to allow installs from this source — allow it.
-3. Install, open **Fussoo VR**.
+1. Open the link on the phone and download.
+2. Open the file. Android asks to allow installs from this source — allow it.
+3. Install, then open **Fussoo VR**.
 
-The APK is signed with a committed development key, so future builds install *over* this
-one without uninstalling.
+Already have 1.0.1? Install straight over it: v2.0.0 is signed with the same key
+(cert SHA-256 `0f84ad70…99ecac`), so nothing is lost and you do not have to uninstall.
 
-**From the repo**
+| File | Size | SHA-256 |
+| --- | --- | --- |
+| `release/FussooVR-2.0.0-release.apk` | 5,669,899 B | `413cf9ff4f9f38f318fb90add1daf6effd1798e4dc254838f6179d4896003ee7` |
+| `release/FussooVR-2.0.0-debug.apk` | 7,134,603 B | `3ac17736cacc9c30b31a26cc4612b5a8afea4a5b75f4bc15ee7b029583568a84` |
 
-| File | Use |
+---
+
+## What you see
+
+One room, four walls of content, nothing on the phone itself.
+
+```
+        ┌──────────────────────────────┐
+        │  ██  ██  ██  ██  ██          │   HOME: a hero film, a row of
+        │  ████████████████            │   posters, search chips, a gear
+        └──────────────────────────────┘
+                 ▁▁▁▁▁▁▁▁▁                rail: Home Browse Search Settings ⟳
+     ═══════════════════════════════════   console (only while a film plays)
+                    ▲ your seat
+```
+
+* **HOME** — a featured film filling the wall, five posters beneath it, quick-search chips
+  along the top, settings behind the gear.
+* **BROWSE** — a 5 × 2 poster wall with paging.
+* **PLAYER** — the film on the curved screen, a control console tilted toward you, and a
+  title card that fades out once playback settles.
+* **SETTINGS** — nine rows of real controls, all steppable with your eyes.
+
+### Controls
+
+| Gesture | Does |
 | --- | --- |
-| `release/FussooVR-1.0.1-release.apk` | Recommended. 5.7 MB, release build. |
-| `release/FussooVR-1.0.1-debug.apk` | Debug build, same key. Logs in `logcat`. |
+| Look at something | A ring fills; at 1.7 s it activates |
+| Tap | Activate whatever the reticle is on. On the film: pause |
+| Long press | Recentre the room in front of you |
+| Swipe sideways | Seek ±10 s |
+| Swipe up / down | Volume |
 
-Checksums are in `release/SHA256SUMS.txt`.
+There is deliberately **no keyboard**. Typing with your eyes is miserable, so search is a
+cycle of curated queries (cinematic 4K, lofi, nature docs, space, music, trailers).
 
 ---
 
 ## How it works
 
 ```
-MainActivity ──search / trending──► Yt (NewPipeExtractor + OkHttp)
-     │
-     └─ pick a video ──► TheatreActivity
-                              │
-              ┌───────────────┼────────────────┐
-              ▼               ▼                ▼
-         ExoPlayer      VrRenderer        Tracker
-       (OES texture)   (stereo GL)     (3DoF head)
-              │               │                │
-              └──── VideoTex ─┴─ Atlas/Layer ──┘
-                              │
-                     one eye per half-screen
-                        + lens pre-warp
+MainActivity ──► WorldSurface (GLSurfaceView) ──► VrRenderer ──► ExoPlayer
+      │                  │            │
+      └── WorldController ┘            └── Tracker (3DoF head)
+              │
+      WorldModel (one snapshot, pushed every 33 ms)
 ```
 
 ### The renderer
 
-Each frame is drawn twice, once into the left half of an off-screen buffer and once into
-the right, then a single full-screen pass applies the lens pre-distortion.
+Each frame is drawn twice into one off-screen buffer — left half, right half — and then a
+single full-screen pass applies the lens pre-distortion.
 
-* **Projection** is derived from the physical screen, not a magic number:
-  `tanY = halfHeight / distance`. With the default 11 m screen at 4.2 m that is a 73°
-  vertical view — the screen overflows your field of view the way an IMAX screen does.
-* **Eye separation** translates the view per eye by ±31.5 mm along the panel, which gives
-  real parallax: a point 30 cm in front of the screen shifts by ~1% between eyes.
-* **Lens pre-distortion** is a radial barrel warp in the fragment shader with a touch of
-  chromatic correction and a vignette that hides the box's bezel.
-* **Render scale** is 68% of the panel by default. Through a plastic lens that is
-  indistinguishable, and it is the single biggest frame-rate win on a Unisoc T606.
+* **The film is centred on your eye** at the distance you chose. It used to hang in the
+  lower half of the view, which is what made v1 feel like a monitor on a desk rather than
+  a cinema.
+* **Projection comes from the room, not a magic number:** `tanY = halfHeight / distance`,
+  with an 11 m screen at 4.2 m giving a 73° vertical field — the film overflows your view
+  the way an IMAX screen does.
+* **The screen is curved** — the film quad bends into a cylinder, so a 2.39:1 film wraps
+  around you instead of sitting flat.
+* **Eye separation** offsets each eye by ±31.5 mm in eye space, which gives real parallax.
+* **Lens pre-distortion** is a radial barrel warp plus chromatic correction and a vignette
+  that hides the box's bezel.
+* **Render scale is 62%** of the panel by default. Through a plastic lens that is
+  indistinguishable, and it is the biggest frame-rate win on a T606.
 
-Every HUD element — buttons, labels, posters, the gaze dot — is packed into one 2 KB
-texture atlas built with Canvas, so the whole interface is **one draw call**. Bitmaps are
-cached by key, so a steady frame allocates nothing.
+Every panel, label and badge is packed into one 2048² Canvas atlas built at runtime, so
+the whole interface is a **single draw call**; third-party thumbnails get their own
+textures so they can never evict the UI.
 
-### Tracking, and why it is stable
+### Gaze that actually points where you look
 
-`Tracker` uses the platform rotation vector when it exists and falls back to gyro
-integration with a gravity levelling term that only corrects pitch and roll — never yaw,
-so the horizon cannot drift sideways while you watch. Smoothing is filtered in *frame
-time*, not frame count, so a slow frame never adds lag. Sensors register on their own
-handler thread, and every session resets its state before the first sample.
+The tracker's matrix is world-from-body. The forward vector is the **negated third
+column** (`-m[8], -m[9], -m[10]`). Using the third *row* instead — the mistake in v1 —
+flips the cursor left/right and makes it run away from you.
 
-### Controls
+The gaze ray is intersected with each panel **in that panel's own rotated frame**, using
+the same numbers the renderer draws with, so a hit box can never drift away from the
+picture. The console is tilted 26°; the intersection is exact at any tilt.
 
-* **Gaze + dwell** — look at a button, a ring fills, it activates. Default 1.7 s.
-* **Tap anywhere** — pause / resume.
-* **Back** — return to the library shelf inside the headset.
-* Buttons: play/pause, −10 s, +10 s, volume, quality, recentre, exit.
+Two threads ask for a head matrix every frame (renderer and controller), so `Tracker`
+hands out ping-ponged scratch matrices — they can no longer write the same matrix
+mid-frame.
+
+### Why v1 showed a black screen
+
+`GLSurfaceView.setRenderer()` was called from a `SurfaceHolder.Callback` added *after* the
+surface existed, by which point GLSurfaceView had already started its GL thread. The
+renderer was never attached: no crash, no log, just black. v2 attaches it from
+`onAttachedToWindow`, the only point where the view has a window and the GL thread does
+not yet exist.
+
+v2 also fixes the second black screen waiting to happen: **ExoPlayer was never given a
+Surface**, so even a working renderer would have played audio over an empty theatre.
 
 ---
 
@@ -89,51 +127,53 @@ handler thread, and every session resets its state before the first sample.
 
 | Setting | Why |
 | --- | --- |
-| Lens separation | Boxes vary from 60 to 65 mm. Wrong here = double vision. |
-| Field of view | Leave on automatic unless the image looks zoomed. |
-| Barrel correction | Increase until straight lines look straight through the lenses. |
+| Lens separation | Boxes vary from 60 to 65 mm. Wrong here means double vision. |
+| Distance | How far the screen feels. Closer is more immersive, less comfortable. |
+| Barrel correction | Raise until straight lines look straight through the lenses. |
 | Curvature | 0 is flat, 1 is a deep IMAX wrap. |
-| Performance | Battery / Balanced / Cinematic, changes render scale. |
-| Max quality | 480p / 720p / 1080p. 720p is the sweet spot on this phone. |
-
-`Calibrate` shows a stereo crosshair pair side by side — use it to line up the box.
+| Performance | Battery / Balanced / Cinematic — changes render scale. |
+| Venue | IMAX Theatre, Noir Lounge, Deep Space, Cozy Room. |
+| Gaze | Off means touch-only. |
 
 ---
 
 ## Honest limits
 
-* **YouTube playback is best-effort.** It uses [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor)
-  (GPLv3), which Google can break at any time. If extraction fails the app falls back to
-  the official YouTube embed on a WebView, which always plays but is lower quality and
-  shows ads.
-* **3DoF only.** Look around, not walk around. The phone has no positional tracking.
-* **No thermal magic.** Expect ~2.5–4 h of playback; the phone gets warm. Battery mode
+* **YouTube extraction is best-effort.** It uses
+  [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor) (GPLv3), which
+  Google can break whenever it changes the player. When it fails the app falls back to
+  the official web player, which always plays but shows ads.
+* **3DoF only** — look around, you cannot walk around.
+* **No thermal magic.** Expect 2.5–4 h of playback; the phone gets warm. Battery mode
   helps.
-* **Vertical video** is letterboxed in a 16:9 theatre. Vertical Shorts look small.
+* **Vertical Shorts** are letterboxed in a 16:9 theatre and look small.
+* **No gyroscope?** The app still works: it falls back to the accelerometer for a
+  level, stable image. Head tracking is then limited to whatever that sensor can give, so
+  look direction is coarse — touch and the rail become the main controls.
 
 ---
 
 ## Build
 
-Everything is built by GitHub Actions — no local Android SDK required:
+CI does the real build; no local Android SDK needed:
 
 ```
 .github/workflows/fussoo-vr-apk.yml
 ```
 
-Push to `android/**` and the workflow assembles debug + release, signs both with
+Push to `android/**` and it assembles debug + release, signs both with
 `android/keystore/fussoo-dev.p12`, and commits the APKs into `release/`.
 
-Locally:
+Locally: `cd android && gradle :app:assembleRelease`
 
-```bash
-cd android && gradle :app:assembleRelease
-```
+`tools/check_java.py` is a static gate for the sandbox (which has no JDK): it parses every
+source file and checks that every referenced member, method and loop-variable capture
+actually exists. It catches the class of error that shipped in v1.
 
 ---
 
 ## Licence and content
 
-The app's own code is yours to do as you like with. NewPipeExtractor is GPLv3; Media3 is
-Apache 2.0. YouTube content belongs to its owners — this is a personal player, not a
-download tool, and nothing is redistributed.
+The app's own code is yours to do as you like with. NewPipeExtractor is GPLv3, Media3 is
+Apache 2.0, Space Grotesk is OFL. YouTube content belongs to its owners — this is a
+personal player, not a download tool, and nothing is redistributed.
