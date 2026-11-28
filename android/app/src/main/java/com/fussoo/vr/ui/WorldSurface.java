@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 import com.fussoo.vr.core.Tracker;
 import com.fussoo.vr.core.WorldModel;
 import com.fussoo.vr.gl.Scene;
+import com.fussoo.vr.gl.VrRenderer;
 import com.fussoo.vr.gl.VrSurface;
 
 /**
@@ -56,6 +57,11 @@ public final class WorldSurface extends VrSurface {
             queueEvent(r::release);
         }
         super.onDetachedFromWindow();
+    }
+
+    /** Detaches the renderer cleanly; GL objects are freed on the GL thread first. */
+    public void onDestroy() {
+        setRendererCallback(null);
     }
 
     public void qualityChanged() {

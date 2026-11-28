@@ -339,10 +339,10 @@ public final class Scene {
 
         switch (w.screen) {
             case HOME:
-                drawHome(at, atlas, w, hw, hh);
+                drawHome(at, atlas, w, hw, hh, mvp);
                 break;
             case BROWSE:
-                drawBrowse(at, atlas, w, hw, hh);
+                drawBrowse(at, atlas, w, hw, hh, mvp);
                 break;
             case PLAYER:
                 // The video is drawn by the renderer; only the chrome goes here.
@@ -358,7 +358,8 @@ public final class Scene {
 
     // ---------------------------------------------------------------- home
 
-    private void drawHome(Layer at, Atlas atlas, WorldModel w, float hw, float hh) {
+    private void drawHome(Layer at, Atlas atlas, WorldModel w, float hw, float hh,
+                          float[] mvp) {
         // Header: wordmark left, search field, filters, settings gear.
         Atlas.Region wordmark = atlas.use("word", () ->
                 Atlas.label("FUSSOO", 128, 0xFFF5F7FA, 0, true));
@@ -460,7 +461,8 @@ public final class Scene {
 
     // -------------------------------------------------------------- browse
 
-    private void drawBrowse(Layer at, Atlas atlas, WorldModel w, float hw, float hh) {
+    private void drawBrowse(Layer at, Atlas atlas, WorldModel w, float hw, float hh,
+                            float[] mvp) {
         Atlas.Region back = atlas.use("backbtn", () ->
                 Atlas.button("\u2039", 128, 0x33FFFFFF, 0xFFF5F7FA));
         at.quad(back, -hw + 0.12f, hh - 0.44f, -hw + 0.92f, hh - 0.14f, 1f);

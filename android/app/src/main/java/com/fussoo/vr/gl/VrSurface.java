@@ -25,7 +25,7 @@ import com.fussoo.vr.core.WorldModel;
  * where the view is guaranteed to have a window but GLSurfaceView has not yet created its
  * GL thread.</p>
  */
-public final class VrSurface extends GLSurfaceView {
+public class VrSurface extends GLSurfaceView {
 
     private final VideoTex video = new VideoTex();
     private final Tracker tracker;
@@ -63,9 +63,7 @@ public final class VrSurface extends GLSurfaceView {
             return;
         }
         renderer = new VrRenderer(video, tracker);
-        if (callback != null) {
-            renderer.setCallback(callback);
-        }
+        renderer.setCallback(callback);
         setRenderer(renderer);
         setRenderMode(RENDERMODE_CONTINUOUSLY);
     }
