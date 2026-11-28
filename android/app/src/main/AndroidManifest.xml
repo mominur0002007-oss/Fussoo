@@ -25,6 +25,7 @@
         android:usesCleartextTraffic="false"
         android:theme="@style/Theme.FussooVR">
 
+        <!-- One activity, one world. Everything else happens inside the headset. -->
         <activity
             android:name=".ui.MainActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
@@ -48,26 +49,7 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".ui.TheatreActivity"
-            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
-            android:exported="false"
-            android:launchMode="singleTop"
-            android:screenOrientation="sensorLandscape"
-            android:theme="@style/Theme.FussooVR" />
 
-        <activity
-            android:name=".ui.SettingsActivity"
-            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
-            android:exported="false"
-            android:screenOrientation="sensorLandscape"
-            android:theme="@style/Theme.FussooVR" />
 
-        <activity
-            android:name=".ui.CalibrateActivity"
-            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
-            android:exported="false"
-            android:screenOrientation="sensorLandscape"
-            android:theme="@style/Theme.FussooVR" />
     </application>
 </manifest>

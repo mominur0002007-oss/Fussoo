@@ -26,6 +26,18 @@ public final class Boot {
         }
     }
 
+    /** Pulls a YouTube id out of a VIEW intent, or null. */
+    public static String videoIdFrom(android.content.Intent intent) {
+        if (intent == null) {
+            return null;
+        }
+        String data = intent.getDataString();
+        if (data == null) {
+            data = intent.getStringExtra(android.content.Intent.EXTRA_TEXT);
+        }
+        return com.fussoo.vr.net.Yt.id(data);
+    }
+
     public static boolean online(Context ctx) {
         try {
             ConnectivityManager cm =

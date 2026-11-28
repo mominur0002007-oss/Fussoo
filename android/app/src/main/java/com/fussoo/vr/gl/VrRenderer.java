@@ -1,11 +1,12 @@
 package com.fussoo.vr.gl;
 
-import android.graphics.Bitmap;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.view.Surface;
 
 import com.fussoo.vr.core.Tracker;
+import com.fussoo.vr.core.WorldModel;
 
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
@@ -14,12 +15,15 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * Stereo theatre renderer.
+ * Stereo renderer for the theatre.
  *
- * <p>Per frame: room shell, then the curved screen, then the HUD, drawn once per eye into
- * a half-resolution-per-eye off-screen buffer; then a single full-screen pass applies the
- * lens pre-distortion. That resolution choice is the main reason this runs smoothly on a
- * Unisoc T606 — through a plastic lens, 66% scale is indistinguishable.</p>
+ * <p>Per eye: room shell, the main board (video wall or poster wall), the control console,
+ * the bottom navigation rail, all drawn in world space so they sit in the room rather than
+ * floating on the screen. Then one full-screen pass applies the lens pre-distortion.</p>
+ *
+ * <p>Resolution is deliberately traded for frame rate. Both eyes render into a buffer that
+ * is 62% of the panel by default; through a moulded lens that is not visible, and on a
+ * Mali-G57 it is the difference between a stuttering 30 and a locked 60.</p>
  */
 public final class VrRenderer implements GLSurfaceView.Renderer {
 
@@ -31,8 +35,9 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
 
     private final VideoTex video;
     private final Tracker tracker;
-    private final Stage stage = new Stage();
-    private Hud hud;
+    private final WorldModel model = new WorldModel();
+    private final WorldModel snap = new WorldModel();
+    private final Scene scene = new Scene();
 
     private Callback callback;
 
@@ -42,29 +47,28 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
     private ShortBuffer quadIdx;
     private FloatBuffer sphereVerts;
     private ShortBuffer sphereIdx;
+    private FloatBuffer curvedWallVerts;
+    private ShortBuffer curvedWallIdx;
 
     private int pShell, uShellMvp, uShellWall, uShellFloor, uShellAccent, uShellTime;
-    private int pScreen, uScrMvp, uScrW, uScrH, uScrCurve, uScrDim, uScrHas;
-    private int pWarp, uWarpBarrel, uWarpZoom, uWarpAspect;
+    private int pVideo, uVidMvp, uVidW, uVidH, uVidCurve, uVidDim, uVidHas, uVidTex;
+    private int pWarp, uWarpTex, uWarpBarrel, uWarpZoom, uWarpAspect, uWarpPos;
 
     private int fbo, fboTex, fboDepth, fboW, fboH;
-    private int surfaceW = 1280;
+    private int surfaceW = 1600;
     private int surfaceH = 720;
 
-    private float[] view = new float[16];
-    private float[] proj = new float[16];
-    private float[] mvp = new float[16];
-    private final Stage snap = new Stage();
+    private float[] proj;
+    private float[] viewRot;
+    private float[] mvp;
 
     private long lastFrameNs;
     private int frames;
     private long fpsStartNs;
     private float fps;
     private boolean ready;
+    private boolean released;
     private long lastVideoMs;
-
-    private volatile Bitmap[] shelf;
-    private volatile String[] shelfNames;
 
     public VrRenderer(VideoTex video, Tracker tracker) {
         this.video = video;
@@ -75,19 +79,14 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
         callback = cb;
     }
 
-    public void setShelf(Bitmap[] posters, String[] names) {
-        shelf = posters;
-        shelfNames = names;
+    public Scene scene() {
+        return scene;
     }
 
-    public Hud hud() {
-        return hud;
-    }
-
-    /** Called from the UI thread whenever playback state changes. */
-    public void push(Stage from) {
-        synchronized (stage) {
-            stage.copyFrom(from);
+    /** Pushed from the UI thread; copied under a short lock onto {@link #model}. */
+    public void push(WorldModel from) {
+        synchronized (model) {
+            model.copyFrom(from);
         }
     }
 
@@ -95,11 +94,20 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
         return fps;
     }
 
-    public long sinceVideoFrame() {
+    /** The Surface ExoPlayer renders into. Only valid once the GL context is up. */
+    public Surface videoSurface() {
+        return video.surface();
+    }
+
+    public boolean glReady() {
+        return ready;
+    }
+
+    public long sinceVideoFrameMs() {
         return lastVideoMs == 0 ? -1 : System.currentTimeMillis() - lastVideoMs;
     }
 
-    // ------------------------------------------------------------- lifecycle
+    // --------------------------------------------------------------- setup
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -114,7 +122,6 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
         atlas = new Atlas();
         atlas.init();
         layer = new Layer(atlas);
-        hud = new Hud(atlas);
 
         quadVerts = Geo.quad2d();
         quadIdx = Geo.quadIdx();
@@ -122,50 +129,57 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
         sphereIdx = Geo.sphereIdx(20, 28);
 
         pShell = Gl.program(Sh.SHELL_VS, Sh.SHELL_FS);
-        uShellMvp = GLES20.glGetUniformLocation(pShell, "uMvp");
-        uShellScale = GLES20.glGetUniformLocation(pShell, "uScale");
-        uShellWall = GLES20.glGetUniformLocation(pShell, "uWall");
-        uShellFloor = GLES20.glGetUniformLocation(pShell, "uFloor");
-        uShellAccent = GLES20.glGetUniformLocation(pShell, "uAccent");
-        uShellTime = GLES20.glGetUniformLocation(pShell, "uTime");
+        uShellMvp = loc(pShell, "uMvp");
+        uShellScale = loc(pShell, "uScale");
+        uShellWall = loc(pShell, "uWall");
+        uShellFloor = loc(pShell, "uFloor");
+        uShellAccent = loc(pShell, "uAccent");
+        uShellTime = loc(pShell, "uTime");
 
-        pScreen = Gl.program(Sh.SCREEN_VS, Sh.SCREEN_FS);
-        uScrMvp = GLES20.glGetUniformLocation(pScreen, "uMvp");
-        uScrW = GLES20.glGetUniformLocation(pScreen, "uWidth");
-        uScrH = GLES20.glGetUniformLocation(pScreen, "uHeight");
-        uScrCurve = GLES20.glGetUniformLocation(pScreen, "uCurve");
-        uScrDim = GLES20.glGetUniformLocation(pScreen, "uDim");
-        uScrHas = GLES20.glGetUniformLocation(pScreen, "uHas");
-        uScrTexId = GLES20.glGetUniformLocation(pScreen, "uTex");
+        pVideo = Gl.program(Sh.VIDEO_VS, Sh.VIDEO_FS);
+        uVidMvp = loc(pVideo, "uMvp");
+        uVidW = loc(pVideo, "uWidth");
+        uVidH = loc(pVideo, "uHeight");
+        uVidCurve = loc(pVideo, "uCurve");
+        uVidDim = loc(pVideo, "uDim");
+        uVidHas = loc(pVideo, "uHas");
+        uVidTex = loc(pVideo, "uTex");
 
         pWarp = Gl.program(Sh.QUAD_VS, Sh.WARP_FS);
-        uWarpTex = GLES20.glGetUniformLocation(pWarp, "uTex");
-        uWarpBarrel = GLES20.glGetUniformLocation(pWarp, "uBarrel");
-        uWarpZoom = GLES20.glGetUniformLocation(pWarp, "uZoom");
-        uWarpAspect = GLES20.glGetUniformLocation(pWarp, "uAspect");
-        uQuadPos = GLES20.glGetAttribLocation(pWarp, "aPos");
+        uWarpTex = loc(pWarp, "uTex");
+        uWarpBarrel = loc(pWarp, "uBarrel");
+        uWarpZoom = loc(pWarp, "uZoom");
+        uWarpAspect = loc(pWarp, "uAspect");
+        uWarpPos = GLES20.glGetAttribLocation(pWarp, "aPos");
     }
 
-    private int uShellScale, uScrTexId, uWarpTex, uQuadPos;
+    private int uShellScale;
+
+    private static int loc(int p, String name) {
+        return GLES20.glGetUniformLocation(p, name);
+    }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        surfaceW = width;
-        surfaceH = height;
+        surfaceW = Math.max(2, width);
+        surfaceH = Math.max(2, height);
+
         float scale;
-        switch (stage.quality) {
+        switch (model.quality) {
             case 0:
-                scale = 0.55f;
+                scale = 0.50f;
                 break;
             case 2:
-                scale = 0.85f;
+                scale = 0.80f;
                 break;
             default:
-                scale = 0.68f;
+                scale = 0.62f;
                 break;
         }
-        fboW = Math.max(2, ((int) (width * scale)) & ~1);
-        fboH = Math.max(2, ((int) (height * scale)) & ~1);
+        int w = ((int) (surfaceW * scale)) & ~1;
+        int h = ((int) (surfaceH * scale)) & ~1;
+        fboW = Math.max(2, w);
+        fboH = Math.max(2, h);
         createFbo();
     }
 
@@ -192,12 +206,14 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
                 GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
                 GLES20.GL_CLAMP_TO_EDGE);
+
         int[] d = new int[1];
         GLES20.glGenRenderbuffers(1, d, 0);
         fboDepth = d[0];
         GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, fboDepth);
         GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16,
                 fboW, fboH);
+
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo);
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
                 GLES20.GL_TEXTURE_2D, fboTex, 0);
@@ -206,7 +222,7 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
     }
 
-    // ----------------------------------------------------------------- frame
+    // ---------------------------------------------------------------- frame
 
     @Override
     public void onDrawFrame(GL10 gl) {
@@ -217,32 +233,30 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
             dt = 0.016f;
         }
 
-        synchronized (stage) {
-            stage.dt = dt;
-            stage.clock += dt;
+        synchronized (model) {
+            model.dt = dt;
+            model.clock += dt;
+            snap.copyFrom(model);
         }
-        Stage s = snap;
 
-        boolean newVideo = video.update();
-        if (newVideo) {
+        boolean fresh = video.update();
+        if (fresh) {
             lastVideoMs = System.currentTimeMillis();
         }
 
-        synchronized (stage) {
-            snap.copyFrom(stage);
-        }
+        viewRot = tracker.view(dt);
         buildProjection(snap);
 
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo);
         GLES20.glViewport(0, 0, fboW, fboH);
         GLES20.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-        drawEye(s, -1);
-        drawEye(s, 1);
+        drawEye(snap, -1);
+        drawEye(snap, 1);
 
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
         GLES20.glViewport(0, 0, surfaceW, surfaceH);
-        drawWarp(s);
+        drawWarp(snap);
 
         atlas.commit();
 
@@ -265,115 +279,160 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
     }
 
     /**
-     * One shared symmetric frustum, defined the way cardboard optics actually work:
-     *
-     * <p>Each half of the screen sits in front of one lens at {@code screen_distance}, so
-     * the vertical view angle is {@code 2·atan(halfHeight / distance)}. At the default
-     * 4.4 m distance and a 1.86 m tall half-panel that is about 46° per eye, which is
-     * exactly what the lens shows you. Horizontal uses the eye panel's real aspect.</p>
+     * Field of view is derived from the physical theatre: the panel half-height at the
+     * viewing distance. Passed through unchanged so the screen keeps the angular size the
+     * user chose in metres.
      */
-    private void buildProjection(Stage s) {
+    private void buildProjection(WorldModel w) {
         float near = 0.05f;
-        float far = 150f;
-        float halfW = s.screenWidth * 0.5f;
-        float halfH = halfW / Math.max(0.55f, s.aspect());
-        // The virtual screen is placed at s.screenDistance; its angular size follows.
-        float vt = halfH / Math.max(0.5f, s.screenDistance);
-        float aspect = (fboW * 0.5f) / (float) fboH;
-        float ht = vt * aspect;
-        proj = M.frustum(ht, vt, near, far);
+        float far = 160f;
+        float halfW = w.screenWidth * 0.5f;
+        float halfH = halfW / Math.max(0.6f, w.aspect());
+        float tanY = halfH / Math.max(0.5f, w.screenDistance);
+        float eyeAspect = (fboW * 0.5f) / (float) fboH;
+        float tanX = tanY * eyeAspect;
+        proj = M.frustum(tanX, tanY, near, far);
     }
 
-    private void drawEye(Stage s, int eye) {
+    private void drawEye(WorldModel w, int eye) {
         int half = fboW / 2;
         GLES20.glViewport(eye < 0 ? 0 : half, 0, half, fboH);
         GLES20.glClear(GL10.GL_DEPTH_BUFFER_BIT);
-        // Left eye sits half an interpupillary distance to the left of the head origin.
-        float eyeX = eye * (s.lensSeparation * 0.5f) * -1f;
-        view = M.mul(M.invRot(tracker.view(s.dt)), M.t(eyeX, 0f, 0f));
-        drawShell(s);
-        drawScreen(s);
-        drawHud(s);
+
+        // Half an interpupillary distance to each side. The offset is in eye space, so it
+        // is applied after the view rotation: view = invRot(head) * T(+/-ipd/2).
+        float eyeX = eye * (w.lensSeparation * 0.5f);
+        viewRot = M.invRot(tracker.view(w.dt));
+        float[] view = M.mul(viewRot, M.t(eyeX, 0f, 0f));
+
+        drawShell(w, view);
+        drawMainSurface(w, view);
+        drawConsole(w, view);
+        drawRail(w, view);
     }
 
-    private void drawShell(Stage s) {
-        Env e = Env.of(s.env);
-        mvp = M.mul(proj, view);
+    // ------------------------------------------------------------- surfaces
+
+    private void drawShell(WorldModel w, float[] view) {
         GLES20.glUseProgram(pShell);
+        mvp = M.mul(proj, view);
         GLES20.glUniformMatrix4fv(uShellMvp, 1, false, mvp, 0);
-        GLES20.glUniform1f(uShellScale, 26f);
-        GLES20.glUniform3f(uShellWall, e.wallR, e.wallG, e.wallB);
-        GLES20.glUniform3f(uShellFloor, e.floorR, e.floorG, e.floorB);
-        GLES20.glUniform3f(uShellAccent, e.accentR, e.accentG, e.accentB);
-        GLES20.glUniform1f(uShellTime, s.clock);
-        int a = GLES20.glGetAttribLocation(pShell, "aPos");
-        GLES20.glEnableVertexAttribArray(a);
+        GLES20.glUniform1f(uShellScale, 30f);
+        float[] c = Env.wall(w.env);
+        float[] f = Env.floor(w.env);
+        float[] a = Env.accent(w.env);
+        GLES20.glUniform3f(uShellWall, c[0], c[1], c[2]);
+        GLES20.glUniform3f(uShellFloor, f[0], f[1], f[2]);
+        GLES20.glUniform3f(uShellAccent, a[0], a[1], a[2]);
+        GLES20.glUniform1f(uShellTime, w.clock);
+        int p = GLES20.glGetAttribLocation(pShell, "aPos");
+        GLES20.glEnableVertexAttribArray(p);
         sphereVerts.position(0);
-        GLES20.glVertexAttribPointer(a, 3, GLES20.GL_FLOAT, false, 12, sphereVerts);
-        // The shell is the backdrop; depth writes off so it never occludes anything.
+        GLES20.glVertexAttribPointer(p, 3, GLES20.GL_FLOAT, false, 12, sphereVerts);
         GLES20.glDepthMask(false);
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, sphereIdx.capacity(),
                 GLES20.GL_UNSIGNED_SHORT, sphereIdx);
         GLES20.glDepthMask(true);
-        GLES20.glDisableVertexAttribArray(a);
+        GLES20.glDisableVertexAttribArray(p);
     }
 
-    private void drawScreen(Stage s) {
-        // Screen sits at the configured distance and eye height.
-        float[] model = M.t(s.screenCenterY - 1.6f, -(0f), 0f);
-        model[13] = s.screenCenterY - 1.6f;
-        model[14] = -s.screenDistance;
+    /**
+     * The main board. For the player it is the film itself; for every other screen it is
+     * the interface, drawn as a curved panel standing in the room.
+     */
+    private void drawMainSurface(WorldModel w, float[] view) {
+        float hw = scene.mainW() * 0.5f;
+        float hh = scene.mainH() * 0.5f;
+
+        // The board is centred on the eye at the chosen distance: that is what makes the
+        // film fill the field of view instead of sitting in the lower half of it.
+        float[] model = M.mul(
+                M.t(0f, 0f, -Math.max(0.6f, w.screenDistance)),
+                M.id());
+
+        if (w.screen == WorldModel.Screen.PLAYER && w.hasVideo) {
+            drawVideo(w, view, model, hw, hh);
+        } else {
+            layer.begin();
+            mvp = M.mul(proj, M.mul(view, model));
+            scene.drawMain(layer, atlas, w, mvp);
+            layer.draw(mvp);
+        }
+    }
+
+    private void drawVideo(WorldModel w, float[] view, float[] model,
+                          float hw, float hh) {
         mvp = M.mul(proj, M.mul(view, model));
-
-        float halfW = s.screenWidth * 0.5f;
-        float halfH = halfW / Math.max(0.55f, s.aspect());
-
-        GLES20.glUseProgram(pScreen);
-        GLES20.glUniformMatrix4fv(uScrMvp, 1, false, mvp, 0);
-        GLES20.glUniform1f(uScrW, halfW * 2f);
-        GLES20.glUniform1f(uScrH, halfH * 2f);
-        GLES20.glUniform1f(uScrCurve, s.fisheye ? s.curve : 0f);
-        GLES20.glUniform1f(uScrDim, 1f - Math.max(0.25f, s.brightness));
-        GLES20.glUniform1f(uScrHas, s.hasVideo && video.hasFrame() ? 1f : 0f);
-        GLES20.glUniform1i(uScrTexId, 0);
+        GLES20.glUseProgram(pVideo);
+        GLES20.glUniformMatrix4fv(uVidMvp, 1, false, mvp, 0);
+        GLES20.glUniform1f(uVidW, hw * 2f);
+        GLES20.glUniform1f(uVidH, hh * 2f);
+        GLES20.glUniform1f(uVidCurve, w.fisheye ? w.curve : 0f);
+        GLES20.glUniform1f(uVidDim, 1f - Math.max(0.25f, w.brightness));
+        GLES20.glUniform1f(uVidHas, video.hasFrame() ? 1f : 0f);
+        GLES20.glUniform1i(uVidTex, 0);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, video.texture());
-        int a = GLES20.glGetAttribLocation(pScreen, "aPos");
-        GLES20.glEnableVertexAttribArray(a);
+        int p = GLES20.glGetAttribLocation(pVideo, "aPos");
+        GLES20.glEnableVertexAttribArray(p);
         quadVerts.position(0);
-        GLES20.glVertexAttribPointer(a, 2, GLES20.GL_FLOAT, false, 8, quadVerts);
+        GLES20.glVertexAttribPointer(p, 2, GLES20.GL_FLOAT, false, 8, quadVerts);
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6, GLES20.GL_UNSIGNED_SHORT, quadIdx);
-        GLES20.glDisableVertexAttribArray(a);
-    }
+        GLES20.glDisableVertexAttribArray(p);
 
-    private void drawHud(Stage s) {
-        float[] model = M.id();
-        model[13] = s.screenCenterY - 1.6f;
-        model[14] = -(s.screenDistance - 0.04f);
-        mvp = M.mul(proj, M.mul(view, model));
-        layer.clear();
-        hud.draw(layer, s, shelf, shelfNames);
+        // Chrome (title, spinner) rides on the same plane.
+        layer.begin();
+        scene.drawMain(layer, atlas, w, mvp);
         layer.draw(mvp);
     }
 
-    private void drawWarp(Stage s) {
+    private void drawConsole(WorldModel w, float[] view) {
+        if (w.screen != WorldModel.Screen.PLAYER) {
+            return;
+        }
+        // Tilt is negative exactly like the gaze solver, so what you look at is what you hit.
+        float[] model = M.mul(
+                M.t(0f, scene.consoleY() - 1.6f, scene.consoleZ()),
+                M.rotX(-scene.consoleTilt()));
+        layer.begin();
+        scene.drawConsole(layer, atlas, w);
+        mvp = M.mul(proj, M.mul(view, model));
+        layer.draw(mvp);
+    }
+
+    private void drawRail(WorldModel w, float[] view) {
+        if (w.screen == WorldModel.Screen.PLAYER && w.hudAlpha < 0.05f) {
+            return;
+        }
+        float[] model = M.t(0f, scene.railY() - 1.6f, scene.railZ());
+        layer.begin();
+        scene.drawRail(layer, atlas, w);
+        mvp = M.mul(proj, M.mul(view, model));
+        layer.draw(mvp);
+    }
+
+    private void drawWarp(WorldModel w) {
         GLES20.glUseProgram(pWarp);
-        GLES20.glUniform1i(uWarpTex, 0);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, fboTex);
-        GLES20.glUniform1f(uWarpBarrel, s.fisheye ? s.barrel : 0f);
-        GLES20.glUniform1f(uWarpZoom, s.fisheye ? 1.035f : 1f);
+        GLES20.glUniform1i(uWarpTex, 0);
+        GLES20.glUniform1f(uWarpBarrel, w.fisheye ? w.barrel : 0f);
+        GLES20.glUniform1f(uWarpZoom, w.fisheye ? 1.035f : 1f);
         GLES20.glUniform1f(uWarpAspect, (fboW * 0.5f) / (float) fboH);
-        GLES20.glEnableVertexAttribArray(uQuadPos);
         quadVerts.position(0);
-        GLES20.glVertexAttribPointer(uQuadPos, 2, GLES20.GL_FLOAT, false, 8, quadVerts);
+        GLES20.glEnableVertexAttribArray(uWarpPos);
+        GLES20.glVertexAttribPointer(uWarpPos, 2, GLES20.GL_FLOAT, false, 8, quadVerts);
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6, GLES20.GL_UNSIGNED_SHORT, quadIdx);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-        GLES20.glDisableVertexAttribArray(uQuadPos);
+        GLES20.glDisableVertexAttribArray(uWarpPos);
     }
 
     public void release() {
+        if (released) {
+            return;
+        }
+        released = true;
         if (atlas != null) {
             atlas.release();
         }
@@ -382,7 +441,7 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
         }
         video.release();
         GLES20.glDeleteProgram(pShell);
-        GLES20.glDeleteProgram(pScreen);
+        GLES20.glDeleteProgram(pVideo);
         GLES20.glDeleteProgram(pWarp);
         if (fbo != 0) {
             GLES20.glDeleteFramebuffers(1, new int[]{fbo}, 0);

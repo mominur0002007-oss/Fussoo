@@ -67,6 +67,19 @@ public final class M {
         return m;
     }
 
+    /** Rotation about X, in degrees (column-major, matches the rest of this file). */
+    public static float[] rotX(float degrees) {
+        double r = Math.toRadians(degrees);
+        float c = (float) Math.cos(r);
+        float sn = (float) Math.sin(r);
+        float[] m = id();
+        m[5] = c;
+        m[6] = sn;
+        m[9] = -sn;
+        m[10] = c;
+        return m;
+    }
+
     public static float[] s(float x, float y, float z) {
         float[] m = id();
         m[0] = x;

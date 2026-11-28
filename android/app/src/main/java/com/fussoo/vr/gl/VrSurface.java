@@ -3,77 +3,88 @@ package com.fussoo.vr.gl;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
-import android.view.SurfaceHolder;
 
 import com.fussoo.vr.core.Tracker;
+import com.fussoo.vr.core.WorldModel;
 
 /**
- * Wired GLSurfaceView for the theatre.
+ * The theatre's rendering surface.
  *
- * <p>Two ordering rules matter and are handled here rather than in the activity:</p>
+ * <p>This class exists because {@link GLSurfaceView} has two ordering rules that are easy
+ * to break and produce a black screen when broken:</p>
+ *
  * <ol>
- *   <li>{@link #setEGLContextClientVersion(int)} must be called before the surface is
- *       created, so ES 2.0 is requested in the very first configuration.</li>
- *   <li>{@link #setRenderer} must be called once the holder exists, so the callback is
- *       created on the GL thread and never races the UI thread.</li>
+ *   <li>{@code setEGLContextClientVersion(2)} must run before the surface is created.</li>
+ *   <li>{@code setRenderer()} must be called <em>after</em> the view is attached and the
+ *       surface exists. Calling it earlier, or from a SurfaceHolder callback that fires
+ *       after GLSurfaceView has already started its own thread, leaves you with a black
+ *       view and no error anywhere.</li>
  * </ol>
+ *
+ * <p>So the renderer is attached from {@code onAttachedToWindow}, which is the one point
+ * where the view is guaranteed to have a window but GLSurfaceView has not yet created its
+ * GL thread.</p>
  */
-public final class VrSurface extends GLSurfaceView implements SurfaceHolder.Callback {
-
-    /** Called once, when it is safe to attach the renderer. */
-    public interface Ready {
-        void go();
-    }
+public final class VrSurface extends GLSurfaceView {
 
     private final VideoTex video = new VideoTex();
+    private final Tracker tracker;
     private VrRenderer renderer;
-    private Ready ready;
-    private boolean booted;
+    private boolean attached;
+    private VrRenderer.Callback callback;
 
-    public VrSurface(Context context) {
+    public VrSurface(Context context, Tracker tracker) {
         super(context);
+        this.tracker = tracker;
         init();
     }
 
     public VrSurface(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.tracker = null;
         init();
     }
 
     private void init() {
         setEGLContextClientVersion(2);
+        setEGLConfigChooser(8, 8, 8, 0, 16, 0);
         setPreserveEGLContextOnPause(true);
         setFocusable(true);
         setFocusableInTouchMode(true);
-        getHolder().addCallback(this);
+        setKeepScreenOn(true);
     }
 
-    public void onSurfaceReady(Ready r) {
-        ready = r;
+    /**
+     * Attaches the renderer exactly once, at the only moment GLSurfaceView allows it
+     * reliably. Safe to call from {@code onCreate} before the view is attached.
+     */
+    public void prepare() {
+        if (tracker == null || renderer != null) {
+            return;
+        }
+        renderer = new VrRenderer(video, tracker);
+        if (callback != null) {
+            renderer.setCallback(callback);
+        }
+        setRenderer(renderer);
+        setRenderMode(RENDERMODE_CONTINUOUSLY);
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        if (!booted) {
-            booted = true;
-            if (ready != null) {
-                ready.go();
-            }
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if (!attached) {
+            attached = true;
+            prepare();
         }
     }
 
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-    }
-
-    public void boot(Tracker tracker) {
-        renderer = new VrRenderer(video, tracker);
-        setRenderer(renderer);
-        setRenderMode(RENDERMODE_CONTINUOUSLY);
+    /** Set before the view is attached; the renderer picks it up on creation. */
+    public void setRendererCallback(VrRenderer.Callback cb) {
+        callback = cb;
+        if (renderer != null) {
+            renderer.setCallback(cb);
+        }
     }
 
     public VrRenderer renderer() {
@@ -82,5 +93,28 @@ public final class VrSurface extends GLSurfaceView implements SurfaceHolder.Call
 
     public VideoTex video() {
         return video;
+    }
+
+    /** Publishing model updates is safe before the renderer exists; they are dropped. */
+    public void push(WorldModel model) {
+        VrRenderer r = renderer;
+        if (r != null) {
+            r.push(model);
+        }
+    }
+
+    public void onResume() {
+        super.onResume();
+        if (renderer != null) {
+            setRenderMode(RENDERMODE_CONTINUOUSLY);
+        }
+    }
+
+    public void onPause() {
+        super.onPause();
+    }
+
+    public Scene scene() {
+        return renderer == null ? new Scene() : renderer.scene();
     }
 }

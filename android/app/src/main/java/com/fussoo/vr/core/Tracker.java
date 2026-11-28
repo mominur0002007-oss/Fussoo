@@ -49,11 +49,24 @@ public final class Tracker implements SensorEventListener {
     private float yawOffset;
     private long recentered;
 
+    // Sensor-thread state.
     private final float[] m9 = new float[9];
-    private final float[] rot9 = new float[9];
-    private final float[] out = new float[16];
-    private final float[] smooth = new float[16];
-    private boolean haveSmooth;
+
+    // Per-caller scratch, ping-ponged in view() so the GL and UI threads never write the
+    // same matrix in the same frame.
+    private final float[] m9a = new float[9];
+    private final float[] m9b = new float[9];
+    private final float[] rot9a = new float[9];
+    private final float[] rot9b = new float[9];
+    private final float[] outA = new float[16];
+    private final float[] outB = new float[16];
+    private final float[] smoothA = new float[16];
+    private final float[] smoothB = new float[16];
+    private volatile boolean matrixFlip;
+    /** Set by the sensor callback once fresh rotation is available; each caller latches it. */
+    private volatile boolean haveSmooth;
+    private volatile boolean haveSmoothA;
+    private volatile boolean haveSmoothB;
     private final float[] tmp = new float[3];
 
     public Tracker(Context ctx) {
@@ -275,6 +288,15 @@ public final class Tracker implements SensorEventListener {
                 }
             }
         }
+        // Two frames are in flight at once: the GL thread and the UI thread each ask for
+        // a matrix every frame. If they share one back buffer, gaze and rendering read
+        // half-written matrices and the world jitters. Rotation state is published by the
+        // sensor callback, so the scratch work here happens under the lock.
+        boolean flip = (matrixFlip = !matrixFlip);
+        float[] m9 = flip ? m9a : m9b;
+        float[] rot9 = flip ? rot9a : rot9b;
+        float[] out = flip ? outA : outB;
+        float[] smooth = flip ? smoothA : smoothB;
         quatToMat3(useVec ? qVec : q, m9);
         float[] r = rotationFix(displayRotation);
         // m9 = R_display * M
@@ -308,9 +330,16 @@ public final class Tracker implements SensorEventListener {
         out[14] = 0f;
         out[15] = 1f;
 
-        if (!haveSmooth) {
+        // Each scratch pair initialises independently: the two callers start at different
+        // times, and a shared flag would make one of them snap to a stale identity.
+        boolean seeded = flip ? haveSmoothA : haveSmoothB;
+        if (!seeded) {
             System.arraycopy(out, 0, smooth, 0, 16);
-            haveSmooth = true;
+            if (flip) {
+                haveSmoothA = true;
+            } else {
+                haveSmoothB = true;
+            }
             return smooth;
         }
         float k;

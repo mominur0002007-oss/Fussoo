@@ -42,6 +42,23 @@ public final class YtDownloader extends Downloader {
         return client;
     }
 
+    /**
+     * NewPipeExtractor 0.28 turned {@link Downloader} into an interface and made execution
+     * asynchronous. 0.27 (pinned here) never calls this, so the override is harmless; it
+     * only exists so the source still builds if the dependency is bumped without touching
+     * Java. If the library is ever moved to 0.28 the call below is all that remains.
+     */
+    public java.util.concurrent.CompletableFuture<Response> submitAsync(Request request) {
+        java.util.concurrent.CompletableFuture<Response> future =
+                new java.util.concurrent.CompletableFuture<>();
+        try {
+            future.complete(execute(request));
+        } catch (Throwable t) {
+            future.completeExceptionally(t);
+        }
+        return future;
+    }
+
     @Override
     public Response execute(Request request) throws IOException, ReCaptchaException {
         String url = request.url();
