@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.fussoo.vr'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.fussoo.vr"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+
+        // 32-bit ARM is the main ABI on the TECNO Spark 10C (Unisoc T606).
+        // A pure-Java app ships no native libs, so every ABI can run it.
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ''
+            versionNameSuffix '-dev'
+        }
+        release {
+            minifyEnabled false
+            // Signed with the debug keystore that the GitHub runner generates,
+            // so `adb install` / sideload work without any secret in the repo.
+            signingConfig signingConfigs.debug
+            // Keep class names: NewPipeExtractor and the GL renderer use reflection-free
+            // code today, but stable names make crash reports readable.
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    packaging {
+        resources {
+            excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE*', 'META-INF/NOTICE*',
+                         'META-INF/*.kotlin_module']
+        }
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    // `gradle :app:assembleRelease` must not depend on the lint step on CI.
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.compilerArgs << '-Xlint:-options'
+    }
+}
+
+dependencies {
+    implementation 'androidx.media3:media3-exoplayer:1.4.1'
+    implementation 'androidx.media3:media3-ui:1.4.1'
+    implementation 'androidx.media3:media3-datasource-okhttp:1.4.1'
+
+    // YouTube extraction (GPLv3). Browser-like UA + OkHttp keeps requests close to
+    // what the mobile web client sends, which is the most reliable path right now.
+    implementation 'com.github.TeamNewPipe:NewPipeExtractor:v0.27.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+}

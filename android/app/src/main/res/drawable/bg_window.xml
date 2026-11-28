@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Deep-space backdrop: soft warm glow at the top centre, cool pool at the bottom. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#0A0C12"
+                android:centerColor="#05060A"
+                android:endColor="#020305"
+                android:type="linear" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="420dp"
+                android:centerX="0.5"
+                android:centerY="0.42"
+                android:startColor="#22FF3B30"
+                android:endColor="#0005060A" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="360dp"
+                android:centerX="0.5"
+                android:centerY="0.95"
+                android:startColor="#248FB7FF"
+                android:endColor="#0005060A" />
+        </shape>
+    </item>
+</layer-list>

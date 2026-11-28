@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ink">#05060A</color>
+    <color name="ink_elevated">#0C0E15</color>
+    <color name="glass">#14FFFFFF</color>
+    <color name="text_primary">#F5F7FA</color>
+    <color name="text_secondary">#9AA3B2</color>
+    <color name="accent">#FF3B30</color>
+    <color name="accent_deep">#C1121F</color>
+</resources>

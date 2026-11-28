@@ -1,0 +1,74 @@
+name: Fussoo VR APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'android/**'
+      - '.github/workflows/fussoo-vr-apk.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install SDK bits
+        run: sdkmanager --licenses >/dev/null 2>&1 || true
+          && sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools" >/dev/null
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Assemble
+        run: |
+          set -o pipefail
+          gradle --no-daemon --project-dir android --console=plain \
+            :app:assembleDebug :app:assembleRelease 2>&1 | tee build.log
+
+      - name: Collect APKs
+        if: success()
+        run: |
+          mkdir -p dist
+          V=$(grep -m1 'versionName' android/app/build.gradle | sed "s/.*\"\(.*\)\".*/\1/")
+          cp android/app/build/outputs/apk/debug/app-debug.apk \
+             "dist/FussooVR-$V-debug.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk \
+             "dist/FussooVR-$V-release.apk"
+          (cd dist && sha256sum *.apk > SHA256SUMS.txt && ls -lh)
+
+      - name: Upload
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FussooVR-apk
+          path: dist/**
+          retention-days: 30
+
+      - name: Publish build log on failure
+        if: failure()
+        run: |
+          mkdir -p ci
+          {
+            echo "# build failed"
+            grep -nE "error:|FAILED|What went wrong|Could not|Caused by" build.log | head -200
+            echo
+            tail -200 build.log
+          } > ci/build-log.txt
+          git config user.name "ci"
+          git config user.email "ci@fussoo.invalid"
+          git add ci/build-log.txt
+          git commit -m "ci: build log [skip ci]" || true
+          git push || true
