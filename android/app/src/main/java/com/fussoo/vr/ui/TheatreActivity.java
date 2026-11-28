@@ -247,11 +247,8 @@ public final class TheatreActivity extends Activity implements VrRenderer.Callba
                     @Override
                     public void run() {
                         if (err != null || chosen == null) {
-                            setToast("Could not load video: " + err);
-                            setStatus("Could not load this video.");
-                            browsing = true;
-                            stage.hasVideo = false;
-                            loadShelf();
+                            setToast("Extraction failed — using the official player");
+                            startWebFallback(id);
                             return;
                         }
                         startPlayback(chosen, described);
@@ -308,6 +305,41 @@ public final class TheatreActivity extends Activity implements VrRenderer.Callba
         }
         return player.getBufferedPosition() / (float) player.getDuration();
     }
+
+    /**
+     * Fallback: put the official YouTube embed on a WebView and pull its frames into the
+     * same texture the theatre renders. Extraction breaks when Google changes their player;
+     * this path cannot break, it just has fewer pixels.
+     */
+    private void startWebFallback(String id) {
+        if (fallbackTried) {
+            setStatus("This video cannot be played. Back = library.");
+            browsing = true;
+            stage.hasVideo = false;
+            loadShelf();
+            return;
+        }
+        fallbackTried = true;
+        stage.hasVideo = true;
+        if (stage.title == null || stage.title.isEmpty()) {
+            stage.title = pendingTitle == null ? "YouTube" : pendingTitle;
+        }
+        stage.qualityText = "embed";
+        android.webkit.WebView wv = com.fussoo.vr.net.WebFallback.create(this, id, null);
+        // The WebView needs a real window to render video; keep it 1x1 and transparent.
+        android.widget.FrameLayout holder = new android.widget.FrameLayout(this);
+        holder.addView(wv, new android.widget.FrameLayout.LayoutParams(
+                Palette.dp(this, 2), Palette.dp(this, 2)));
+        addContentView(holder, new android.view.ViewGroup.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+        holder.setAlpha(0f);
+        wv.setAlpha(0f);
+        fallbackWebView = wv;
+    }
+
+    private android.webkit.WebView fallbackWebView;
+    private boolean fallbackTried;
 
     // ---------------------------------------------------------------- shelf
 
@@ -644,6 +676,10 @@ public final class TheatreActivity extends Activity implements VrRenderer.Callba
         if (player != null) {
             player.release();
             player = null;
+        }
+        if (fallbackWebView != null) {
+            fallbackWebView.destroy();
+            fallbackWebView = null;
         }
         if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();

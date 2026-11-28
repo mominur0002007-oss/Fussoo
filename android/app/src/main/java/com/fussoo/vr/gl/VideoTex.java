@@ -60,6 +60,19 @@ public final class VideoTex implements SurfaceTexture.OnFrameAvailableListener {
         }
     }
 
+    /** Points the texture at an arbitrary producer surface (e.g. a WebView fallback). */
+    public void bind(Surface s) {
+        if (st == null) {
+            return;
+        }
+        // SurfaceTexture only supports one producer; releasing the old Surface is enough
+        // for ExoPlayer to stop writing, and the WebView then becomes the producer.
+        if (surface != null) {
+            surface.release();
+        }
+        surface = s;
+    }
+
     public void size(int w, int h) {
         if (st != null && w > 0 && h > 0) {
             st.setDefaultBufferSize(w, h);
