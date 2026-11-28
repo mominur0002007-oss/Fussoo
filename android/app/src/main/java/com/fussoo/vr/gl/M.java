@@ -42,14 +42,11 @@ public final class M {
         return t;
     }
 
-    /** Off-axis frustum; shiftX/shiftY are the eye offset in metres at distance {@code at}. */
-    public static float[] frustum(float l, float r, float b, float t, float n, float f,
-                                  float shiftX, float shiftY, float at) {
+    /** Symmetric perspective; the eye offset is applied to the view matrix instead. */
+    public static float[] frustum(float halfW, float halfH, float n, float f) {
         float[] m = new float[16];
-        m[0] = 2f * n / (r - l);
-        m[5] = 2f * n / (t - b);
-        m[8] = (r + l) / (r - l) - 2f * shiftX / at;
-        m[9] = (t + b) / (t - b) - 2f * shiftY / at;
+        m[0] = n / halfW;
+        m[5] = n / halfH;
         m[10] = -(f + n) / (f - n);
         m[11] = -1f;
         m[14] = -(2f * f * n) / (f - n);

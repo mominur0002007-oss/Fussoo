@@ -52,9 +52,9 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
     private int surfaceH = 720;
 
     private float[] view = new float[16];
-    private float[] projL = new float[16];
-    private float[] projR = new float[16];
+    private float[] proj = new float[16];
     private float[] mvp = new float[16];
+    private final Stage snap = new Stage();
 
     private long lastFrameNs;
     private int frames;
@@ -217,19 +217,21 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
             dt = 0.016f;
         }
 
-        Stage s = stage;
-        synchronized (s) {
-            s.dt = dt;
-            s.clock += dt;
+        synchronized (stage) {
+            stage.dt = dt;
+            stage.clock += dt;
         }
+        Stage s = snap;
 
         boolean newVideo = video.update();
         if (newVideo) {
             lastVideoMs = System.currentTimeMillis();
         }
 
-        view = M.invRot(tracker.view(dt));
-        buildProjections(s);
+        synchronized (stage) {
+            snap.copyFrom(stage);
+        }
+        buildProjection(snap);
 
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo);
         GLES20.glViewport(0, 0, fboW, fboH);
@@ -262,31 +264,33 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
         }
     }
 
-    private void buildProjections(Stage s) {
+    /**
+     * One shared symmetric frustum. Each eye gets its own view matrix with a small
+     * horizontal translation, which is both physically right and impossible to get the
+     * handedness wrong on.
+     */
+    private void buildProjection(Stage s) {
         float near = 0.05f;
         float far = 120f;
         double halfV = Math.toRadians(s.fov * 0.5);
         float vt = (float) Math.tan(halfV);
         float aspect = (fboW * 0.5f) / (float) fboH;
-        float ht = vt * aspect;
-        float ipd = s.lensSeparation * 0.5f;
-        // Eye positions are shifted, not the frustum centre, so both eyes see the same
-        // world with the right parallax.
-        projL = M.frustum(-ht, ht, -vt, vt, near, far, ipd, 0f, 1f);
-        projR = M.frustum(-ht, ht, -vt, vt, near, far, -ipd, 0f, 1f);
+        proj = M.frustum(vt * aspect, vt, near, far);
     }
 
     private void drawEye(Stage s, int eye) {
         int half = fboW / 2;
         GLES20.glViewport(eye < 0 ? 0 : half, 0, half, fboH);
         GLES20.glClear(GL10.GL_DEPTH_BUFFER_BIT);
-        float[] proj = eye < 0 ? projL : projR;
-        drawShell(s, proj);
-        drawScreen(s, proj);
-        drawHud(s, proj);
+        // Left eye sits half an interpupillary distance to the left of the head origin.
+        float eyeX = eye * (s.lensSeparation * 0.5f) * -1f;
+        view = M.mul(M.invRot(tracker.view(s.dt)), M.t(eyeX, 0f, 0f));
+        drawShell(s);
+        drawScreen(s);
+        drawHud(s);
     }
 
-    private void drawShell(Stage s, float[] proj) {
+    private void drawShell(Stage s) {
         Env e = Env.of(s.env);
         mvp = M.mul(proj, view);
         GLES20.glUseProgram(pShell);
@@ -308,7 +312,7 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
         GLES20.glDisableVertexAttribArray(a);
     }
 
-    private void drawScreen(Stage s, float[] proj) {
+    private void drawScreen(Stage s) {
         // Screen sits at the configured distance and eye height.
         float[] model = M.t(s.screenCenterY - 1.6f, -(0f), 0f);
         model[13] = s.screenCenterY - 1.6f;
@@ -327,9 +331,7 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
         GLES20.glUniform1f(uScrHas, s.hasVideo && video.hasFrame() ? 1f : 0f);
         GLES20.glUniform1i(uScrTexId, 0);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        if (s.hasVideo) {
-            GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, video.texture());
-        }
+        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, video.texture());
         int a = GLES20.glGetAttribLocation(pScreen, "aPos");
         GLES20.glEnableVertexAttribArray(a);
         quadVerts.position(0);
@@ -338,7 +340,7 @@ public final class VrRenderer implements GLSurfaceView.Renderer {
         GLES20.glDisableVertexAttribArray(a);
     }
 
-    private void drawHud(Stage s, float[] proj) {
+    private void drawHud(Stage s) {
         float[] model = M.id();
         model[13] = s.screenCenterY - 1.6f;
         model[14] = -(s.screenDistance - 0.06f);

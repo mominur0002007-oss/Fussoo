@@ -404,7 +404,9 @@ public final class TheatreActivity extends Activity implements VrRenderer.Callba
             updateDwell(hit);
         }
         stage.hudAlpha = 1f;
-        renderer.push(stage);
+        if (renderer != null) {
+            renderer.push(stage);
+        }
     }
 
     private void updateDwell(int target) {
@@ -432,22 +434,22 @@ public final class TheatreActivity extends Activity implements VrRenderer.Callba
     }
 
     private float[] gazePoint() {
-        // The gaze point is derived from head direction projected onto the screen plane.
-        // The renderer owns the head rotation; the activity only needs the screen-space
-        // intersection, which the tracker gives us in view space.
+        // Rotate the camera's forward vector (0,0,-1) by the head rotation, then intersect
+        // that ray with the virtual screen plane. This mirrors exactly what the renderer
+        // does, so the dot under the crosshair is the dot the user sees.
         float[] m = tracker.view(0f);
-        // Forward vector is -Z in view space; project it onto the screen at distance d.
         float fx = -m[8];
         float fy = -m[9];
         float fz = -m[10];
-        if (fz > -0.05f) {
-            // Pointing away from the screen: park the cursor off-screen.
-            return new float[]{9999f, 9999f};
+        if (fz > -0.08f) {
+            return new float[]{9999f, 9999f};   // looking away from the screen
         }
-        float d = stage.screenDistance;
-        float t = d / -fz;
+        float dist = stage.screenDistance;
+        float t = dist / -fz;
         float x = fx * t;
-        float y = fy * t + (1.6f - stage.screenCenterY);
+        // Screen centre sits (screenCenterY - eyeHeight) above the eye. Eye height is
+        // assumed at 1.6 m, matching the renderer's model translation.
+        float y = fy * t + (stage.screenCenterY - 1.6f);
         return new float[]{x, y};
     }
 

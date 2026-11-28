@@ -56,6 +56,20 @@ jobs:
           path: dist/**
           retention-days: 30
 
+      - name: Commit APK to branch (hand-off for mobile download)
+        if: success()
+        run: |
+          mkdir -p release
+          cp dist/*.apk release/
+          cp dist/SHA256SUMS.txt release/ 2>/dev/null || true
+          printf '%s\n' "Fussoo VR · built from ${GITHUB_SHA:0:7} on $(date -u +%Y-%m-%dT%H:%MZ)" > release/README.txt
+          git config user.name "ci"
+          git config user.email "ci@fussoo.invalid"
+          git add -f release
+          git commit -m "ci: attach APK for hand-off [skip ci]" || true
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" || true
+
       - name: Publish build log on failure
         if: failure()
         run: |
